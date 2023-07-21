@@ -12,6 +12,6 @@ namespace io {
 
       /** Default destructor */
       ~Options() = default;
-  }
+  };
 
 } // namespace io
