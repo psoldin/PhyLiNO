@@ -2,6 +2,8 @@
 
 namespace io {
 
+  // TODO Documentation
+
   class InputOptions {
     public:
       /** Constructor that gets the command line arguments
