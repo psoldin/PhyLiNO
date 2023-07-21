@@ -1,8 +1,8 @@
 #pragma once
 
 // STL includes
-#include <type_traits>
 #include <cmath>
+#include <type_traits>
 
 // TODO Documentation
 
@@ -25,4 +25,4 @@ namespace utilities {
     return fuzzyIsNull(a - b);
   }
 
-} // namespace utilities
+}  // namespace utilities
