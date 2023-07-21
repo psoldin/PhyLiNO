@@ -1,0 +1,10 @@
+bin/
+lib/
+build/
+result/
+.idea/
+xcode/
+.DS_Store
+cmake-build-debug/
+cmake-build-default/
+compile_commands.json
