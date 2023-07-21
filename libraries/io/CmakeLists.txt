@@ -1,0 +1,15 @@
+set(files
+        InputOptions.h
+        Options.h
+)
+
+add_library(io SHARED ${files})
+
+target_include_directories(io PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(io PUBLIC utilities)
+target_include_directories(io PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(io PRIVATE ${ROOT_INCLUDE_DIR})
+
+target_link_libraries(io PUBLIC utilities ${Boost_LIBRARIES} ROOT::Core ROOT::Tree ROOT::TreePlayer)
+
+set_target_properties(io PROPERTIES LINKER_LANGUAGE CXX)
