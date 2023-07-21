@@ -20,7 +20,7 @@ namespace utilities {
     }
   }
 
-  template <is_float_double> T>
+  template <is_float_double T>
   [[nodiscard]] __attribute__((always_inline)) inline bool fuzzyCompare(T&& a, T&& b) noexcept {
     return fuzzyIsNull(a - b);
   }
