@@ -5,6 +5,7 @@ set(files
         Options.cpp
         InputPaths.cpp
         InputPaths.h
+        TreeEntry.h
 )
 
 add_library(io SHARED ${files})
