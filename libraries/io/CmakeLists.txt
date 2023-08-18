@@ -1,6 +1,10 @@
 set(files
         InputOptions.h
+        InputOptions.cpp
         Options.h
+        Options.cpp
+        InputPaths.cpp
+        InputPaths.h
 )
 
 add_library(io SHARED ${files})
