@@ -20,6 +20,8 @@ namespace io {
 
    private:
     int m_Seed;
+
+    bool m_Silent;
   };
 
 }  // namespace io
