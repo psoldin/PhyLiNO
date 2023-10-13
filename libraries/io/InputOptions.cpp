@@ -1,5 +1,3 @@
-#pragma once
-
 #include "InputOptions.h"
 
 // STL includes
