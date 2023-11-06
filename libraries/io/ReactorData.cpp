@@ -228,6 +228,13 @@ namespace io {
     }
   }
 
+  /**
+   * @brief Constructor for ReactorData class.
+   * 
+   * @param entries A span of TreeEntry objects.
+   * @param type The type of detector.
+   * @throws std::invalid_argument if the type is not one of the three base types FDI, FDII or ND.
+   */
   ReactorData::ReactorData(std::span<TreeEntry> entries, params::dc::DetectorType type)
     : m_DetectorType(type)
     , m_Evis(entries.size())
@@ -242,14 +249,15 @@ namespace io {
     if (!params::dc::is_base_type(un_split_type))
       throw std::invalid_argument("The type is not one of the three base types FDI, FDII or ND");
 
+    using namespace params::dc;
     switch (un_split_type) {
-      case params::dc::ND:
+      case ND:
         convert_function = &nd_scaling_factor;
         break;
-      case params::dc::FDI:
+      case FDI:
         convert_function = &fd1_scaling_factor;
         break;
-      case params::dc::FDII:
+      case FDII:
         convert_function = &fd2_scaling_factor;
         break;
       default:
