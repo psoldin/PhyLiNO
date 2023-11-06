@@ -6,6 +6,10 @@ set(files
         InputPaths.cpp
         InputPaths.h
         TreeEntry.h
+        Parameter.h
+        DataBase.h
+        ReactorData.h
+        ReactorData.cpp
 )
 
 add_library(io SHARED ${files})
