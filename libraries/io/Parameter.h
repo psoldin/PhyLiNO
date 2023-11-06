@@ -6,8 +6,14 @@
 
 namespace params {
 
+
   namespace dc {
 
+    /**
+     * Enumeration of detector types used in the Double Chooz experiment.
+     * Each detector type is represented as a bit flag, which can be combined
+     * using bitwise OR to represent multiple detector types.
+     */
     enum DetectorType : int {
       FD     = 1 << 0,
       ND     = 1 << 1,
@@ -35,12 +41,26 @@ namespace params {
       return static_cast<bool>((type == ND) + (type == FDII) + (type == FDI));
     }
 
+    /**
+     * @brief Casts a DetectorType to a version without reactor split.
+     * 
+     * This function takes a DetectorType and returns a new DetectorType with the reactor split bit removed.
+     * 
+     * @param type The original DetectorType to cast.
+     * @return The new DetectorType without the reactor split bit.
+     */
     inline constexpr DetectorType cast_to_no_reactor_split(DetectorType type) noexcept {
       using enum DetectorType;
       constexpr unsigned int base_type = FD | ND | V1 | V2;
       return static_cast<DetectorType>(type & base_type);
     }
 
+    /**
+     * Determines if a given detector type is a reactor split detector.
+     * 
+     * @param type The detector type to check.
+     * @return True if the detector type is a reactor split detector, false otherwise.
+     */
     inline constexpr bool is_reactor_split(DetectorType type) noexcept {
       using enum DetectorType;
       constexpr int split_type = B1 | B2;
@@ -57,6 +77,12 @@ namespace params {
       return static_cast<bool>(type & B1);
     }
 
+    /**
+     * Returns true if the given detector type is a B2 split detector.
+     * 
+     * @param type The detector type to check.
+     * @return True if the detector type is a B2 split detector, false otherwise.
+     */
     inline constexpr bool is_B2_split(DetectorType type) noexcept {
       using enum DetectorType;
       return static_cast<bool>(type & B2);
@@ -82,6 +108,12 @@ namespace params {
       return static_cast<bool>(type & ND);
     }
 
+    /**
+     * Returns the name of the detector type as a string.
+     * 
+     * @param type The detector type to get the name of.
+     * @return The name of the detector type as a string.
+     */
     inline std::string get_detector_name(DetectorType type) noexcept {
       std::stringstream ss;
       using enum DetectorType;
@@ -96,6 +128,10 @@ namespace params {
       return ss.str();
     }
 
+    /**
+     * Enumeration of detector types used in the Double Chooz experiment.
+     * Each detector type is represented as an integer value.
+     */
     enum Detector : int {
       BkgRAcc = 0,
       BkgRLi,
@@ -236,6 +272,7 @@ namespace params {
 
   }  // namespace dc
 
+  
   enum class BackgroundType : int {
     accidental,
     lithium,
@@ -243,6 +280,10 @@ namespace params {
     dnc
   };
 
+  /**
+   * Enumeration of general parameters used in the Double Chooz experiment.
+   * Each parameter is represented as an integer value.
+   */
   enum General : int {
     SinSqT13 = 0,
     DeltaM31,
@@ -295,7 +336,7 @@ namespace params {
 
   /** Get the number of parameters in the General namespace */
   inline constexpr int number_of_general_parameters() noexcept {
-    constexpr int num = static_cast<int>(General::_last_of_General_);
+    constexpr int num = static_cast<int>(_last_of_General_);
     return num;
   }
 
