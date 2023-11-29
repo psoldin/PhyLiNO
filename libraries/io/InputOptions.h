@@ -18,10 +18,13 @@ namespace io {
     /** Global random seed for the number generation */
     [[nodiscard]] int seed() const noexcept { return m_Seed; }
 
-   private:
-    int m_Seed;
+    /** Whether to run in silent mode */
+    [[nodiscard]] bool silent() const noexcept { return m_Silent; }
 
-    bool m_Silent;
-  };
+     private:
+      int m_Seed;
 
-}  // namespace io
+      bool m_Silent;
+    };
+  }  // namespace io
+
