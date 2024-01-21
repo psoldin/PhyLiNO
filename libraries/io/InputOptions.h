@@ -1,5 +1,9 @@
 #pragma once
 
+// includes
+#include "InputParameter.h"
+#include "InputPaths.h"
+
 namespace io {
 
   // TODO Documentation
@@ -21,10 +25,18 @@ namespace io {
     /** Whether to run in silent mode */
     [[nodiscard]] bool silent() const noexcept { return m_Silent; }
 
-     private:
-      int m_Seed;
+   private:
+    int m_Seed;
+    bool m_Silent;
+    bool m_UseData;
+    bool mUseSystematicalErrors;
+    bool mUseStatisticalErrors;
+    bool mFakeBump;
+    bool mLikelihoodScan;
 
-      bool m_Silent;
-    };
-  }  // namespace io
+    std::string m_ConfigFile;
 
+    std::unique_ptr<InputParameter> m_InputParameter;
+    std::vector<InputPaths>         m_InputPaths;
+  };
+}  // namespace io
