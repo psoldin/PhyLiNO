@@ -4,9 +4,9 @@
 #include "Parameter.h"
 #include "ReactorData.h"
 
+#include <span>
 #include <string>
 #include <vector>
-#include <span>
 
 namespace io {
 
@@ -24,19 +24,20 @@ namespace io {
     /** Default destructor */
     ~DataBase() = default;
 
-    [[nodiscard]] const io::InputOptions& InputOptions() const noexcept { return m_InputOptions; }
+      /**
+       * Returns a read-only span of measurement data for the specified detector type.
+       * @param type The detector type.
+       * @return A read-only span of measurement data.
+       */
+      [[nodiscard]] std::span<const double> measurement_data(params::dc::DetectorType type) const noexcept {
+        if (params::get_index(type) >= m_MeasurementData.size()) {
+          return {};
+        }
+        return m_MeasurementData[params::get_index(type)];
+      }
 
-    /**
-     * Returns a read-only span of measurement data for the specified detector type.
-     * @param type The detector type.
-     * @return A read-only span of measurement data.
-     */
-    [[nodiscard]] std::span<const double> measurement_data(params::dc::DetectorType type) const noexcept { 
-      return m_MeasurementData[params::get_index(type)];
-    }
-
-   private:
-    const io::InputOptions& m_InputOptions;
+     private:
+      const io::InputOptions& m_InputOptions;
 
     /**
      * @brief A class representing a pair of keys used in the database.
