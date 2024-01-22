@@ -18,10 +18,16 @@ namespace io {
   InputPaths::InputPaths(std::string section, const boost::property_tree::ptree& tree)
     : m_DetectorSection(std::move(section)) {
     // Define enum for less writing
+
+    // Loop through all entries in tree and print key-value pairs
+    // for (const auto& entry : tree) {
+    //   std::cout << "Key: " << entry.first << ", Value: " << entry.second.get_value<std::string>() << std::endl;
+    // }
+
     using enum params::BackgroundType;
     try {
       for (auto background : {accidental, lithium, fastN}) {
-        std::string name = m_DetectorSection + "." + params::get_background_name(background);
+        std::string name = params::get_background_name(background);
         m_BackgroundPath.push_back(tree.get<std::string>(name));
         m_BackgroundTree.push_back(tree.get<std::string>(name + "_tree"));
         m_BackgroundBranch.push_back(tree.get<std::string>(name + "_branch"));
@@ -34,40 +40,24 @@ namespace io {
       }
 
       // Data files
-      m_DataPath       = tree.get<std::string>(m_DetectorSection + ".data");
-      m_OffOffDataPath = tree.get<std::string>(m_DetectorSection + ".data_off");
+      m_DataPath       = tree.get<std::string>("data");
+      m_OffOffDataPath = tree.get<std::string>("data_off");
 
       // Reactor data
-      m_ReactorPath    = tree.get<std::string>(m_DetectorSection + ".reactor");
-      m_ReactorTree    = tree.get<std::string>(m_DetectorSection + ".reactor_tree");
-      m_ReactorCovPath = tree.get<std::string>(m_DetectorSection + ".reactor_cov");
-      m_ReactorCovName = tree.get<std::string>(m_DetectorSection + ".reactor_cov_name");
+      m_ReactorPath          = tree.get<std::string>("reactor");
+      m_ReactorTree          = tree.get<std::string>("reactor_tree");
+      m_ReactorCovPath       = tree.get<std::string>("reactor_cov");
+      m_ReactorCovName       = tree.get<std::string>("reactor_cov_name");
+      m_Reactor_energy       = tree.get<std::string>("reactor_branch_energy");
+      m_Reactor_visualEnergy = tree.get<std::string>("reactor_branch_visualEnergy");
+      m_Reactor_distance     = tree.get<std::string>("reactor_branch_distance");
+      m_Reactor_GDML         = tree.get<std::string>("reactor_branch_GDML");
 
       // Double Neutron Capture data
-      m_DNCPath = tree.get<std::string>(m_DetectorSection + ".dnc");
-      m_DNCName = tree.get<std::string>(m_DetectorSection + ".dnc_name");
+      m_DNCPath = tree.get<std::string>("dnc");
+      m_DNCName = tree.get<std::string>("dnc_name");
     } catch (std::exception& e) {
       std::cout << e.what() << '\n';
     }
   }
-
-  const std::string& InputPaths::covarianceMatrix_name(params::BackgroundType type) const {
-    if (type == params::BackgroundType::dnc)
-      throw std::invalid_argument("No Covariance Matrix is used for the DNC background");
-
-    return m_CovarianceMatrixName[static_cast<int>(type)];
-  }
-
-  const std::string& InputPaths::background_path(params::BackgroundType type) const noexcept {
-    return m_BackgroundPath[static_cast<int>(type)];
-  }
-
-  const std::string& InputPaths::background_tree_name(params::BackgroundType type) const noexcept {
-    return m_BackgroundTree[static_cast<int>(type)];
-  }
-
-  const std::string& InputPaths::background_branch_name(params::BackgroundType type) const noexcept {
-    return m_BackgroundBranch[static_cast<int>(type)];
-  }
-
 }  // namespace io

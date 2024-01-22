@@ -5,8 +5,8 @@
 
 // STL includes
 #include <fstream>
-#include <string>
 #include <iostream>
+#include <string>
 
 // boost includes
 #include <boost/property_tree/ptree.hpp>
@@ -16,13 +16,11 @@ namespace io {
   /**
    * @class InputPaths
    * @brief Class representing input paths for a detector.
-   * 
    * This class stores the paths to various input files and data for a detector.
    * It is used to initialize the paths by reading them from a boost::property_tree.
    */
   class InputPaths {
    public:
-
     /**
      * @brief Constructor for InputPaths class.
      * @param section The section name.
@@ -45,7 +43,9 @@ namespace io {
      * @brief Getter function for data path.
      * @return The data path.
      */
-    [[nodiscard]] const std::string& data_path() const noexcept;
+    [[nodiscard]] const std::string& data_path() const noexcept {
+      return m_DataPath;
+    }
 
     /**
      * @brief Getter function for off-off data path.
@@ -58,12 +58,6 @@ namespace io {
      * @return The reactor neutrino data path.
      */
     [[nodiscard]] const std::string& reactor_neutrino_data_path() const noexcept;
-
-    /**
-     * @brief Getter function for reactor neutrino tree name.
-     * @return The reactor neutrino tree name.
-     */
-    [[nodiscard]] const std::string& reactor_neutrino_tree_name() const noexcept;
 
     /**
      * @brief Getter function for neutrino visual energy branch name.
@@ -124,6 +118,30 @@ namespace io {
      */
     [[nodiscard]] const std::string& background_branch_name(params::BackgroundType type) const noexcept;
 
+    [[nodiscard]] const std::string& reactor_branch_visualEnergy() const noexcept {
+      return m_ReactorVisualEnergyName;
+    }
+
+    [[nodiscard]] const std::string& reactor_branch_trueEnergy() const noexcept {
+      return m_ReactorTrueEnergyName;
+    }
+
+    [[nodiscard]] const std::string& reactor_branch_distance() const noexcept {
+      return m_ReactorDistanceName;
+    }
+
+    [[nodiscard]] const std::string& reactor_branch_GDML() const noexcept {
+      return m_ReactorGDMLName;
+    }
+
+    /**
+     * @brief Getter function for reactor neutrino tree name.
+     * @return The reactor neutrino tree name.
+     */
+    [[nodiscard]] const std::string& reactor_neutrino_tree_name() const noexcept {
+      return m_ReactorTree;
+    }
+
    private:
     std::string m_DetectorSection;
     std::string m_DataPath;
@@ -140,6 +158,10 @@ namespace io {
     std::string m_DNCPath;
     std::string m_DNCName;
     std::string m_AccidentalOffPath;
+    std::string m_Reactor_energy;
+    std::string m_Reactor_visualEnergy;
+    std::string m_Reactor_distance;
+    std::string m_Reactor_GDML;
 
     std::vector<std::string> m_CovarianceMatrixPath;
     std::vector<std::string> m_CovarianceMatrixName;
