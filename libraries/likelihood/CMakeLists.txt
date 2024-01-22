@@ -1,6 +1,10 @@
 set(files
     Fitter.h
     Fitter.cpp
+    ParameterWrapper.h
+    ParameterWrapper.cpp
+    Likelihood.h
+    Likelihood.cpp
 )
 
 add_library(likelihood SHARED ${files})
