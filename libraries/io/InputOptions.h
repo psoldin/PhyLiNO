@@ -46,10 +46,10 @@ namespace io {
     int  m_Seed;
     bool m_Silent;
     bool m_UseData;
-    bool mUseSystematicalErrors;
-    bool mUseStatisticalErrors;
-    bool mFakeBump;
-    bool mLikelihoodScan;
+    bool m_UseSystematicalErrors;
+    bool m_UseStatisticalErrors;
+    bool m_FakeBump;
+    bool m_LikelihoodScan;
 
     std::string m_ConfigFile;
 

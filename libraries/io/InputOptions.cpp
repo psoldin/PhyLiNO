@@ -48,10 +48,10 @@ namespace io {
       ("seed", po::value<int>(&m_Seed)->default_value(current_time), "Set seed for simulation")
       ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
       ("useData", po::bool_switch(&m_UseData), "Use measurement Data")
-      ("addSystematicalErrors,y", po::bool_switch(&mUseSystematicalErrors), "Use Systematic Errors for toy-Spectra creation")
-      ("addStatisticalErrors,t", po::bool_switch(&mUseStatisticalErrors), "Use Statistics Errors for toy-Spectra creation")
-      ("fakeBump,f", po::bool_switch(&mFakeBump), "Add fake bump to fake data")
-      ("llhScan", po::bool_switch(&mLikelihoodScan), "Perform a likelihood scan")
+      ("addSystematicalErrors,y", po::bool_switch(&m_UseSystematicalErrors), "Use Systematic Errors for toy-Spectra creation")
+      ("addStatisticalErrors,t", po::bool_switch(&m_UseStatisticalErrors), "Use Statistics Errors for toy-Spectra creation")
+      ("fakeBump,f", po::bool_switch(&m_FakeBump), "Add fake bump to fake data")
+      ("llhScan", po::bool_switch(&m_LikelihoodScan), "Perform a likelihood scan")
       ;
       /*
       ("seed", po::value<int>(&mSeed)->default_value(current_time), "Set seed for simulation")
