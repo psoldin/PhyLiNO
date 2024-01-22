@@ -230,7 +230,7 @@ namespace io {
 
   /**
    * @brief Constructor for ReactorData class.
-   * 
+   *
    * @param entries A span of TreeEntry objects.
    * @param type The type of detector.
    * @throws std::invalid_argument if the type is not one of the three base types FDI, FDII or ND.
@@ -274,4 +274,4 @@ namespace io {
       m_Distance[i] = entries[i].Distance;
     }
   }
-} // namespace io
+}  // namespace io
