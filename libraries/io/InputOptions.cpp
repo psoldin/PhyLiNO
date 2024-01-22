@@ -11,47 +11,27 @@
 
 namespace io {
 
-  /*
-  InputOptions::InputOptions(int argc, char** argv) {
-    namespace po = boost::program_options;
-    using namespace std::chrono;
-
-    try {
-      const int current_time = std::chrono::system_clock::now().time_since_epoch().count();
-      const int seed = static_cast<int>(system_clock::now().time_since_epoch().count());
-      po::options_description generic_options("Generic Options");
-      generic_options.add_options()
-      ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
-      ("seed", po::value<int>(&m_Seed)->default_value(current_time), "Set seed for simulation")
-      ("help,h", "Print help message")
-      ("config,c", po::value<std::string>(&m_ConfigFile)->default_value("config.json"), "Set config file");
-    } catch (std::exception& e) {
-      std::cout << e.what() << '\n';
-    }
-  }
-  */
-
-
   InputOptions::InputOptions(int argc, char** argv) {
     std::string inputFile;
     try {
       namespace po = boost::program_options;
       namespace pt = boost::property_tree;
 
-      const int current_time = std::chrono::system_clock::now().time_since_epoch().count();
+      const long current_time = std::chrono::system_clock::now().time_since_epoch().count();
 
       po::options_description generic_options("Options");
-      
 
-      generic_options.add_options()("help,h", "Print help message")
+      generic_options.add_options()
+      ("help,h", "Print help message")
       ("config,c", po::value<std::string>(&m_ConfigFile)->default_value("config.json"), "Set Config File")
-      ("seed", po::value<int>(&m_Seed)->default_value(current_time), "Set seed for simulation")
+      ("seed", po::value<long>(&m_Seed)->default_value(current_time), "Set seed for simulation")
       ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
       ("useData", po::bool_switch(&m_UseData), "Use measurement Data")
       ("addSystematicalErrors,y", po::bool_switch(&m_UseSystematicalErrors), "Use Systematic Errors for toy-Spectra creation")
       ("addStatisticalErrors,t", po::bool_switch(&m_UseStatisticalErrors), "Use Statistics Errors for toy-Spectra creation")
       ("fakeBump,f", po::bool_switch(&m_FakeBump), "Add fake bump to fake data")
       ("llhScan", po::bool_switch(&m_LikelihoodScan), "Perform a likelihood scan")
+      ("useSterile", po::bool_switch(&m_UseSterile), "Use Sterile Neutrino Parameters")
       ;
       /*
       ("seed", po::value<int>(&mSeed)->default_value(current_time), "Set seed for simulation")
@@ -59,7 +39,6 @@ namespace io {
       ("silent", po::bool_switch(&mSilent), "Run fit in silence mode")
       ("gpu", po::bool_switch(&mUseGPU), "Use GPU for fitting")
       ("useSterile", po::bool_switch(&mUseSterile), "Use Sterile Parameters")
-      ("useData", po::bool_switch(&mUseData), "Use measurement Data")
       ("multiThreading,m", po::bool_switch(&mMultiThreading), "Use multiple threads for fitting")
       ("addSystematicalErrors,y", po::bool_switch(&mUseSystematicalErrors), "Use Systematic Errors for toy-Spectra")
       ("addStatisticalErrors,t", po::bool_switch(&mUseStatisticalErrors), "Use Statistics Errors for toy-Spectra")
@@ -88,15 +67,28 @@ namespace io {
         throw std::logic_error(ss.str());
       }
 
+      po::notify(vm);
+
       pt::ptree tree;
       pt::read_json(m_ConfigFile, tree);
 
       m_InputParameter = std::make_unique<InputParameter>(tree.get_child("parameters"));
 
+      auto get_detectorType_from_String = [](const std::string& name) {
+        if (name == "ND")
+          return params::dc::DetectorType::ND;
+        else if (name == "FDI")
+          return params::dc::DetectorType::FDI;
+        else if (name == "FDII")
+          return params::dc::DetectorType::FDII;
+        else
+          throw std::invalid_argument("Error: DetectorType " + name + " not known");
+      };
+
       for (const auto& section : tree.get_child("paths")) {
         // This is the name of the section, so ND, FDI and FDII in the first part.
         // The second part are the individual paths in the same format. It is stricly required that they are in the same format.
-        m_InputPaths.emplace_back(section.first, section.second);
+        m_InputPaths.emplace(get_detectorType_from_String(section.first), InputPaths(section.first, section.second));
       }
 
     } catch (std::exception& e) {
