@@ -6,7 +6,6 @@
 
 namespace params {
 
-
   namespace dc {
 
     /**
@@ -43,9 +42,9 @@ namespace params {
 
     /**
      * @brief Casts a DetectorType to a version without reactor split.
-     * 
+     *
      * This function takes a DetectorType and returns a new DetectorType with the reactor split bit removed.
-     * 
+     *
      * @param type The original DetectorType to cast.
      * @return The new DetectorType without the reactor split bit.
      */
@@ -57,7 +56,7 @@ namespace params {
 
     /**
      * Determines if a given detector type is a reactor split detector.
-     * 
+     *
      * @param type The detector type to check.
      * @return True if the detector type is a reactor split detector, false otherwise.
      */
@@ -79,7 +78,7 @@ namespace params {
 
     /**
      * Returns true if the given detector type is a B2 split detector.
-     * 
+     *
      * @param type The detector type to check.
      * @return True if the detector type is a B2 split detector, false otherwise.
      */
@@ -110,7 +109,7 @@ namespace params {
 
     /**
      * Returns the name of the detector type as a string.
-     * 
+     *
      * @param type The detector type to get the name of.
      * @return The name of the detector type as a string.
      */
@@ -272,13 +271,40 @@ namespace params {
 
   }  // namespace dc
 
-  
+  /**
+   * @brief Enumeration of background types used in the Double Chooz experiment.
+   *
+   * This enum class represents the different types of backgrounds that can be encountered in the Double Chooz experiment.
+   * The background types include accidental, lithium, fast neutron, and delayed neutron capture.
+   */
   enum class BackgroundType : int {
-    accidental,
-    lithium,
-    fastN,
-    dnc
+    accidental, /**< Accidental background */
+    lithium,    /**< Lithium background */
+    fastN,      /**< Fast neutron background */
+    dnc         /**< Delayed neutron capture background */
   };
+
+  /**
+   * Returns the name of the background type as a string.
+   *
+   * @param type The background type.
+   * @return The name of the background type as a string.
+   * @throws std::invalid_argument if the background type is invalid.
+   */
+  inline std::string get_background_name(BackgroundType type) {
+    switch (type) {
+      case BackgroundType::accidental:
+        return "accidental";
+      case BackgroundType::lithium:
+        return "lithium";
+      case BackgroundType::fastN:
+        return "fnsm";
+      case BackgroundType::dnc:
+        return "dnc";
+      default:
+        throw std::invalid_argument("Invalid background type");
+    }
+  }
 
   /**
    * Enumeration of general parameters used in the Double Chooz experiment.
