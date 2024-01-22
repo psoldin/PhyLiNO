@@ -8,25 +8,42 @@ namespace io {
 
   // TODO Documentation
 
+  /**
+   * @brief Class representing input options for the program.
+   * 
+   * This class provides methods to access and manipulate the input options
+   * for the program. It stores information such as the command line arguments,
+   * random seed, silent mode flag, and other related options.
+   */
   class InputOptions {
    public:
-    /** Constructor that gets the command line arguments
-     * @param argc
-     * @param argv
+    /**
+     * @brief Constructor that initializes the input options.
+     * 
+     * @param argc The number of command line arguments.
+     * @param argv The array of command line arguments.
      */
     InputOptions(int argc, char** argv);
 
     /** Default destructor */
     ~InputOptions() = default;
 
-    /** Global random seed for the number generation */
+    /**
+     * @brief Get the global random seed.
+     * 
+     * @return The global random seed for number generation.
+     */
     [[nodiscard]] int seed() const noexcept { return m_Seed; }
 
-    /** Whether to run in silent mode */
+    /**
+     * @brief Check if the program should run in silent mode.
+     * 
+     * @return True if the program should run in silent mode, false otherwise.
+     */
     [[nodiscard]] bool silent() const noexcept { return m_Silent; }
 
    private:
-    int m_Seed;
+    int  m_Seed;
     bool m_Silent;
     bool m_UseData;
     bool mUseSystematicalErrors;
