@@ -8,8 +8,7 @@ namespace io {
   /**
    * Main class for the options that are handled in the Likelihood fit.
    * Here the command line arguments as well as the measurement data are accessible.
-   * 
-  */
+   */
   class Options {
    public:
     /**
@@ -45,11 +44,9 @@ namespace io {
      */
     [[nodiscard]] const DataBase& dataBase() const noexcept { return m_DataBase; }
 
-  private:
+   private:
     InputOptions m_InputOptions;
     DataBase     m_DataBase;
   };
-
-  
 
 }  // namespace io
