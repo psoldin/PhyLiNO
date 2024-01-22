@@ -4,88 +4,90 @@
 #include "Parameter.h"
 
 // STL includes
+#include <fstream>
 #include <string>
+#include <iostream>
 
 // boost includes
-#include <boost/program_options/options_description.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace io {
 
   /**
-   * @brief Class for handling input paths for the PhyLiNO library.
+   * @class InputPaths
+   * @brief Class representing input paths for a detector.
    * 
-   * This class provides methods for accessing various input paths required by the PhyLiNO library.
-   * These include paths for detector data, reactor neutrino data, covariance matrices, and background data.
-   * 
-   * @note This class is not copyable or movable.
-   */
-  /**
-   * @brief Class for managing input paths for the detector data and background simulations.
+   * This class stores the paths to various input files and data for a detector.
+   * It is used to initialize the paths by reading them from a boost::property_tree.
    */
   class InputPaths {
    public:
+
     /**
      * @brief Constructor for InputPaths class.
-     * @param section The detector section name.
+     * @param section The section name.
+     * @param tree The boost::property_tree object.
      */
-    InputPaths(std::string&& section)
-      : m_DetectorSection(std::move(section)) {}
+    InputPaths(std::string section, const boost::property_tree::ptree& tree);
 
+    /**
+     * @brief Destructor for InputPaths class.
+     */
     ~InputPaths() = default;
 
     /**
      * @brief Getter function for detector section name.
      * @return The detector section name.
      */
-    [[nodiscard]] const std::string& detector_section() const noexcept { return m_DetectorSection; }
+    [[nodiscard]] const std::string& detector_section() const noexcept;
 
     /**
      * @brief Getter function for data path.
      * @return The data path.
      */
-    [[nodiscard]] const std::string& data_path() const noexcept { return m_DataPath; }
+    [[nodiscard]] const std::string& data_path() const noexcept;
 
     /**
      * @brief Getter function for off-off data path.
      * @return The off-off data path.
      */
-    [[nodiscard]] const std::string& data_offoff_path() const noexcept { return m_OffOffDataPath; }
+    [[nodiscard]] const std::string& data_offoff_path() const noexcept;
 
     /**
      * @brief Getter function for reactor neutrino data path.
      * @return The reactor neutrino data path.
      */
-    [[nodiscard]] const std::string& reactor_neutrino_data_path() const noexcept { return m_ReactorPath; }
+    [[nodiscard]] const std::string& reactor_neutrino_data_path() const noexcept;
 
     /**
      * @brief Getter function for reactor neutrino tree name.
      * @return The reactor neutrino tree name.
      */
-    [[nodiscard]] const std::string& reactor_neutrino_tree_name() const noexcept { return m_ReactorTree; }
+    [[nodiscard]] const std::string& reactor_neutrino_tree_name() const noexcept;
 
     /**
      * @brief Getter function for neutrino visual energy branch name.
      * @return The neutrino visual energy branch name.
      */
-    [[nodiscard]] const std::string& neutrino_visual_energy_branch() const noexcept { return m_ReactorVisualEnergyName; }
+    [[nodiscard]] const std::string& neutrino_visual_energy_branch() const noexcept;
 
     /**
      * @brief Getter function for neutrino true energy branch name.
      * @return The neutrino true energy branch name.
      */
-    [[nodiscard]] const std::string& neutrino_true_energy_branch() const noexcept { return m_ReactorTrueEnergyName; }
+    [[nodiscard]] const std::string& neutrino_true_energy_branch() const noexcept;
 
     /**
      * @brief Getter function for neutrino distance branch name.
      * @return The neutrino distance branch name.
      */
-    [[nodiscard]] const std::string& neutrino_distance_branch() const noexcept { return m_ReactorDistanceName; }
+    [[nodiscard]] const std::string& neutrino_distance_branch() const noexcept;
 
     /**
      * @brief Getter function for neutrino GDML branch name.
      * @return The neutrino GDML branch name.
      */
-    [[nodiscard]] const std::string& neutrino_GDML_branch() const noexcept { return m_ReactorGDMLName; }
+    [[nodiscard]] const std::string& neutrino_GDML_branch() const noexcept;
 
     /**
      * @brief Getter function for covariance matrix path.
@@ -122,12 +124,6 @@ namespace io {
      */
     [[nodiscard]] const std::string& background_branch_name(params::BackgroundType type) const noexcept;
 
-    /**
-     * @brief Function for setting up input paths.
-     * @param description The program options description.
-     */
-    void setup_inputPaths(boost::program_options::options_description& description);
-
    private:
     std::string m_DetectorSection;
     std::string m_DataPath;
@@ -140,7 +136,9 @@ namespace io {
     std::string m_ReactorDistanceName;
     std::string m_ReactorGDMLName;
     std::string m_ReactorCovPath;
+    std::string m_ReactorCovName;
     std::string m_DNCPath;
+    std::string m_DNCName;
     std::string m_AccidentalOffPath;
 
     std::vector<std::string> m_CovarianceMatrixPath;
