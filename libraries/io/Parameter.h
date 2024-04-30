@@ -418,6 +418,12 @@ namespace params {
     return static_cast<int>(idx);
   }
 
+  // TODO: Documentation missing
+  inline int index(params::dc::DetectorType d, General idx) {
+    throw std::invalid_argument("Invalid Index, General parameters are not associated with a detector type.")
+    return -1;
+  }
+
   /**
    * Get the index of the detector parameters. Since the index for these parameters are offset after the general
    * parameters, the index is calculated on the fly. This itself is a convenience function and calls the index function
