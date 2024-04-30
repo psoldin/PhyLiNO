@@ -36,6 +36,16 @@ namespace io {
         return m_MeasurementData[params::get_index(type)];
       }
 
+      /**
+       * @brief Accessor function to retrieve the reactor data for a specific detector type.
+       *
+       * @param type The detector type for which to retrieve the reactor data.
+       * @return A reference to the reactor data for the specified detector type.
+       */
+      [[nodiscard]] const ReactorData& reactor_data(params::dc::DetectorType type) const noexcept {
+        return m_ReactorData[params::get_index(type)];
+      }
+
      private:
       const io::InputOptions& m_InputOptions;
 
