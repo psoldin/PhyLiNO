@@ -8,3 +8,5 @@ xcode/
 cmake-build-debug/
 cmake-build-default/
 compile_commands.json
+.cache/
+.vscode/
