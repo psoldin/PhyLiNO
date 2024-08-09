@@ -7,7 +7,7 @@ set(files
     Likelihood.cpp
     Oscillator.cpp
     Oscillator.h
-    DoubleChooz/BackgroundBase.h
+        BackgroundBase.h
 )
 
 add_library(likelihood SHARED ${files})
