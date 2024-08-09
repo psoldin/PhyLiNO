@@ -9,7 +9,7 @@ namespace ana {
   class AnalysisParameter {
    public:
     AnalysisParameter(const double* __restrict__ input_parameter) noexcept
-      : m_InputParameter{input_parameter, params::dc::number_of_parameters()} {
+      : m_InputParameter{input_parameter, params::number_of_parameters()} {
     }
 
     ~AnalysisParameter() = default;
