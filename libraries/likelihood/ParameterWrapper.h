@@ -53,56 +53,56 @@ namespace ana {
      *
      * @return An iterator to the beginning of the unified parameters.
      */
-    inline auto begin() const noexcept { return m_UnifiedParameters.begin(); }
+    [[nodiscard]] inline auto begin() const noexcept { return m_UnifiedParameters.begin(); }
 
     /**
      * @brief Returns an iterator to the end of the unified parameters.
      *
      * @return An iterator to the end of the unified parameters.
      */
-    inline auto end() const noexcept { return m_UnifiedParameters.end(); }
+    [[nodiscard]] inline auto end() const noexcept { return m_UnifiedParameters.end(); }
 
     /**
      * @brief Returns a reverse iterator to the beginning of the unified parameters.
      *
      * @return A reverse iterator to the beginning of the unified parameters.
      */
-    inline auto rbegin() const noexcept { return m_UnifiedParameters.rbegin(); }
+    [[nodiscard]] inline auto rbegin() const noexcept { return m_UnifiedParameters.rbegin(); }
 
     /**
      * @brief Returns a reverse iterator to the end of the unified parameters.
      *
      * @return A reverse iterator to the end of the unified parameters.
      */
-    inline auto rend() const noexcept { return m_UnifiedParameters.rend(); }
+    [[nodiscard]] inline auto rend() const noexcept { return m_UnifiedParameters.rend(); }
 
     /**
      * @brief Returns a constant iterator to the beginning of the unified parameters.
      *
      * @return A constant iterator to the beginning of the unified parameters.
      */
-    inline auto cbegin() const noexcept { return m_UnifiedParameters.cbegin(); }
+    [[nodiscard]] inline auto cbegin() const noexcept { return m_UnifiedParameters.cbegin(); }
 
     /**
      * @brief Returns a constant iterator to the end of the unified parameters.
      *
      * @return A constant iterator to the end of the unified parameters.
      */
-    inline auto cend() const noexcept { return m_UnifiedParameters.cend(); }
+    [[nodiscard]] inline auto cend() const noexcept { return m_UnifiedParameters.cend(); }
 
     /**
      * @brief Returns a constant reverse iterator to the beginning of the unified parameters.
      *
      * @return A constant reverse iterator to the beginning of the unified parameters.
      */
-    inline auto crbegin() const noexcept { return m_UnifiedParameters.crbegin(); }
+    [[nodiscard]] inline auto crbegin() const noexcept { return m_UnifiedParameters.crbegin(); }
 
     /**
      * @brief Returns a constant reverse iterator to the end of the unified parameters.
      *
      * @return A constant reverse iterator to the end of the unified parameters.
      */
-    inline auto crend() const noexcept { return m_UnifiedParameters.crend(); }
+    [[nodiscard]] inline auto crend() const noexcept { return m_UnifiedParameters.crend(); }
 
    private:
     const double*                                      m_Parameter;          // Pointer to the parameter array
