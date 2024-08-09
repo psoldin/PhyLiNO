@@ -15,19 +15,19 @@ namespace ana {
    * The ParameterWrapper class provides a convenient way to access and manipulate a parameter array.
    * It wraps a raw double pointer and provides various member functions for accessing the parameters.
    */
-  class ParameterWrapper {
+  class DCParameterWrapper {
    public:
     /**
      * @brief Constructs a ParameterWrapper object with a raw double pointer to the parameter array.
      *
      * @param parameter A pointer to the parameter array.
      */
-    explicit ParameterWrapper(const double* parameter);
+    explicit DCParameterWrapper(const double* parameter);
 
     /**
      * @brief Default destructor.
      */
-    ~ParameterWrapper() = default;
+    ~DCParameterWrapper() = default;
 
     /**
      * @brief Resets the parameter to the given values.
