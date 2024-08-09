@@ -2,8 +2,8 @@
 
 namespace ana {
 
-  Oscillator::Oscillator(const io::Options& options)
-    : m_Options(options) {
+  Oscillator::Oscillator(std::shared_ptr<io::Options> options)
+    : m_Options(std::move(options)) {
   }
 
   void Oscillator::recalculate_spectra() {

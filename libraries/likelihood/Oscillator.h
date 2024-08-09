@@ -16,7 +16,7 @@ class Oscillator {
      * 
      * @param options The options for the Oscillator.
      */
-    explicit Oscillator(const io::Options& options);
+    explicit Oscillator(std::shared_ptr<io::Options> options);
 
     /**
      * @brief Destructor for the Oscillator object.
@@ -26,6 +26,6 @@ class Oscillator {
     void recalculate_spectra();
 
  private:
-    const io::Options& m_Options; /**< The options for the Oscillator. */
+    std::shared_ptr<io::Options> m_Options; /**< The options for the Oscillator. */
 };
 }  // namespace ana
