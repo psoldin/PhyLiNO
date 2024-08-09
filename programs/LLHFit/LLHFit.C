@@ -5,11 +5,15 @@
 #include "Fitter.h"
 
 int main(int argc, char** argv) {
-  auto options = std::make_shared<io::Options>(argc, argv);
+  try {
+    auto options = std::make_shared<io::Options>(argc, argv);
 
-  ana::Fitter fit(options);
+    ana::Fitter fit(options);
 
-  std::cout << options->inputOptions().seed() << std::endl;
+    std::cout << options->inputOptions().seed() << std::endl;
 
-  std::cout << "Hello World!" << std::endl;
+    std::cout << "Hello World!" << std::endl;
+  } catch (std::exception& e) {
+    std::cout << e.what() << '\n';
+  }
 }
