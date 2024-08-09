@@ -30,18 +30,6 @@ namespace ana {
     ~ParameterWrapper() = default;
 
     /**
-     * @brief Implicit cast operator to std::array.
-     *
-     * This operator allows the ParameterWrapper object to be implicitly converted to a std::array
-     * of doubles.
-     *
-     * @return A const reference to the std::array of doubles.
-     */
-    operator const std::array<double, params::number_of_parameters()>&() const {
-            return m_UnifiedParameters;
-    }
-
-    /**
      * @brief Returns the value of the parameter with the given index.
      *
      * @param index The index of the parameter.
