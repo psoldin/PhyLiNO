@@ -30,6 +30,13 @@ namespace ana {
     ~ParameterWrapper() = default;
 
     /**
+     * @brief Resets the parameter to the given values.
+     *
+     * @param parameter A pointer to the new value of the parameters.
+     */
+    void reset_parameter(const double* parameter);
+
+    /**
      * @brief Returns the value of the parameter with the given index.
      *
      * @param index The index of the parameter.
