@@ -31,6 +31,7 @@ namespace ana {
     }
 
     double likelihood_function(const AnalysisParameter& parameter) const noexcept {
+      return 0.0;
     }
 
     AnalysisParameter correlate_parameters(const double* __restrict__ parameter) noexcept;
