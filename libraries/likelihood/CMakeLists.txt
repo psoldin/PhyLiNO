@@ -5,6 +5,8 @@ set(files
     DCParameterWrapper.cpp
     Likelihood.h
     Likelihood.cpp
+    Oscillator.cpp
+    Oscillator.h
 )
 
 add_library(likelihood SHARED ${files})
