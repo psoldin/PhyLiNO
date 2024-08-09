@@ -45,7 +45,7 @@ namespace ana {
      * @return A std::span object containing the raw parameters.
      */
     [[nodiscard]] std::span<const double> raw_parameters() const noexcept {
-        return std::span<const double>(m_Parameter, params::number_of_parameters());
+        return {m_Parameter, params::number_of_parameters()};
     }
 
     /**
