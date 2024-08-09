@@ -7,12 +7,12 @@ namespace ana {
 
   class Fitter {
    public:
-    explicit Fitter(io::Options& options);
+    explicit Fitter(std::shared_ptr<io::Options> options);
 
     ~Fitter() = default;
 
    private:
-    const io::Options& m_Options;
+    std::shared_ptr<io::Options> m_Options;
   };
 
 }  // namespace ana
