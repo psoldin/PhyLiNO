@@ -420,7 +420,7 @@ namespace params {
 
   // TODO: Documentation missing
   inline int index(params::dc::DetectorType d, General idx) {
-    throw std::invalid_argument("Invalid Index, General parameters are not associated with a detector type.")
+    throw std::invalid_argument("Invalid Index, General parameters are not associated with a detector type.");
     return -1;
   }
 
