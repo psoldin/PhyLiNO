@@ -8,11 +8,11 @@ namespace ana {
 
   void ParameterWrapper::reset_parameter(const double* parameter) {
     m_RawParameter = parameter;
-    std::copy(m_RawParameter, m_RawParameter + params::number_of_parameters(), m_UnifiedParameters.begin());
-    unify_parameters();
+    unify_parameters(parameter);
   }
 
-  void ParameterWrapper::unify_parameters() {
+  void ParameterWrapper::unify_parameters(const double* parameter) {
+    
   }
 
 }  // namespace ana

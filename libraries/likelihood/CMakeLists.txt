@@ -1,8 +1,8 @@
 set(files
     Fitter.h
     Fitter.cpp
-    ParameterWrapper.h
-    ParameterWrapper.cpp
+    DCParameterWrapper.h
+    DCParameterWrapper.cpp
     Likelihood.h
     Likelihood.cpp
 )

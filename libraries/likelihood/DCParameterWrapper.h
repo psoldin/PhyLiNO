@@ -116,9 +116,13 @@ namespace ana {
     std::array<double, params::number_of_parameters()> m_UnifiedParameters;  // Unified parameters array
 
     /**
-     * @brief Unifies the parameters from the raw double pointer into the unified parameters array.
+     * @brief Unifies the parameters.
+     *
+     * This function unifies the parameters by copying the raw parameters to the unified parameters array.
+     *
+     * @param parameter A pointer to the raw parameters.
      */
-    void unify_parameters();
+    void unify_parameters(const double* parameter);
   };
 
 }  // namespace ana
