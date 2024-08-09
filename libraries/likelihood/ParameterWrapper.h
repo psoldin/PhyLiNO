@@ -45,7 +45,7 @@ namespace ana {
      * @return A std::span object containing the raw parameters.
      */
     [[nodiscard]] std::span<const double> raw_parameters() const noexcept {
-        return {m_Parameter, params::number_of_parameters()};
+        return {m_RawParameter, params::number_of_parameters()};
     }
 
     /**
@@ -105,7 +105,7 @@ namespace ana {
     [[nodiscard]] inline auto crend() const noexcept { return m_UnifiedParameters.crend(); }
 
    private:
-    const double*                                      m_Parameter;          // Pointer to the parameter array
+    const double*                                      m_RawParameter;       // Pointer to the parameter array
     std::array<double, params::number_of_parameters()> m_UnifiedParameters;  // Unified parameters array
 
     /**

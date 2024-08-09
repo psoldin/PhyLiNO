@@ -3,8 +3,8 @@
 namespace ana {
 
   ParameterWrapper::ParameterWrapper(const double* parameter)
-    : m_Parameter(parameter) {
-    std::copy(m_Parameter, m_Parameter + params::number_of_parameters(), m_UnifiedParameters.begin());
+    : m_RawParameter(parameter) {
+    std::copy(m_RawParameter, m_RawParameter + params::number_of_parameters(), m_UnifiedParameters.begin());
     unify_parameters();
   }
 
