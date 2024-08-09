@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Parameter.h>
+#include <span>
 
 namespace ana {
 
