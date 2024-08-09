@@ -12,8 +12,6 @@ set(files
         ReactorData.h
         ReactorData.cpp
         ParameterValue.h
-        StartingParameter.h
-        StartingParameter.cpp
 )
 
 add_library(io SHARED ${files})
