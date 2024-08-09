@@ -1,18 +1,18 @@
-#include "ParameterWrapper.h"
+#include "DCParameterWrapper.h"
 
 namespace ana {
 
-  ParameterWrapper::ParameterWrapper(const double* parameter) {
+  DCParameterWrapper::DCParameterWrapper(const double* parameter) {
       reset_parameter(parameter);
   }
 
-  void ParameterWrapper::reset_parameter(const double* parameter) {
+  void DCParameterWrapper::reset_parameter(const double* parameter) {
     m_RawParameter = parameter;
-    unify_parameters(parameter);
+    std::copy(parameter, parameter + params::number_of_parameters(), m_UnifiedParameters.begin());
+    unify_parameters();
   }
 
-  void ParameterWrapper::unify_parameters(const double* parameter) {
-    
+  void DCParameterWrapper::unify_parameters() {
   }
 
 }  // namespace ana
