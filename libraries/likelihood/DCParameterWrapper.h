@@ -118,11 +118,9 @@ namespace ana {
     /**
      * @brief Unifies the parameters.
      *
-     * This function unifies the parameters by copying the raw parameters to the unified parameters array.
-     *
-     * @param parameter A pointer to the raw parameters.
+     * This function unifies the parameters
      */
-    void unify_parameters(const double* parameter);
+    void unify_parameters();
   };
 
 }  // namespace ana
