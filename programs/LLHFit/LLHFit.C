@@ -2,13 +2,13 @@
 #include <iostream>
 
 #include "Options.h"
-#include "Fitter.h"
+#include "Fit.h"
 
 int main(int argc, char** argv) {
   try {
     auto options = std::make_shared<io::Options>(argc, argv);
 
-    ana::Fitter fit(options);
+    ana::Fit fit(options);
 
     std::cout << options->inputOptions().seed() << std::endl;
 
