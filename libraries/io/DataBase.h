@@ -7,8 +7,20 @@
 #include <span>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <tuple>
+
+#include <Eigen/Core>
 
 namespace io {
+
+  enum class SpectrumType {
+    Reactor,
+    Accidental,
+    FastN,
+    Lithium,
+    DNC
+  };
 
   /**
    *
@@ -42,8 +54,12 @@ namespace io {
        * @param type The detector type for which to retrieve the reactor data.
        * @return A reference to the reactor data for the specified detector type.
        */
-      [[nodiscard]] const ReactorData& reactor_data(params::dc::DetectorType type) const noexcept {
+      [[nodiscard]] const ReactorData& reactor_data(params::dc::DetectorType type) const {
         return m_ReactorData[params::get_index(type)];
+      }
+
+      [[nodiscard]] const Eigen::Matrix<double, 44, 44>& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
+        return m_CovarianceMatrices.at({detectorType, spectrumType});
       }
 
      private:
@@ -87,6 +103,19 @@ namespace io {
 
     std::vector<std::vector<double>> m_SignalData;
     std::vector<std::vector<double>> m_MeasurementData;
+
+    struct KeyHash {
+      template <typename T1, typename T2>
+      std::size_t operator()(const std::tuple<T1, T2>& key) const {
+        auto h1 = std::hash<T1>{}(std::get<0>(key));
+        auto h2 = std::hash<T2>{}(std::get<1>(key));
+        return h1 ^ (h2 << 1);
+      }
+    };
+
+    using tuple_t = std::tuple<params::dc::DetectorType, SpectrumType>;
+    using cov_matrix_t = Eigen::Matrix<double, 44, 44>;
+    std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
   };
 
 }  // namespace io
