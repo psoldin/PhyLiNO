@@ -42,7 +42,11 @@ namespace ana::dc {
      * @param index The index of the parameter.
      * @return The value of the parameter.
      */
-    [[nodiscard]] double operator[](std::size_t index) const noexcept { return m_UnifiedParameters[index]; }
+    [[nodiscard]] double operator[](int index) const noexcept { return m_UnifiedParameters[index]; }
+
+    [[nodiscard]] std::span<const double> sub_range(int start, int end) const noexcept {
+      return std::span(m_UnifiedParameters).subspan(start, end - start);
+    }
 
     /**
      * @brief Returns a span of the raw parameters.
