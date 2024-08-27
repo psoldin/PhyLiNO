@@ -16,7 +16,7 @@ namespace utilities {
     if constexpr (std::is_same_v<typename std::decay_t<T>, double>) {
       return std::abs(value) <= 1e-12;
     } else {
-      return std::abs(value) <= 0.00001f;
+      return std::abs(value) <= 1e-5f;
     }
   }
 
