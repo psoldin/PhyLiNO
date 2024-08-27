@@ -1,8 +1,71 @@
-//
-// Created by Philipp Soldin on 27.08.24.
-//
+#pragma once
 
-#ifndef LIKELIHOOD_SPECTRUMBASE_H
-#define LIKELIHOOD_SPECTRUMBASE_H
+#include "DoubleChooz/ParameterWrapper.h"
+#include "Options.h"
 
-#endif //LIKELIHOOD_SPECTRUMBASE_H
+#include <Eigen/Core>
+
+/**
+ * @brief The BackgroundBase class is a base class for background models in the ana namespace.
+ *
+ * It provides a common interface for derived classes to implement background models.
+ *
+ * @tparam Derived The derived class type.
+ */
+namespace ana::dc {
+
+  template <typename T>
+  concept is_background_derived = requires(T t) {
+    { t.check_and_recalculate_spectrum(std::declval<ParameterWrapper>()) } -> std::same_as<void>;
+    { t.return_spectrum(params::dc::DetectorType::ND) } -> std::same_as<Eigen::Array<double, 44, 1>>;
+  };
+
+  template <typename Derived>
+  class SpectrumBase {
+   public:
+    /**
+     * @class SpectrumBase
+     * @brief Base class for spectrum calculations.
+     *
+     * This class provides a base implementation for spectrum calculations in any physics experiment.
+     * It is intended to be inherited by specific spectrum classes that implement the actual calculations.
+     * The class takes an options object as a parameter in its constructor.
+     */
+    explicit SpectrumBase(std::shared_ptr<io::Options> options)
+      : m_Options(std::move(options)) {
+    }
+
+    /**
+     * @brief Destructor for the BackgroundBase class.
+     */
+    ~SpectrumBase() = default;
+
+    /**
+     * @brief Get the options object.
+     *
+     * @return const std::shared_ptr<io::Options>& The options object.
+     */
+    [[nodiscard]] const std::shared_ptr<io::Options>& options() const noexcept { return m_Options; }
+
+    /**
+     * @brief Check and recalculate the spectrum.
+     *
+     * This function is called to check if the spectrum needs to be recalculated and then recalculates it if necessary.
+     *
+     * @param parameter The parameter object.
+     */
+    void recalculate_spectrum(const ParameterWrapper& parameter) {
+      static_assert(is_background_derived<Derived>, "Derived class must implement check_and_recalculate_spectrum");
+      static_cast<Derived*>(this)->check_and_recalculate_spectrum(parameter);
+    }
+
+    [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(int index) const noexcept {
+      static_assert(is_background_derived<Derived>, "Derived class must implement return_spectrum");
+      return static_cast<Derived*>(this)->return_spectrum(index);
+    }
+
+   protected:
+    std::shared_ptr<io::Options> m_Options;
+  };
+
+}  // namespace ana::dc
