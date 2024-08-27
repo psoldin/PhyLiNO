@@ -5,11 +5,11 @@
 namespace ana {
   // TODO: Implementation & Documentation missing
 
-  class Fitter {
+  class Fit {
    public:
-    explicit Fitter(std::shared_ptr<io::Options> options);
+    explicit Fit(std::shared_ptr<io::Options> options);
 
-    ~Fitter() = default;
+    ~Fit() = default;
 
    private:
     std::shared_ptr<io::Options> m_Options;
