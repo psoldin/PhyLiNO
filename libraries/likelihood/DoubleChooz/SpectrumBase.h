@@ -2,6 +2,7 @@
 
 #include "DoubleChooz/ParameterWrapper.h"
 #include "Options.h"
+#include "../Definitions.h"
 
 #include <Eigen/Core>
 
@@ -17,7 +18,7 @@ namespace ana::dc {
   template <typename T>
   concept is_background_derived = requires(T t) {
     { t.check_and_recalculate_spectrum(std::declval<ParameterWrapper>()) } -> std::same_as<void>;
-    { t.return_spectrum(params::dc::DetectorType::ND) } -> std::same_as<Eigen::Array<double, 44, 1>>;
+    { t.return_spectrum(params::dc::DetectorType::ND) } -> std::same_as<return_t>;
   };
 
   template <typename Derived>
@@ -59,9 +60,9 @@ namespace ana::dc {
       static_cast<Derived*>(this)->check_and_recalculate_spectrum(parameter);
     }
 
-    [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(int index) const noexcept {
+    [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept {
       static_assert(is_background_derived<Derived>, "Derived class must implement return_spectrum");
-      return static_cast<Derived*>(this)->return_spectrum(index);
+      return static_cast<Derived*>(this)->return_spectrum(type);
     }
 
    protected:
