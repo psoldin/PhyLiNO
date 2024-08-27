@@ -28,8 +28,6 @@ namespace ana::dc {
                           const Eigen::Matrix<double, Nbins, Nbins>& covMatrix,
                           return_t& result) {
 
-    double rate2 = pow_2(rate);
-
     auto backgroundSpectrum = make_spectrum<Nbins>(shape);
 
     auto backgroundSpectrumSubset = backgroundSpectrum.template head<Nbins>();
