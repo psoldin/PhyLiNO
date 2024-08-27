@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(cmake/mpi.cmake)
 
+add_subdirectory(external/eigen)
+set(EIGEN3_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/external/eigen/")
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 find_package(ROOT REQUIRED COMPONENTS Minuit2 Minuit)
 
 find_package(Boost COMPONENTS system filesystem iostreams program_options log REQUIRED)
