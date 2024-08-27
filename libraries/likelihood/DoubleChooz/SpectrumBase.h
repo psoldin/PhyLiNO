@@ -1,0 +1,8 @@
+//
+// Created by Philipp Soldin on 27.08.24.
+//
+
+#ifndef LIKELIHOOD_SPECTRUMBASE_H
+#define LIKELIHOOD_SPECTRUMBASE_H
+
+#endif //LIKELIHOOD_SPECTRUMBASE_H
