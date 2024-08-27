@@ -1,14 +1,19 @@
 set(files
-    Fitter.h
-    Fitter.cpp
-    DCParameterWrapper.h
-    DCParameterWrapper.cpp
-    Likelihood.h
-    Likelihood.cpp
-    Oscillator.cpp
-    Oscillator.h
-        BackgroundBase.h
-        DoubleChooz/DCBackground.h
+    Fit.h
+    Fit.cpp
+        DoubleChooz/ParameterWrapper.h
+        DoubleChooz/ParameterWrapper.cpp
+        Likelihood.h
+        DoubleChooz/Oscillator.cpp
+    Definitions.h
+    SpectrumBase.h
+    DoubleChooz/Oscillator.h
+    DoubleChooz/Oscillator.cpp
+    DoubleChooz/DCBackground.h
+    DoubleChooz/Calculate_Spectrum.h
+    DoubleChooz/AccidentalBackground.cpp
+    DoubleChooz/AccidentalBackground.h
+    DoubleChooz/DCBackground.cpp
 )
 
 add_library(likelihood SHARED ${files})
