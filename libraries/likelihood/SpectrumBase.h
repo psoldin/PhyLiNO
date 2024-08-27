@@ -21,17 +21,17 @@ namespace ana {
   };
 
   template <typename Derived>
-  class BackgroundBase {
+  class SpectrumBase {
    public:
     /**
-     * @class BackgroundBase
-     * @brief Base class for background calculations.
+     * @class SpectrumBase
+     * @brief Base class for spectrum calculations.
      *
-     * This class provides a base implementation for background calculations in the DoubleChooz experiment.
-     * It is intended to be inherited by specific background classes that implement the actual calculations.
+     * This class provides a base implementation for spectrum calculations in any physics experiment.
+     * It is intended to be inherited by specific spectrum classes that implement the actual calculations.
      * The class takes an options object as a parameter in its constructor.
      */
-    explicit BackgroundBase(std::shared_ptr<io::Options> options)
+    explicit SpectrumBase(std::shared_ptr<io::Options> options)
     : m_Options(std::move(options)) {
 
     }
@@ -39,7 +39,7 @@ namespace ana {
     /**
      * @brief Destructor for the BackgroundBase class.
      */
-    ~BackgroundBase() = default;
+    ~SpectrumBase() = default;
 
     /**
      * @brief Get the options object.
