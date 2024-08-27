@@ -9,11 +9,11 @@ namespace ana::dc {
     explicit DCLikelihood(std::shared_ptr<io::Options> options)
       : Likelihood(std::move(options)) { }
 
+    ~DCLikelihood() override = default;
+
     [[nodiscard]] double calculate_likelihood(const double* parameter) override {
       return 0.0;
     }
-
-    ~DCLikelihood() override = default;
   };
 
-}
+} // namespace ana::dc
