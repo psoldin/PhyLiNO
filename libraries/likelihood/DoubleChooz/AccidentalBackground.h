@@ -16,8 +16,8 @@ namespace ana::dc {
 
     void check_and_recalculate_spectrum(const ParameterWrapper& parameter);
 
-    [[nodiscard]] Eigen::Array<double, 44, 1> return_spectrum(params::dc::DetectorType type) const noexcept {
-      return {};
+    [[nodiscard]] const return_t& return_spectrum(params::dc::DetectorType type) const noexcept {
+      return m_Cache.at(type);
     }
 
    private:
