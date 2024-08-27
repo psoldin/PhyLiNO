@@ -16,8 +16,8 @@ namespace ana::dc {
     inline auto pow_2(T&& t) noexcept { return t * t; }
 
     template <int Nbins>
-    auto make_spectrum(std::span<const double> shape) noexcept {
-      Eigen::Map<Eigen::Vector<double, Nbins>>(shape.data(), Nbins);
+    inline auto make_spectrum(std::span<const double> shape) noexcept {
+      return Eigen::Map<const Eigen::Vector<double, Nbins>>(shape.data(), Nbins);
     }
   }
 
