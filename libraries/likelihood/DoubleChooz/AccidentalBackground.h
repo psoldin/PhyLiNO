@@ -1,14 +1,15 @@
 #pragma once
 
-#include "../SpectrumBase.h"
+#include "SpectrumBase.h"
 
 namespace ana::dc {
 
   class AccidentalBackground : public SpectrumBase<AccidentalBackground> {
     friend class SpectrumBase<AccidentalBackground>;
+
    public:
     explicit AccidentalBackground(std::shared_ptr<io::Options> options)
-      : SpectrumBase<AccidentalBackground>(std::move(options)) { }
+      : SpectrumBase<AccidentalBackground>(std::move(options)) {}
 
     ~AccidentalBackground() = default;
 
@@ -17,5 +18,8 @@ namespace ana::dc {
     [[nodiscard]] Eigen::Array<double, 44, 1> return_spectrum(params::dc::DetectorType type) const noexcept {
       return {};
     }
+
+   private:
+    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
   };
-}
+}  // namespace ana::dc
