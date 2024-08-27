@@ -2,18 +2,17 @@
 
 #include "Options.h"
 
-namespace ana {
-
-/**
- * @brief Represents an Oscillator.
- * 
- * This class provides functionality to handle an Oscillator.
- */
-class Oscillator {
- public:
+namespace ana::dc {
+  /**
+   * @brief Represents an Oscillator.
+   *
+   * This class provides functionality to handle an Oscillator.
+   */
+  class Oscillator {
+   public:
     /**
      * @brief Constructs an Oscillator object with the given options.
-     * 
+     *
      * @param options The options for the Oscillator.
      */
     explicit Oscillator(std::shared_ptr<io::Options> options);
@@ -25,7 +24,7 @@ class Oscillator {
 
     void recalculate_spectra();
 
- private:
+   private:
     std::shared_ptr<io::Options> m_Options; /**< The options for the Oscillator. */
-};
-}  // namespace ana
+  };
+}  // namespace ana::dc
