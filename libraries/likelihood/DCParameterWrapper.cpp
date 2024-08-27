@@ -1,9 +1,10 @@
 #include "DCParameterWrapper.h"
 
-namespace ana {
+namespace ana::dc {
 
-  DCParameterWrapper::DCParameterWrapper(const double* parameter) {
-      reset_parameter(parameter);
+  DCParameterWrapper::DCParameterWrapper(const double* parameter)
+    : ParameterWrapper(parameter) {
+    reset_parameter(parameter);
   }
 
   void DCParameterWrapper::reset_parameter(const double* parameter) {
@@ -15,4 +16,4 @@ namespace ana {
   void DCParameterWrapper::unify_parameters() {
   }
 
-}  // namespace ana
+}  // namespace ana::dc

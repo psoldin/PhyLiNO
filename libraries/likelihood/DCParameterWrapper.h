@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Parameter.h"
+#include "ParameterWrapper.h"
 
 // STL includes
 #include <array>
 #include <span>
 #include <vector>
 
-namespace ana {
+namespace ana::dc {
 
   /**
    * @brief Wrapper class for a parameter array.
@@ -15,7 +16,7 @@ namespace ana {
    * The ParameterWrapper class provides a convenient way to access and manipulate a parameter array.
    * It wraps a raw double pointer and provides various member functions for accessing the parameters.
    */
-  class DCParameterWrapper {
+  class DCParameterWrapper : public ParameterWrapper {
    public:
     /**
      * @brief Constructs a ParameterWrapper object with a raw double pointer to the parameter array.
@@ -27,7 +28,7 @@ namespace ana {
     /**
      * @brief Default destructor.
      */
-    ~DCParameterWrapper() = default;
+    ~DCParameterWrapper() final = default;
 
     /**
      * @brief Resets the parameter to the given values.
@@ -112,7 +113,6 @@ namespace ana {
     [[nodiscard]] inline auto crend() const noexcept { return m_UnifiedParameters.crend(); }
 
    private:
-    const double*                                      m_RawParameter;       // Pointer to the parameter array
     std::array<double, params::number_of_parameters()> m_UnifiedParameters;  // Unified parameters array
 
     /**
