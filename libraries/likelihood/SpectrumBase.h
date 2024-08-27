@@ -60,7 +60,7 @@ namespace ana {
       static_cast<Derived*>(this)->check_and_recalculate_spectrum(parameter);
     }
 
-    [[nodiscard]] Eigen::Array<double, 44, 1> get_spectrum(params::dc::DetectorType type) const noexcept {
+    [[nodiscard]] const auto& get_spectrum(params::dc::DetectorType type) const noexcept {
       static_assert(is_background_derived<Derived>, "Derived class must implement return_spectrum");
       return static_cast<Derived*>(this)->return_spectrum(type);
     }
