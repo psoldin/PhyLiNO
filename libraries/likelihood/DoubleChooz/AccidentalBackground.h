@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SpectrumBase.h"
+#include "../Definitions.h"
 
 namespace ana::dc {
 
@@ -21,5 +22,8 @@ namespace ana::dc {
 
    private:
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+
+    std::unordered_map<params::dc::DetectorType, return_t> m_Cache;
+    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 38, 1>> m_SpectrumTemplate;
   };
 }  // namespace ana::dc

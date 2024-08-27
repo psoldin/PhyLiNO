@@ -1,4 +1,6 @@
 #include "AccidentalBackground.h"
+#include "Calculate_Spectrum.h"
+#include "Parameter.h"
 
 namespace ana::dc {
 
@@ -25,8 +27,23 @@ namespace ana::dc {
   }
 
   void AccidentalBackground::recalculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+    using namespace params;
 
+    for (auto detector : {ND, FDI, FDII}) {
+      const double            rate            = parameter[params::index(detector, BkgRAcc)];
+      const auto&             shape           = m_SpectrumTemplate[detector];
+      std::span<const double> shape_parameter = parameter.sub_range(index(detector, AccShape01), index(detector, AccShape38) + 1);
+      const auto&             covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Accidental);
+      auto&                   result          = m_Cache[detector];
+
+      calculate_spectrum<38>(rate,
+                             shape,
+                             shape_parameter,
+                             covMatrix.block<38, 38>(0, 0),
+                             result);
+    }
   }
 
-}
-
+}  // namespace ana::dc
