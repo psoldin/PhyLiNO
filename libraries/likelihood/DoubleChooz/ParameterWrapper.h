@@ -114,7 +114,7 @@ namespace ana::dc {
    private:
     std::array<double, params::number_of_parameters()> m_UnifiedParameters;  // Unified parameters array
 
-    double* m_RawParameter;  // Pointer to the raw parameter array
+    const double* m_RawParameter;  // Pointer to the raw parameter array
 
     /**
      * @brief Unifies the parameters.
