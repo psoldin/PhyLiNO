@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Options.h"
-#include "DoubleChooz/DCParameterWrapper.h"
+#include "DoubleChooz/ParameterWrapper.h"
 
 #include <Eigen/Core>
 
