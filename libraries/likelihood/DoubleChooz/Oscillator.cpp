@@ -1,6 +1,6 @@
 #include "Oscillator.h"
 
-namespace ana {
+namespace ana::dc {
 
   Oscillator::Oscillator(std::shared_ptr<io::Options> options)
     : m_Options(std::move(options)) {
