@@ -2,8 +2,8 @@
 
 namespace ana::dc {
 
-  double DCLikelihood::calculate_likelihood(const double *parameter) {
+  double DCLikelihood::calculate_likelihood(const double* parameter) {
     return 0.0;
   }
 
-} // namespace ana::dc
+}  // namespace ana::dc
