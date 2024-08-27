@@ -11,9 +11,7 @@ namespace ana::dc {
 
     ~DCLikelihood() override = default;
 
-    [[nodiscard]] double calculate_likelihood(const double* parameter) override {
-      return 0.0;
-    }
+    [[nodiscard]] double calculate_likelihood(const double* parameter) override;
   };
 
 } // namespace ana::dc
