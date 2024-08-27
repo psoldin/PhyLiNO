@@ -52,7 +52,7 @@ namespace ana::dc {
      * @return A std::span object containing the raw parameters.
      */
     [[nodiscard]] std::span<const double> raw_parameters() const noexcept {
-        return {m_RawParameter, params::number_of_parameters()};
+      return {m_RawParameter, params::number_of_parameters()};
     }
 
     /**
@@ -111,8 +111,11 @@ namespace ana::dc {
      */
     [[nodiscard]] inline auto crend() const noexcept { return m_UnifiedParameters.crend(); }
 
+    [[nodiscard]] bool parameter_changed(int idx) const noexcept;
+
    private:
-    std::array<double, params::number_of_parameters()> m_UnifiedParameters;  // Unified parameters array
+    std::array<double, params::number_of_parameters()> m_UnifiedParameters;   // Unified parameters array
+    std::array<double, params::number_of_parameters()> m_PreviousParameters;  // Previous parameter set for comparison
 
     const double* m_RawParameter;  // Pointer to the raw parameter array
 
@@ -124,4 +127,4 @@ namespace ana::dc {
     void unify_parameters();
   };
 
-}  // namespace ana
+}  // namespace ana::dc
