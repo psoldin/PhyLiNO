@@ -20,22 +20,22 @@ namespace ana::dc {
     return is_valid;
   }
 
-  void LithiumBackground::check_and_recalculate_spectrum(const ana::dc::ParameterWrapper& parameter) {
+  void LithiumBackground::check_and_recalculate_spectrum(const ParameterWrapper& parameter) {
     if (!check_parameter(parameter)) {
       return;
     }
     recalculate_spectra(parameter);
   }
 
-  void LithiumBackground::recalculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
+  void LithiumBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
     using namespace params;
 
     for (auto detector : {ND, FDI, FDII}) {
-      double      rate            = parameter[params::index(detector, BkgRAcc)];
+      double      rate            = parameter[params::index(detector, BkgRLi)];
       const auto& shape           = m_SpectrumTemplate[detector];
-      auto        shape_parameter = parameter.sub_range(index(detector, AccShape01), index(detector, AccShape38) + 1);
+      auto        shape_parameter = parameter.sub_range(General::LiShape01, General::LiShape38 + 1);
       const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Accidental);
       auto&       result          = m_Cache[detector];
 
@@ -47,5 +47,4 @@ namespace ana::dc {
     }
   }
 
-} // namespace ana::dc
-
+}  // namespace ana::dc
