@@ -1,0 +1,8 @@
+//
+// Created by Philipp Soldin on 27.08.24.
+//
+
+#ifndef LIKELIHOOD_RANGEOSCILLATOR_H
+#define LIKELIHOOD_RANGEOSCILLATOR_H
+
+#endif //LIKELIHOOD_RANGEOSCILLATOR_H
