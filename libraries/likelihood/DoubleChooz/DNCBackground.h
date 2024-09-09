@@ -21,7 +21,8 @@ namespace ana::dc {
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
     std::unordered_map<params::dc::DetectorType, return_t> m_Cache;
-    std::unordered_map<params::dc::DetectorType, return_t> m_SpectrumTemplate;
+    std::unordered_map<params::dc::DetectorType, return_t> m_SpectrumTemplate_Gd;
+    std::unordered_map<params::dc::DetectorType, return_t> m_SpectrumTemplate_Hy;
   };
 
 }  // namespace ana::dc
