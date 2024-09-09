@@ -91,6 +91,8 @@ namespace io {
 
     [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
 
+    [[nodiscard]] bool use_reactor_split() const noexcept;
+
    private:
     long m_Seed;                  /**< The global random seed. */
     bool m_Silent;                /**< Flag indicating if the program should run in silent mode. */
