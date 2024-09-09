@@ -8,7 +8,7 @@ namespace ana::dc {
   }
 
   void DCLikelihood::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
-    m_Background.recalculate_spectra(m_Parameter);
+    m_Background.check_and_recalculate_spectra(m_Parameter);
   }
 
   double DCLikelihood::calculate_likelihood(const double* parameter) {
