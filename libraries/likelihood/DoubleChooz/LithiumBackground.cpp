@@ -17,10 +17,12 @@ namespace ana::dc {
     return has_changed;
   }
 
-  void LithiumBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
-    if (parameter_changed(parameter)) {
+  bool LithiumBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
+    bool has_changed = parameter_changed(parameter);
+    if (has_changed) {
       recalculate_spectra(parameter);
     }
+    return has_changed;
   }
 
   void LithiumBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {

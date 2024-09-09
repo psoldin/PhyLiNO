@@ -18,18 +18,26 @@ namespace ana::dc {
 
     ~DCBackground() override = default;
 
-    void check_and_recalculate_spectra(const ParameterWrapper& parameter) override {
-      m_Accidental.check_and_recalculate_spectra(parameter);
-      m_Lithium.check_and_recalculate_spectra(parameter);
-      m_FastN.check_and_recalculate_spectra(parameter);
+    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override {
+      bool has_changed = false;
+      has_changed |= m_Accidental.check_and_recalculate_spectra(parameter);
+      has_changed |= m_Lithium.check_and_recalculate_spectra(parameter);
+      has_changed |= m_FastN.check_and_recalculate_spectra(parameter);
+
+      if (has_changed) {
+        using enum params::dc::DetectorType;
+
+        for (auto detector : {ND, FDI, FDII}) {
+          m_Cache[detector] = m_Accidental.get_spectrum(detector)
+                              + m_Lithium.get_spectrum(detector)
+                              + m_FastN.get_spectrum(detector);
+        }
+      }
+      return has_changed;
     }
 
     [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept override {
-      const auto& acc   = m_Accidental.get_spectrum(type);
-      const auto& lit   = m_Lithium.get_spectrum(type);
-      const auto& fastN = m_FastN.get_spectrum(type);
-
-      return acc + lit + fastN;
+      return m_Cache.at(type);
     }
 
    protected:
@@ -39,9 +47,5 @@ namespace ana::dc {
     // DNCBackground m_DNC;
 
     std::unordered_map<params::dc::DetectorType, return_t> m_Cache;
-
-    [[nodiscard]] Eigen::Array<double, 44, 1> return_spectrum(const ParameterWrapper& parameter, params::dc::DetectorType type) {
-      return {};
-    }
   };
 }  // namespace ana::dc

@@ -48,7 +48,7 @@ namespace ana::dc {
      *
      * @param parameter The parameter object.
      */
-    virtual void check_and_recalculate_spectra(const ParameterWrapper& parameter) = 0;
+    [[nodiscard]] virtual bool check_and_recalculate_spectra(const ParameterWrapper& parameter) = 0;
 
     [[nodiscard]] virtual const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept = 0;
 

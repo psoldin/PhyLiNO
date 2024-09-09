@@ -13,7 +13,7 @@ namespace ana::dc {
 
     ~DNCBackground() override = default;
 
-    void check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
 
     [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept override;
 

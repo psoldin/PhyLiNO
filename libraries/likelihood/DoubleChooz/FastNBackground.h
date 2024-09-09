@@ -12,7 +12,7 @@ namespace ana::dc {
 
     ~FastNBackground() = default;
 
-    void check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
 
     [[nodiscard]] const return_t& get_spectrum(params::dc::DetectorType type) const noexcept override {
       return m_Cache.at(type);

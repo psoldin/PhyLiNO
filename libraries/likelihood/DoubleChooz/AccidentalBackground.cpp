@@ -17,10 +17,12 @@ namespace ana::dc {
     return has_changed;
   }
 
-  void AccidentalBackground::check_and_recalculate_spectra(const ana::dc::ParameterWrapper& parameter) {
-    if (parameter_changed(parameter)) {
+  bool AccidentalBackground::check_and_recalculate_spectra(const ana::dc::ParameterWrapper& parameter) {
+    bool has_changed = parameter_changed(parameter);
+    if (has_changed) {
       recalculate_spectra(parameter);
     }
+    return has_changed;
   }
 
   void AccidentalBackground::recalculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
