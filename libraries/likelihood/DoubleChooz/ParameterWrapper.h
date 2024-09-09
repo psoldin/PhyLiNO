@@ -24,6 +24,8 @@ namespace ana::dc {
      */
     explicit ParameterWrapper(const double* parameter);
 
+    ParameterWrapper();
+
     /**
      * @brief Default destructor.
      */
@@ -116,6 +118,8 @@ namespace ana::dc {
     [[nodiscard]] inline auto crend() const noexcept { return m_UnifiedParameters.crend(); }
 
     [[nodiscard]] bool parameter_changed(int idx) const noexcept;
+
+    [[nodiscard]] bool range_changed(int start, int end) const noexcept;
 
    private:
     std::array<double, params::number_of_parameters()> m_UnifiedParameters;   // Unified parameters array
