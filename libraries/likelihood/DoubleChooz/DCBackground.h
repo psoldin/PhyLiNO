@@ -25,5 +25,8 @@ namespace ana::dc {
     // DNCBackground m_DNC;
 
     std::unordered_map<params::dc::DetectorType, return_t> m_Cache;
+
+  private:
+    void refresh_cache();
   };
 }  // namespace ana::dc

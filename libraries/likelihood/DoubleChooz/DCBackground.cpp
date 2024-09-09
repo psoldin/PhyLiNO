@@ -7,6 +7,17 @@ namespace ana::dc {
     , m_Lithium(options)
     , m_FastN(options) {}
 
+
+  void DCBackground::refresh_cache() {
+    using enum params::dc::DetectorType;
+
+    for (auto detector : {ND, FDI, FDII}) {
+      m_Cache[detector] = m_Accidental.get_spectrum(detector)
+                          + m_Lithium.get_spectrum(detector)
+                          + m_FastN.get_spectrum(detector);
+    }
+  }
+
   bool DCBackground::check_and_recalculate_spectra(const ParameterWrapper &parameter) {
     bool has_changed = false;
     has_changed |= m_Accidental.check_and_recalculate_spectra(parameter);
@@ -14,14 +25,9 @@ namespace ana::dc {
     has_changed |= m_FastN.check_and_recalculate_spectra(parameter);
 
     if (has_changed) {
-      using enum params::dc::DetectorType;
-
-      for (auto detector : {ND, FDI, FDII}) {
-        m_Cache[detector] = m_Accidental.get_spectrum(detector)
-                            + m_Lithium.get_spectrum(detector)
-                            + m_FastN.get_spectrum(detector);
-      }
+      refresh_cache();
     }
+
     return has_changed;
   }
 
