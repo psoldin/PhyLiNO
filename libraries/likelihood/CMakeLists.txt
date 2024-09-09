@@ -1,10 +1,10 @@
 set(files
     Fit.h
     Fit.cpp
-        DoubleChooz/ParameterWrapper.h
-        DoubleChooz/ParameterWrapper.cpp
-        Likelihood.h
-        DoubleChooz/Oscillator.cpp
+    DoubleChooz/ParameterWrapper.h
+    DoubleChooz/ParameterWrapper.cpp
+    Likelihood.h
+    DoubleChooz/Oscillator.cpp
     Definitions.h
     DoubleChooz/SpectrumBase.h
     DoubleChooz/Oscillator.h
@@ -17,6 +17,13 @@ set(files
     DoubleChooz/SpectrumBase.h
     DoubleChooz/LithiumBackground.h
     DoubleChooz/LithiumBackground.cpp
+    DoubleChooz/FastNBackground.cpp
+    DoubleChooz/FastNBackground.h
+    DoubleChooz/RangeOscillator.h
+    DoubleChooz/ThreeFlavorOscillation.cpp
+    DoubleChooz/ThreeFlavorOscillation.h
+    DoubleChooz/DNCBackground.h
+    DoubleChooz/DNCBackground.cpp
 )
 
 add_library(likelihood SHARED ${files})
