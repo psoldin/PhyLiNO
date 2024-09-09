@@ -17,7 +17,7 @@ namespace ana::dc {
 
     [[nodiscard]] virtual double calculate_likelihood(const double* parameter) = 0;
 
-  private:
+  protected:
     std::shared_ptr<io::Options> m_Options;
   };
 
