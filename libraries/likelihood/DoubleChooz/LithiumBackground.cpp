@@ -3,28 +3,24 @@
 
 namespace ana::dc {
 
-  inline bool check_parameter(const ana::dc::ParameterWrapper& parameter) noexcept {
+  inline bool parameter_changed(const ana::dc::ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
     using namespace params;
 
-    bool is_valid = true;
-    for (int i = General::LiShape01; i <= General::LiShape38; ++i) {
-      is_valid |= parameter.parameter_changed(i);
-    }
+    bool has_changed = parameter.range_changed(General::LiShape01, General::LiShape38 + 1);
 
     for (auto detector : {ND, FDI, FDII}) {
-      is_valid |= parameter.parameter_changed(index(detector, BkgRLi));
+      has_changed |= parameter.parameter_changed(index(detector, BkgRLi));
     }
 
-    return is_valid;
+    return has_changed;
   }
 
-  void LithiumBackground::check_and_recalculate_spectrum(const ParameterWrapper& parameter) {
-    if (!check_parameter(parameter)) {
-      return;
+  void LithiumBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
+    if (parameter_changed(parameter)) {
+      recalculate_spectra(parameter);
     }
-    recalculate_spectra(parameter);
   }
 
   void LithiumBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
@@ -36,7 +32,7 @@ namespace ana::dc {
       double      rate            = parameter[params::index(detector, BkgRLi)];
       const auto& shape           = m_SpectrumTemplate[detector];
       auto        shape_parameter = parameter.sub_range(General::LiShape01, General::LiShape38 + 1);
-      const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Accidental);
+      const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Lithium);
       auto&       result          = m_Cache[detector];
 
       calculate_spectrum<38>(rate,

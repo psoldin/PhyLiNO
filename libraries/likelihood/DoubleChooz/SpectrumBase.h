@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../Definitions.h"
 #include "DoubleChooz/ParameterWrapper.h"
 #include "Options.h"
-#include "../Definitions.h"
 
 #include <Eigen/Core>
 
@@ -15,13 +15,6 @@
  */
 namespace ana::dc {
 
-  template <typename T>
-  concept is_background_derived = requires(T t) {
-    { t.check_and_recalculate_spectrum(std::declval<ParameterWrapper>()) } -> std::same_as<void>;
-    { t.return_spectrum(params::dc::DetectorType::ND) } -> std::same_as<return_t>;
-  };
-
-  template <typename Derived>
   class SpectrumBase {
    public:
     /**
@@ -39,7 +32,7 @@ namespace ana::dc {
     /**
      * @brief Destructor for the BackgroundBase class.
      */
-    ~SpectrumBase() = default;
+    virtual ~SpectrumBase() = default;
 
     /**
      * @brief Get the options object.
@@ -55,15 +48,9 @@ namespace ana::dc {
      *
      * @param parameter The parameter object.
      */
-    void recalculate_spectrum(const ParameterWrapper& parameter) {
-      static_assert(is_background_derived<Derived>, "Derived class must implement check_and_recalculate_spectrum");
-      static_cast<Derived*>(this)->check_and_recalculate_spectrum(parameter);
-    }
+    virtual void check_and_recalculate_spectra(const ParameterWrapper& parameter) = 0;
 
-    [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept {
-      static_assert(is_background_derived<Derived>, "Derived class must implement return_spectrum");
-      return static_cast<Derived*>(this)->return_spectrum(type);
-    }
+    [[nodiscard]] virtual const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept = 0;
 
    protected:
     std::shared_ptr<io::Options> m_Options;
