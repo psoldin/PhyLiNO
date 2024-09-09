@@ -6,9 +6,9 @@
 
 #include <span>
 #include <string>
-#include <vector>
-#include <unordered_map>
 #include <tuple>
+#include <unordered_map>
+#include <vector>
 
 #include <Eigen/Core>
 
@@ -36,34 +36,36 @@ namespace io {
     /** Default destructor */
     ~DataBase() = default;
 
-      /**
-       * Returns a read-only span of measurement data for the specified detector type.
-       * @param type The detector type.
-       * @return A read-only span of measurement data.
-       */
-      [[nodiscard]] std::span<const double> measurement_data(params::dc::DetectorType type) const noexcept {
-        if (params::get_index(type) >= m_MeasurementData.size()) {
-          return {};
-        }
-        return m_MeasurementData[params::get_index(type)];
+    /**
+     * Returns a read-only span of measurement data for the specified detector type.
+     * @param type The detector type.
+     * @return A read-only span of measurement data.
+     */
+    [[nodiscard]] std::span<const double> measurement_data(params::dc::DetectorType type) const noexcept {
+      if (params::get_index(type) >= m_MeasurementData.size()) {
+        return {};
       }
+      return m_MeasurementData[params::get_index(type)];
+    }
 
-      /**
-       * @brief Accessor function to retrieve the reactor data for a specific detector type.
-       *
-       * @param type The detector type for which to retrieve the reactor data.
-       * @return A reference to the reactor data for the specified detector type.
-       */
-      [[nodiscard]] const ReactorData& reactor_data(params::dc::DetectorType type) const {
-        return m_ReactorData[params::get_index(type)];
-      }
+    /**
+     * @brief Accessor function to retrieve the reactor data for a specific detector type.
+     *
+     * @param type The detector type for which to retrieve the reactor data.
+     * @return A reference to the reactor data for the specified detector type.
+     */
+    [[nodiscard]] const ReactorData& reactor_data(params::dc::DetectorType type) const {
+      return m_ReactorData[params::get_index(type)];
+    }
 
-      [[nodiscard]] const Eigen::Matrix<double, 44, 44>& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
-        return m_CovarianceMatrices.at({detectorType, spectrumType});
-      }
+    [[nodiscard]] const Eigen::Matrix<double, 44, 44>& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
+      return m_CovarianceMatrices.at({detectorType, spectrumType});
+    }
 
-     private:
-      const io::InputOptions& m_InputOptions;
+    [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return -1.0; };  // TODO: Implement this function
+
+   private:
+    const io::InputOptions& m_InputOptions;
 
     /**
      * @brief A class representing a pair of keys used in the database.
@@ -113,7 +115,7 @@ namespace io {
       }
     };
 
-    using tuple_t = std::tuple<params::dc::DetectorType, SpectrumType>;
+    using tuple_t      = std::tuple<params::dc::DetectorType, SpectrumType>;
     using cov_matrix_t = Eigen::Matrix<double, 44, 44>;
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
   };
