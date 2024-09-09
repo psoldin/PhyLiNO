@@ -1,8 +1,21 @@
-//
-// Created by Philipp Soldin on 27.08.24.
-//
+#pragma once
 
-#ifndef LIKELIHOOD_RANGEOSCILLATOR_H
-#define LIKELIHOOD_RANGEOSCILLATOR_H
+#include "OscillationData.h"
 
-#endif //LIKELIHOOD_RANGEOSCILLATOR_H
+namespace ana::dc {
+
+  class RangeOscillator {
+   public:
+    RangeOscillator() = default;
+
+    virtual ~RangeOscillator() = default;
+
+    [[nodiscard]] double operator()(const OscillationData& data) const noexcept {
+      return oscillate_events(data);
+    }
+
+   protected:
+    [[nodiscard]] virtual double oscillate_events(const OscillationData& data) const noexcept = 0;
+  };
+
+}  // namespace ana::dc

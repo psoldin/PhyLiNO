@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Options.h"
+#include "OscillationData.h"
+#include "ParameterWrapper.h"
 
 namespace ana::dc {
   /**
@@ -22,9 +24,15 @@ namespace ana::dc {
      */
     ~Oscillator() = default;
 
-    void recalculate_spectra();
+    void recalculate_spectra(const ParameterWrapper& parameter, std::vector<Eigen::Array<double, 80, 1>>& spectra) const noexcept;
 
    private:
     std::shared_ptr<io::Options> m_Options; /**< The options for the Oscillator. */
+
+    using span_t = std::span<const double>;
+
+    std::vector<OscillationData> m_CalculationData; /**< The data used for the actual computations. */
+
+    void add_reactor_data(const io::ReactorData& reactorData, params::dc::DetectorType type);
   };
 }  // namespace ana::dc

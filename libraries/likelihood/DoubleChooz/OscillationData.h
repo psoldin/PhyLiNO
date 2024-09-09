@@ -1,16 +1,25 @@
-//
-// Created by Philipp Soldin on 27.08.24.
-//
+#pragma once
 
-#ifndef LIKELIHOOD_OSCILLATIONDATA_H
-#define LIKELIHOOD_OSCILLATIONDATA_H
+// includes
+#include "Parameter.h"
 
+// STL includes
+#include <span>
 
+namespace ana::dc {
 
-class OscillationData {
+  struct OscillationData {
+    using span_t = std::span<const double>;
+    OscillationData(span_t loe, span_t scl, int target_bin, params::dc::DetectorType type)
+      : LoverE(loe)
+      , scaling(scl)
+      , target_bin(target_bin)
+      , type(type) {}
 
-};
+    const span_t LoverE; /**< The L over E data. */
+    const span_t scaling; /**< The scaling data. */
+    const int target_bin; /**< The target bin. */
+    const params::dc::DetectorType type; /**< The detector type. */
+  };
 
-
-
-#endif //LIKELIHOOD_OSCILLATIONDATA_H
+} // namespace ana::dc
