@@ -41,7 +41,6 @@ namespace ana::dc {
     }
   }
 
-  
   const Eigen::Array<double, 44, 1>& DNCBackground::get_spectrum(params::dc::DetectorType type) const noexcept {
     return m_Cache.at(type);
   }
