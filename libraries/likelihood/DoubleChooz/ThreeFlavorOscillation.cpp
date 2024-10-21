@@ -26,12 +26,12 @@ namespace ana::dc {
 
     const double cos4 = m_cos413 * m_t12;
 
-    const int N = loe.size();
+    const std::size_t N = loe.size();
 
     double result = 0.0;
 
 #pragma omp simd reduction(+ : result)
-    for (int i = 0; i < N; ++i) {
+    for (std::size_t i = 0; i < N; ++i) {
       double t13Part = m_t13 * pow_2(sin(m_dmee * loe[i]));
       double t12Part = cos4 * pow_2(sin(m_dm21 * loe[i]));
       result += scl[i] * (1 - t13Part - t12Part);
