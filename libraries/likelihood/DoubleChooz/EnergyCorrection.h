@@ -1,14 +1,21 @@
-//
-// Created by Philipp Soldin on 09.09.24.
-//
+#pragma once
 
-#ifndef LIKELIHOOD_ENERGYCORRECTION_H
-#define LIKELIHOOD_ENERGYCORRECTION_H
+#include "Oscillator.h"
 
+namespace ana::dc {
 
-class EnergyCorrection {
+  class EnergyCorrection {
+  public:
+    explicit EnergyCorrection(std::shared_ptr<io::Options> options)
+    : m_Options(std::move(options)) { }
 
-};
+    ~EnergyCorrection() = default;
 
+    void calculate_energy_correction(const ParameterWrapper& parameter, const Oscillator& oscillator) noexcept;
 
-#endif //LIKELIHOOD_ENERGYCORRECTION_H
+  private:
+    std::shared_ptr<io::Options> m_Options;
+
+    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 80, 1>> m_Cache;
+  };
+} // namespace ana::dc
