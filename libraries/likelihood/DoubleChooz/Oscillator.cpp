@@ -22,18 +22,15 @@ namespace ana::dc {
 
   Oscillator::Oscillator(std::shared_ptr<io::Options> options)
     : m_Options(std::move(options)) {
-
     using enum params::dc::DetectorType;
 
     for (auto detector : {ND, FDI, FDII}) {
       const auto& reactorData = m_Options->dataBase().reactor_data(detector);
       add_reactor_data(reactorData, detector);
     }
-
   }
 
-  void Oscillator::add_reactor_data(const io::ReactorData &reactorData, params::dc::DetectorType type) {
-
+  void Oscillator::add_reactor_data(const io::ReactorData& reactorData, params::dc::DetectorType type) {
     // Get the L over E data
     span_t LoverE = reactorData.LoverE();
 
@@ -54,16 +51,22 @@ namespace ana::dc {
     }
   }
 
-  #pragma omp declare simd
+#pragma omp declare simd
   template <typename T>
-  inline auto pow_2(T&& x) noexcept { return x * x; }
+  inline auto pow_2(T&& x) noexcept {
+    return x * x;
+  }
 
-  void Oscillator::recalculate_spectra(const ParameterWrapper& parameter, std::vector<Eigen::Array<double, 80, 1>>& spectra) const noexcept {
+  void Oscillator::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
+    perform_cpu_oscillation(parameter);
+  }
 
+  void Oscillator::perform_cpu_oscillation(const ParameterWrapper& parameter) noexcept {
     const std::size_t N = m_CalculationData.size();
 
-    for (auto& spectrum : spectra)
-      std::fill(spectrum.begin(), spectrum.end(), 0.0);
+    for (auto& [_, spectra] : m_Cache) {
+      spectra.setZero();
+    }
 
     const ThreeFlavorOscillation osci(parameter[params::General::SinSqT13],
                                       parameter[params::General::DeltaM31],
@@ -72,9 +75,9 @@ namespace ana::dc {
 
     // #pragma omp parallel for
     for (std::size_t i = 0UL; i < N; ++i) {
-      const auto& data = m_CalculationData[i];
-      spectra[params::get_index(data.type)][data.target_bin] = osci(data);
+      const auto& data                    = m_CalculationData[i];
+      m_Cache[data.type][data.target_bin] = osci(data);
     }
   }
 
-}  // namespace ana
+}  // namespace ana::dc
