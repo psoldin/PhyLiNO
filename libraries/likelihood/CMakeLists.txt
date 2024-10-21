@@ -24,6 +24,10 @@ set(files
     DoubleChooz/ThreeFlavorOscillation.h
     DoubleChooz/DNCBackground.h
     DoubleChooz/DNCBackground.cpp
+    DoubleChooz/ReactorSpectrum.cpp
+    DoubleChooz/ReactorSpectrum.h
+    DoubleChooz/EnergyCorrection.h
+    DoubleChooz/EnergyCorrection.cpp
 )
 
 add_library(likelihood SHARED ${files})
