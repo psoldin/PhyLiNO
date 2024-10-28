@@ -94,7 +94,10 @@ namespace ana::dc {
     using namespace params::dc;
     using enum DetectorType;
 
-    const double parA = parameter[General::EnergyA];
+    auto starting_parameter = m_Options->starting_parameter();
+
+    const ParameterValue base_parA = starting_parameter.energy_correction_parameter_A();
+    const double parA = base_parA.value() + base_parA.error() * parameter[index(General::EnergyA)];
 
     for (auto detector : {ND, FDI, FDII}) {
       const Eigen::Array<double, 80, 1>& oscillatedSpectrum = oscillator.get_spectrum(detector);
@@ -103,9 +106,11 @@ namespace ana::dc {
       std::partial_sum(oscillatedSpectrum.data(), oscillatedSpectrum.data() + oscillatedSpectrum.size(), cumsum.data());
 
       SplineFunction spline(m_XPos, cumsum);
+      const ParameterValue base_parB = starting_parameter.energy_correction_parameter_B(detector);
+      const ParameterValue base_parC = starting_parameter.energy_correction_parameter_C(detector);
 
-      const double parB = parameter[index(detector, Detector::EnergyB)];
-      const double parC = parameter[index(detector, Detector::EnergyC)];
+      const double parB = base_parB.value() + base_parB.error() * parameter[index(detector, Detector::EnergyB)];
+      const double parC = base_parC.value() + base_parC.error() * parameter[index(detector, Detector::EnergyC)];
 
       auto& energy_corrected_spectrum = m_Cache[detector];
 
