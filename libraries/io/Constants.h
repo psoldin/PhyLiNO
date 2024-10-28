@@ -12,14 +12,14 @@ namespace io {
 
     /**
      * @brief Destructor for the Constants class.
-     * 
+     *
      * This destructor is set to default.
      */
     ~Constants() = default;
 
     /**
      * @brief Energy bin x-axis values used in the Double Chooz experiment.
-     * 
+     *
      * This static constexpr std::array<double, 45> contains the energy bin x-axis values used in the Double Chooz experiment.
      * The values are in MeV and range from 1.0 to 50.0 MeV.
      */
@@ -38,6 +38,7 @@ namespace io {
 
     static constexpr double DistanceB2FD = 997.839;  // meter (DocDB# 6286 slide 7)
 
+    static constexpr int number_of_energy_bins = 38;  // Number of energy bins used in the Double Chooz experiment
   };
 
 }  // namespace io
