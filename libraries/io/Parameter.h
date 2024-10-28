@@ -40,6 +40,12 @@ namespace params {
       return static_cast<bool>((type == ND) + (type == FDII) + (type == FDI));
     }
 
+    inline constexpr DetectorType cast_to_base_type(DetectorType type) noexcept {
+      using enum DetectorType;
+      constexpr int base_type = ND | FDI | FDII;
+      return static_cast<DetectorType>(type & base_type);
+    }
+
     /**
      * @brief Casts a DetectorType to a version without reactor split.
      *
