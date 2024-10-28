@@ -2,6 +2,7 @@
 
 #include "DataBase.h"
 #include "InputOptions.h"
+#include "StartingParameter.h"
 
 namespace io {
 
@@ -44,9 +45,12 @@ namespace io {
      */
     [[nodiscard]] const DataBase& dataBase() const noexcept { return m_DataBase; }
 
+    [[nodiscard]] const StartingParameter& startingParameter() const noexcept { return m_StartingParameter; }
+
    private:
     InputOptions m_InputOptions;
     DataBase     m_DataBase;
+    StartingParameter m_StartingParameter;
   };
 
 }  // namespace io
