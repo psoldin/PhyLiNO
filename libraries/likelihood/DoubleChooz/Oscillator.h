@@ -26,6 +26,16 @@ namespace ana::dc {
 
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
+    /**
+     * @brief Returns the calculated spectra for the given detector type.
+     *
+     * @param type The detector type.
+     * @return The calculated spectra.
+     */
+    [[nodiscard]] const Eigen::Array<double, 80, 1>& get_spectrum(params::dc::DetectorType type) const noexcept {
+      return m_Cache.at(type);
+    }
+
    private:
     std::shared_ptr<io::Options> m_Options; /**< The options for the Oscillator. */
 

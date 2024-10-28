@@ -24,6 +24,9 @@ namespace ana::dc {
 
     void recalculate_energy_correction(const ParameterWrapper& parameter) noexcept {
       m_EnergyCorrection.calculate_energy_correction(parameter, m_Oscillator);
+    }
+
+    void recalculate_shape_correction(const ParameterWrapper& parameter) noexcept {
 
     }
 

@@ -67,7 +67,7 @@ namespace ana::dc {
         recalculate_oscillation_spectra(parameter);
         [[fallthrough]];
       case CalculationType::EnergyCorrection:
-        recalculate_energy_correction(parameter, m_Oscillator);
+        recalculate_energy_correction(parameter);
         [[fallthrough]];
       case CalculationType::ShapeCorrection:
         recalculate_shape_correction(parameter);

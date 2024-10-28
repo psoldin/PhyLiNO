@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Oscillator.h"
+#include <Eigen/Core>
 
 namespace ana::dc {
 
   class EnergyCorrection {
   public:
-    explicit EnergyCorrection(std::shared_ptr<io::Options> options)
-    : m_Options(std::move(options)) { }
+    explicit EnergyCorrection(std::shared_ptr<io::Options> options);
 
     ~EnergyCorrection() = default;
 
@@ -15,6 +15,7 @@ namespace ana::dc {
 
   private:
     std::shared_ptr<io::Options> m_Options;
+    Eigen::Array<double, 80, 1> m_XPos;
 
     std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 80, 1>> m_Cache;
   };
