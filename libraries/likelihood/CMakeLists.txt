@@ -28,6 +28,8 @@ set(files
     DoubleChooz/ReactorSpectrum.h
     DoubleChooz/EnergyCorrection.h
     DoubleChooz/EnergyCorrection.cpp
+    DoubleChooz/ShapeCorrection.cpp
+    DoubleChooz/ShapeCorrection.h
 )
 
 add_library(likelihood SHARED ${files})
