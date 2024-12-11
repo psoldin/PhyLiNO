@@ -22,7 +22,7 @@ namespace ana::dc {
      *
      * @param parameter A pointer to the parameter array.
      */
-    explicit ParameterWrapper(const double* parameter);
+    explicit ParameterWrapper(std::size_t nParameter);
 
     /**
      * @brief Default destructor.
@@ -139,8 +139,8 @@ namespace ana::dc {
     [[nodiscard]] bool check_parameter_changed(int from, int to) const noexcept;
 
    private:
-    std::array<double, params::number_of_parameters()> m_CurrentParameters;   // Unified parameters array
-    std::array<double, params::number_of_parameters()> m_PreviousParameters;  // Previous parameter set for comparison
+    std::vector<double> m_CurrentParameters;   // Unified parameters array
+    std::vector<double> m_PreviousParameters;  // Previous parameter set for comparison
 
     const double* m_RawParameter;  // Pointer to the raw parameter array
 

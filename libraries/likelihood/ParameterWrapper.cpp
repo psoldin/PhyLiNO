@@ -3,10 +3,10 @@
 
 namespace ana::dc {
 
-  ParameterWrapper::ParameterWrapper(const double* parameter)
-    : m_RawParameter(parameter) {
-    reset_parameter(parameter);
-  }
+  ParameterWrapper::ParameterWrapper(std::size_t nParameter)
+    : m_CurrentParameters(nParameter)
+    , m_PreviousParameters(nParameter)
+    , m_RawParameter(nullptr) { }
 
   void ParameterWrapper::reset_parameter(const double* parameter) {
     m_RawParameter = parameter;

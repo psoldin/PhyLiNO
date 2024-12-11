@@ -1,8 +1,8 @@
 set(files
     Fit.h
     Fit.cpp
-    DoubleChooz/ParameterWrapper.h
-    DoubleChooz/ParameterWrapper.cpp
+        ParameterWrapper.h
+        ParameterWrapper.cpp
     Likelihood.h
     DoubleChooz/Oscillator.cpp
     Definitions.h
