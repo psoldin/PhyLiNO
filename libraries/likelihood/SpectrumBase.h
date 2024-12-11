@@ -4,8 +4,6 @@
 #include "ParameterWrapper.h"
 #include "../io/Options.h"
 
-#include <../../external/eigen/Eigen/Core>
-
 /**
  * @brief The BackgroundBase class is a base class for background models in the ana namespace.
  *
