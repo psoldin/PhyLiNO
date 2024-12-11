@@ -10,22 +10,26 @@ namespace ana::dc {
     using namespace params;
 
     bool has_changed = false;
-    for (auto detector : {ND, FDI, FDII}) {
-      has_changed |= parameter.range_changed(index(detector, AccShape01), index(detector, AccShape38) + 1);
-      has_changed |= parameter.parameter_changed(index(detector, BkgRAcc));
+
+    for (const auto detector : {ND, FDI, FDII}) {
+      has_changed |= parameter.check_parameter_changed(index(detector, AccShape01), index(detector, AccShape38) + 1);
+      has_changed |= parameter.check_parameter_changed(index(detector, BkgRAcc));
     }
+
     return has_changed;
   }
 
-  bool AccidentalBackground::check_and_recalculate_spectra(const ana::dc::ParameterWrapper& parameter) {
-    bool has_changed = parameter_changed(parameter);
+  bool AccidentalBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
+    const bool has_changed = parameter_changed(parameter);
+
     if (has_changed) {
       recalculate_spectra(parameter);
     }
+
     return has_changed;
   }
 
-  void AccidentalBackground::recalculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
+  void AccidentalBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
     using namespace params;

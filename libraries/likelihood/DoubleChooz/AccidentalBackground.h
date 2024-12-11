@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Definitions.h"
-#include "ParameterWrapper.h"
+#include "../ParameterWrapper.h"
 #include "SpectrumBase.h"
 
 namespace ana::dc {
@@ -15,14 +15,17 @@ namespace ana::dc {
 
     bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
 
-    [[nodiscard]] const return_t& get_spectrum(params::dc::DetectorType type) const noexcept override {
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override {
       return m_Cache.at(type);
     }
 
    private:
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
-    std::unordered_map<params::dc::DetectorType, return_t>                    m_Cache;
-    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 38, 1>> m_SpectrumTemplate;
+    template <typename T>
+    using uo_map = std::unordered_map<params::dc::DetectorType, T>;
+
+    uo_map<return_t<44>>                m_Cache;
+    uo_map<Eigen::Array<double, 38, 1>> m_SpectrumTemplate;
   };
 }  // namespace ana::dc
