@@ -45,8 +45,11 @@ namespace ana::dc {
      * This function is called to check if the spectrum needs to be recalculated and then recalculates it if necessary.
      *
      * @param parameter The parameter object.
+     * @param previous_calculation_step A boolean indicating if the previous calculation was recalculated.
+     * This is only necessary if the previous calculation step is dependent on the current one.
+     * @return bool A boolean indicating if the spectrum was recalculated.
      */
-    [[nodiscard]] virtual bool check_and_recalculate_spectra(const ParameterWrapper& parameter) = 0;
+    [[nodiscard]] virtual bool check_and_recalculate(const ParameterWrapper& parameter, bool previous_calculation_step) noexcept = 0;
 
     /**
      * @brief Get the spectrum for a specific detector type.
