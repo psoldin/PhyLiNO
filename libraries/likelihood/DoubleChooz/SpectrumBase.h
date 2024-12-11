@@ -50,7 +50,17 @@ namespace ana::dc {
      */
     [[nodiscard]] virtual bool check_and_recalculate_spectra(const ParameterWrapper& parameter) = 0;
 
-    [[nodiscard]] virtual const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept = 0;
+    /**
+     * @brief Get the spectrum for a specific detector type.
+     *
+     * This pure virtual function must be implemented by derived classes to return the spectrum data
+     * for the given detector type.
+     *
+     * @param type The detector type for which the spectrum is requested.
+     * @return std::span<const double> A span containing the spectrum data.
+     * It is a span to incorporate all possible shapes.
+     */
+    [[nodiscard]] virtual std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept = 0;
 
    protected:
     std::shared_ptr<io::Options> m_Options;
