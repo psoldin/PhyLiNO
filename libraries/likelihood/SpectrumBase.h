@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Definitions.h"
-#include "DoubleChooz/ParameterWrapper.h"
-#include "Options.h"
+#include "Definitions.h"
+#include "ParameterWrapper.h"
+#include "../io/Options.h"
 
-#include <Eigen/Core>
+#include <../../external/eigen/Eigen/Core>
 
 /**
  * @brief The BackgroundBase class is a base class for background models in the ana namespace.
