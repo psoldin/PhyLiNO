@@ -57,6 +57,24 @@ namespace ana::dc {
     return x * x;
   }
 
+  inline bool check_parameter(const ParameterWrapper& parameter) noexcept {
+    using namespace params;
+    bool recalculate = parameter.check_parameter_changed(General::SinSqT13);
+    recalculate |= parameter.check_parameter_changed(General::DeltaM31);
+
+    return recalculate;
+  }
+
+  bool Oscillator::check_and_recalculate_spectra(const ParameterWrapper &parameter) noexcept {
+    bool recalculate = check_parameter(parameter);
+
+    if (recalculate) {
+      recalculate_spectra(parameter);
+    }
+
+    return recalculate;
+  }
+
   void Oscillator::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
     perform_cpu_oscillation(parameter);
   }

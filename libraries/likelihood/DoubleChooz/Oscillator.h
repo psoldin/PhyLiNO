@@ -2,7 +2,8 @@
 
 #include "Options.h"
 #include "OscillationData.h"
-#include "ParameterWrapper.h"
+#include "../ParameterWrapper.h"
+#include "SpectrumBase.h"
 
 namespace ana::dc {
   /**
@@ -10,7 +11,7 @@ namespace ana::dc {
    *
    * This class provides functionality to handle an Oscillator.
    */
-  class Oscillator {
+  class Oscillator : public SpectrumBase {
    public:
     /**
      * @brief Constructs an Oscillator object with the given options.
@@ -22,9 +23,9 @@ namespace ana::dc {
     /**
      * @brief Destructor for the Oscillator object.
      */
-    ~Oscillator() = default;
+    ~Oscillator() override = default;
 
-    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+    bool check_and_recalculate(const ParameterWrapper& parameter, bool previous_calculation_step=true) noexcept override;
 
     /**
      * @brief Returns the calculated spectra for the given detector type.
