@@ -33,7 +33,7 @@ namespace ana::dc {
      * @param type The detector type.
      * @return The calculated spectra.
      */
-    [[nodiscard]] const Eigen::Array<double, 80, 1>& get_spectrum(params::dc::DetectorType type) const noexcept {
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override {
       return m_Cache.at(type);
     }
 
