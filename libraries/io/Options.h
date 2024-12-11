@@ -45,7 +45,7 @@ namespace io {
      */
     [[nodiscard]] const DataBase& dataBase() const noexcept { return m_DataBase; }
 
-    [[nodiscard]] const StartingParameter& startingParameter() const noexcept { return m_StartingParameter; }
+    [[nodiscard]] const StartingParameter& starting_parameter() const noexcept { return m_StartingParameter; }
 
    private:
     InputOptions m_InputOptions;
