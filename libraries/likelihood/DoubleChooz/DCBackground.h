@@ -4,7 +4,7 @@
 #include "AccidentalBackground.h"
 #include "FastNBackground.h"
 #include "LithiumBackground.h"
-#include "SpectrumBase.h"
+#include "../SpectrumBase.h"
 
 namespace ana::dc {
 

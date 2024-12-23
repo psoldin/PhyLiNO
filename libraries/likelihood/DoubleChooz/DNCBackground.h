@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Definitions.h"
-#include "ParameterWrapper.h"
-#include "SpectrumBase.h"
+#include "../ParameterWrapper.h"
+#include "../SpectrumBase.h"
 
 namespace ana::dc {
 
