@@ -4,6 +4,7 @@
 
 namespace ana::dc {
 
-  using return_t = Eigen::Array<double, 44, 1>;
+  template <int nBins=44>
+  using return_t = Eigen::Array<double, nBins, 1>;
 
 }
