@@ -3,6 +3,20 @@
 
 namespace ana::dc {
 
+  [[nodiscard]] inline bool check_parameters(const ParameterWrapper& parameter) noexcept {
+    using enum params::dc::DetectorType;
+    using namespace params;
+    using namespace params::dc;
+
+    bool recalculate = parameter.check_parameter_changed(General::LiShape01, General::LiShape38);
+
+    for (auto detector : {ND, FDI, FDII}) {
+      recalculate |= parameter.check_parameter_changed(index(detector, Detector::BkgRLi));
+    }
+
+    return recalculate;
+  }
+
   inline bool parameter_changed(const ana::dc::ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;

@@ -13,17 +13,24 @@ namespace ana::dc {
 
     ~LithiumBackground() override = default;
 
-    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
-
-    [[nodiscard]] const return_t& get_spectrum(params::dc::DetectorType type) const noexcept override {
-      return m_Cache.at(type);
+    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override {
+      const bool recalculate = check_parameters(parameter);
+      if (!check_parameters(parameter)) {
+        recalculate_spectra(parameter);
+      }
+      return recalculate;
     }
 
-   private:
-    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const override {
+      return m_Spectra.at(detector);
+    }
 
-    std::unordered_map<params::dc::DetectorType, return_t>                    m_Cache;
-    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 38, 1>> m_SpectrumTemplate;
+  private:
+    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 44, 1>> m_Spectra;
+
+  void recalculate_spectra(const ParameterWrapper& parameter) {
+      // Recalculate the lithium background spectrum
+  }
   };
 
 }  // namespace ana::dc
