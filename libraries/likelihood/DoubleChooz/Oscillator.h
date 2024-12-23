@@ -44,10 +44,12 @@ namespace ana::dc {
 
     std::vector<OscillationData> m_CalculationData; /**< The data used for the actual computations. */
 
-    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 80, 1>> m_Cache; /**< The cache for the calculated spectra. */
+    std::unordered_map<params::dc::DetectorType, std::array<double, 80>> m_Cache; /**< The cache for the calculated spectra. */
 
     void add_reactor_data(const io::ReactorData& reactorData, params::dc::DetectorType type);
 
     void perform_cpu_oscillation(const ParameterWrapper& parameter) noexcept;
+
+    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
   };
 }  // namespace ana::dc

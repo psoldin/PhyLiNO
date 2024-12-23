@@ -51,21 +51,19 @@ namespace ana::dc {
     }
   }
 
-#pragma omp declare simd
-  template <typename T>
-  inline auto pow_2(T&& x) noexcept {
-    return x * x;
-  }
-
   inline bool check_parameter(const ParameterWrapper& parameter) noexcept {
-    using namespace params;
-    bool recalculate = parameter.check_parameter_changed(General::SinSqT13);
-    recalculate |= parameter.check_parameter_changed(General::DeltaM31);
+    using enum params::General;
+    bool recalculate = parameter.check_parameter_changed(SinSqT13);
+    recalculate |= parameter.check_parameter_changed(DeltaM31);
 
     return recalculate;
   }
 
-  bool Oscillator::check_and_recalculate_spectra(const ParameterWrapper &parameter) noexcept {
+  void Oscillator::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
+    perform_cpu_oscillation(parameter);
+  }
+
+  bool Oscillator::check_and_recalculate(const ParameterWrapper &parameter, bool previous_calculation_step) noexcept {
     bool recalculate = check_parameter(parameter);
 
     if (recalculate) {
@@ -75,15 +73,11 @@ namespace ana::dc {
     return recalculate;
   }
 
-  void Oscillator::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
-    perform_cpu_oscillation(parameter);
-  }
-
   void Oscillator::perform_cpu_oscillation(const ParameterWrapper& parameter) noexcept {
     const std::size_t N = m_CalculationData.size();
 
     for (auto& [_, spectra] : m_Cache) {
-      spectra.setZero();
+      std::ranges::fill(spectra, 0.0);
     }
 
     const ThreeFlavorOscillation osci(parameter[params::General::SinSqT13],
