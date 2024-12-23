@@ -1,5 +1,6 @@
-#include "EnergyCorrection.h"
+2#include "EnergyCorrection.h"
 #include "FuzzyCompare.h"
+#include "ParameterValue.h"
 #include <unsupported/Eigen/Splines>
 #include <Constants.h>
 
@@ -81,33 +82,52 @@ namespace ana::dc {
     Eigen::Spline<double, 1, 3> spline_;
   };
 
-  EnergyCorrection::EnergyCorrection(std::shared_ptr<io::Options> options)
-    : m_Options(std::move(options)) {
+  EnergyCorrection::EnergyCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<ShapeCorrection> shape_correction)
+    : m_Options(std::move(options))
+    , m_ShapeCorrection(std::move(shape_correction)) {
     auto xpos_values = range(0.25, 20.25, 0.25);
     m_XPos           = Eigen::Array<double, 80, 1>(xpos_values.data());
   }
 
-  void EnergyCorrection::calculate_energy_correction(const ParameterWrapper& parameter,
-                                                     const Oscillator&       oscillator) noexcept {
+  [[nodiscard]] inline bool parameter_changed(const ParameterWrapper& parameter) noexcept {
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+    using namespace params;
 
+    bool has_changed = parameter.parameter_changed(General::EnergyA);
+    for (auto detector : {ND, FDI, FDII}) {
+      has_changed |= parameter.parameter_changed(index(detector, EnergyB));
+      has_changed |= parameter.parameter_changed(index(detector, EnergyC));
+    }
+    return has_changed;
+  }
+
+  void EnergyCorrection::check_and_recalculate_spectra(const ParameterWrapper& parameter) noexcept {
+    m_ShapeCorrection->check_and_recalculate_spectra(parameter);
+    if (parameter_changed(parameter)) {
+      calculate_spectra(parameter);
+    }
+  }
+
+  void EnergyCorrection::calculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
     using namespace params;
     using namespace params::dc;
     using enum DetectorType;
 
     auto starting_parameter = m_Options->starting_parameter();
 
-    const ParameterValue base_parA = starting_parameter.energy_correction_parameter_A();
+    const io::ParameterValue base_parA = starting_parameter.energy_correction_parameter_A();
     const double parA = base_parA.value() + base_parA.error() * parameter[index(General::EnergyA)];
 
     for (auto detector : {ND, FDI, FDII}) {
-      const Eigen::Array<double, 80, 1>& oscillatedSpectrum = oscillator.get_spectrum(detector);
+      const Eigen::Array<double, 80, 1>& oscillatedSpectrum = m_ShapeCorrection->get_spectrum(detector);
 
       Eigen::Array<double, 80, 1> cumsum;
       std::partial_sum(oscillatedSpectrum.data(), oscillatedSpectrum.data() + oscillatedSpectrum.size(), cumsum.data());
 
       SplineFunction spline(m_XPos, cumsum);
-      const ParameterValue base_parB = starting_parameter.energy_correction_parameter_B(detector);
-      const ParameterValue base_parC = starting_parameter.energy_correction_parameter_C(detector);
+      const io::ParameterValue base_parB = starting_parameter.energy_correction_parameter_B(detector);
+      const io::ParameterValue base_parC = starting_parameter.energy_correction_parameter_C(detector);
 
       const double parB = base_parB.value() + base_parB.error() * parameter[index(detector, Detector::EnergyB)];
       const double parC = base_parC.value() + base_parC.error() * parameter[index(detector, Detector::EnergyC)];
