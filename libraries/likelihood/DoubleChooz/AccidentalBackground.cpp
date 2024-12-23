@@ -1,52 +1,56 @@
 #include "AccidentalBackground.h"
-#include "Calculate_Spectrum.h"
-#include "Parameter.h"
+
+#include <algorithm>
+#include "Eigen/Core"
+#include "Eigen/Eigenvalues"
 
 namespace ana::dc {
 
-  inline bool parameter_changed(const ana::dc::ParameterWrapper& parameter) noexcept {
-    using enum params::dc::DetectorType;
-    using enum params::dc::Detector;
-    using namespace params;
-
-    bool has_changed = false;
-
-    for (const auto detector : {ND, FDI, FDII}) {
-      has_changed |= parameter.check_parameter_changed(index(detector, AccShape01), index(detector, AccShape38) + 1);
-      has_changed |= parameter.check_parameter_changed(index(detector, BkgRAcc));
-    }
-
-    return has_changed;
+  template <typename T1, typename T2>
+  inline void scale_and_clip_vector(const T1& v, T2& result,  double scale) noexcept {
+    std::transform(v.cbegin(),
+                   v.cend(),
+                   result.begin(),
+                   [scale](double x) { return std::max(x * scale, 0.0); });
   }
 
-  bool AccidentalBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
-    const bool has_changed = parameter_changed(parameter);
+  template <typename T1, typename T2>
+  inline void add_vector1_to_vector2(const T1& v1, const T2& v2) noexcept {
+    std::transform(v1.cbegin(),
+                   v1.cend(),
+                   v2.cbegin(),
+                   v2.begin(),
+                   std::plus<>());
+  }
 
-    if (has_changed) {
+  /**
+   * \brief Checks if any relevant parameters have changed and determines if spectra need to be recalculated.
+   *
+   * \param parameter The ParameterWrapper object containing the parameters to check.
+   * \return True if any relevant parameters have changed, false otherwise.
+   */
+  [[nodiscard]] inline bool check_parameters(const ParameterWrapper& parameter) noexcept {
+    using enum params::dc::DetectorType;
+    using namespace params;
+    using namespace params::dc;
+
+    bool recalculate = false;
+    for (auto detector : {ND, FDI, FDII}) {
+      recalculate |= parameter.check_parameter_changed(index(detector, BkgRAcc));
+      recalculate |= parameter.check_parameter_changed(index(detector, AccShape01), index(detector, AccShape38));
+    }
+
+    return recalculate;
+  }
+
+  bool AccidentalBackground::check_and_recalculate_spectra(const ParameterWrapper &parameter) {
+    const bool recalculate = check_parameters(parameter);
+    if (!check_parameters(parameter)) {
       recalculate_spectra(parameter);
     }
-
-    return has_changed;
+    return recalculate;
   }
 
-  void AccidentalBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
-    using enum params::dc::DetectorType;
-    using enum params::dc::Detector;
-    using namespace params;
 
-    for (auto detector : {ND, FDI, FDII}) {
-      double      rate            = parameter[params::index(detector, BkgRAcc)];
-      const auto& shape           = m_SpectrumTemplate[detector];
-      auto        shape_parameter = parameter.sub_range(index(detector, AccShape01), index(detector, AccShape38) + 1);
-      const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Accidental);
-      auto&       result          = m_Cache[detector];
+}
 
-      calculate_spectrum<38>(rate,
-                             shape,
-                             shape_parameter,
-                             covMatrix.block<38, 38>(0, 0),
-                             result);
-    }
-  }
-
-}  // namespace ana::dc
