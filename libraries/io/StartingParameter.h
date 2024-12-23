@@ -14,7 +14,8 @@ namespace io {
 
   class StartingParameter {
     public:
-      explicit StartingParameter(const InputOptions& inputOptions);
+      explicit StartingParameter(const InputOptions& inputOptions)
+        : m_InputOptions(inputOptions) { }
 
       ~StartingParameter() = default;
 
@@ -45,6 +46,7 @@ namespace io {
 
       [[nodiscard]] ParameterValue energy_correction_parameter_C(params::dc::DetectorType type) const noexcept { return m_EnergyCorrectionParameterC.at(params::dc::cast_to_base_type(type)); }
     private:
+      const io::InputOptions& m_InputOptions;
       std::vector<ParameterValue> m_ParameterValues;
 
       std::array<double, params::number_of_data_sets()> m_OnLifeTime;
