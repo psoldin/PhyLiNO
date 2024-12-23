@@ -6,7 +6,7 @@ set(files
     Likelihood.h
     DoubleChooz/Oscillator.cpp
     Definitions.h
-    DoubleChooz/SpectrumBase.h
+        SpectrumBase.h
     DoubleChooz/Oscillator.h
     DoubleChooz/Oscillator.cpp
     DoubleChooz/DCBackground.h
@@ -14,7 +14,7 @@ set(files
     DoubleChooz/AccidentalBackground.cpp
     DoubleChooz/AccidentalBackground.h
     DoubleChooz/DCBackground.cpp
-    DoubleChooz/SpectrumBase.h
+        SpectrumBase.h
     DoubleChooz/LithiumBackground.h
     DoubleChooz/LithiumBackground.cpp
     DoubleChooz/FastNBackground.cpp

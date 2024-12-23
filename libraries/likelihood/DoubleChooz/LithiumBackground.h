@@ -2,7 +2,7 @@
 
 #include "../Definitions.h"
 #include "Options.h"
-#include "SpectrumBase.h"
+#include "../SpectrumBase.h"
 
 namespace ana::dc {
 
