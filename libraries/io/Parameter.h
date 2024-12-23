@@ -103,7 +103,7 @@ namespace params {
      * @param type The DetectorType to be cast.
      * @return The casted DetectorType if it is a base type, otherwise the original type.
      */
-    inline constexpr bool cast_to_B1_split(DetectorType type) noexcept {
+    inline constexpr DetectorType cast_to_B1_split(DetectorType type) noexcept {
       using enum DetectorType;
       return is_base_type(type) ? static_cast<DetectorType>(type | B1) : type;
     }
@@ -118,7 +118,7 @@ namespace params {
      * @param type The DetectorType to be cast.
      * @return The casted DetectorType if it is a base type, otherwise the original type.
      */
-    inline constexpr bool cast_to_B2_split(DetectorType type) noexcept {
+    inline constexpr DetectorType cast_to_B2_split(DetectorType type) noexcept {
       using enum DetectorType;
       return is_base_type(type) ? static_cast<DetectorType>(type | B2) : type;
     }
