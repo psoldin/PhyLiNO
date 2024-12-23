@@ -6,8 +6,9 @@ namespace ana::dc {
     return std::pow(std::cos(std::asin(std::sqrt(xt13)) / 2.0), 4);
   }
 
-#pragma omp declare simd
-  inline auto pow_2(double x) noexcept {
+  #pragma omp declare simd
+  template <typename T>
+  auto pow_2(T&& x) noexcept {
     return x * x;
   }
 
@@ -21,8 +22,8 @@ namespace ana::dc {
   double ThreeFlavorOscillation::oscillate_events(const OscillationData& data) const noexcept {
     using span_t = std::span<const double>;
 
-    span_t loe = data.LoverE;
-    span_t scl = data.scaling;
+    const span_t loe = data.LoverE;
+    const span_t scl = data.scaling;
 
     const double cos4 = m_cos413 * m_t12;
 
@@ -30,10 +31,10 @@ namespace ana::dc {
 
     double result = 0.0;
 
-#pragma omp simd reduction(+ : result)
+    #pragma omp simd reduction(+ : result)
     for (std::size_t i = 0; i < N; ++i) {
-      double t13Part = m_t13 * pow_2(sin(m_dmee * loe[i]));
-      double t12Part = cos4 * pow_2(sin(m_dm21 * loe[i]));
+      const double t13Part = m_t13 * pow_2(sin(m_dmee * loe[i]));
+      const double t12Part = cos4 * pow_2(sin(m_dm21 * loe[i]));
       result += scl[i] * (1 - t13Part - t12Part);
     }
 
