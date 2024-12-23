@@ -2,9 +2,33 @@
 
 namespace ana::dc {
 
-  inline double calculate_poisson_likelihood(const return_t& data, const return_t& signal, const return_t& bkg) noexcept {
+  /**
+   * @brief Calculates the Poisson likelihood for given data, signal, and background.
+   *
+   * This function computes the Poisson likelihood for a given set of observed data,
+   * expected signal, and background. The likelihood is calculated using the formula:
+   *
+   * \f[
+   * \mathcal{L} = -2 \sum_{i} \left( data_i \log(model_i) - model_i \right)
+   * \f]
+   *
+   * where \f$ model_i = signal_i + bkg_i \f$.
+   *
+   * @param data A span of observed data values.
+   * @param signal A span of expected signal values.
+   * @param bkg A span of expected background values.
+   * @return The calculated Poisson likelihood.
+   */
+  inline double calculate_poisson_likelihood(std::span<const double> data, std::span<const double> signal, std::span<const double> bkg) noexcept {
     auto model = bkg + signal;
-    return -2.0 * (data * model.log() - model).sum();
+
+    double return_value = 0.0;
+    for (size_t i = 0; i < data.size(); ++i) {
+      const double model_i = signal[i] + bkg[i];
+      return_value += data[i] * std::log(model_i) - model_i;
+    }
+
+    return -2.0 * return_value;
   }
 
   void DCLikelihood::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
