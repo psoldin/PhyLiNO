@@ -17,22 +17,8 @@ namespace ana::dc {
     return recalculate;
   }
 
-  inline bool parameter_changed(const ana::dc::ParameterWrapper& parameter) noexcept {
-    using enum params::dc::DetectorType;
-    using enum params::dc::Detector;
-    using namespace params;
-
-    bool has_changed = parameter.range_changed(General::LiShape01, General::LiShape38 + 1);
-
-    for (auto detector : {ND, FDI, FDII}) {
-      has_changed |= parameter.parameter_changed(index(detector, BkgRLi));
-    }
-
-    return has_changed;
-  }
-
   bool LithiumBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
-    bool has_changed = parameter_changed(parameter);
+    bool has_changed = check_parameters(parameter);
     if (has_changed) {
       recalculate_spectra(parameter);
     }
