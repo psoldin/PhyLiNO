@@ -94,6 +94,36 @@ namespace params {
     }
 
     /**
+     * @brief Casts the given DetectorType to a B1 split type if it is a base type.
+     *
+     * This function checks if the provided DetectorType is a base type. If it is,
+     * it casts the type to a B1 split type by performing a bitwise OR operation
+     * with the B1 value. If the type is not a base type, it returns the type as is.
+     *
+     * @param type The DetectorType to be cast.
+     * @return The casted DetectorType if it is a base type, otherwise the original type.
+     */
+    inline constexpr bool cast_to_B1_split(DetectorType type) noexcept {
+      using enum DetectorType;
+      return is_base_type(type) ? static_cast<DetectorType>(type | B1) : type;
+    }
+
+    /**
+     * @brief Casts the given DetectorType to a B2 split type if it is a base type.
+     *
+     * This function checks if the provided DetectorType is a base type. If it is,
+     * it casts the type to a B2 split type by performing a bitwise OR operation
+     * with the B2 value. If the type is not a base type, it returns the type as is.
+     *
+     * @param type The DetectorType to be cast.
+     * @return The casted DetectorType if it is a base type, otherwise the original type.
+     */
+    inline constexpr bool cast_to_B2_split(DetectorType type) noexcept {
+      using enum DetectorType;
+      return is_base_type(type) ? static_cast<DetectorType>(type | B2) : type;
+    }
+
+    /**
      * Test whether the DetectorType is of type far detector.
      * @param type DetectorType
      * @return boolean: Is far detector type
