@@ -21,22 +21,22 @@ namespace ana::dc {
     }
   }
 
-  template <int Nbins>
+  template <int NBins>
   void calculate_spectrum(double rate,
-                          const Eigen::Vector<double, Nbins>& shape,
+                          const Eigen::Vector<double, NBins>& shape,
                           std::span<const double> shape_parameter,
-                          const Eigen::Matrix<double, Nbins, Nbins>& covMatrix,
-                          return_t& result) {
+                          const Eigen::Matrix<double, NBins, NBins>& covMatrix,
+                          return_t<NBins>& result) {
 
-    auto backgroundSpectrum = make_spectrum<Nbins>(shape);
+    auto backgroundSpectrum = make_spectrum<NBins>(shape);
 
-    auto backgroundSpectrumSubset = backgroundSpectrum.template head<Nbins>();
+    auto backgroundSpectrumSubset = backgroundSpectrum.template head<NBins>();
     auto backgroundOuterProduct = backgroundSpectrumSubset * backgroundSpectrumSubset.transpose();
 
     // Element-wise multiplication of the fractional covariance matrix with the outer product
     auto defracCovMatrix = pow_2(rate) * covMatrix.cwiseProduct(backgroundOuterProduct);
 
-    using matrix_t = Eigen::Matrix<double, Nbins, Nbins>;
+    using matrix_t = Eigen::Matrix<double, NBins, NBins>;
 
     Eigen::SelfAdjointEigenSolver<matrix_t> eigen_solver(0.5 * (defracCovMatrix + defracCovMatrix.transpose()));
 
@@ -60,12 +60,13 @@ namespace ana::dc {
       eigenvalueCorrection *= 1.1;
     }
 
-    auto param_map = make_spectrum<Nbins>(shape_parameter);
-    Eigen::Vector<double, Nbins> shifts = llt_solver.matrixL() * param_map;
+    auto param_map = make_spectrum<NBins>(shape_parameter);
+    Eigen::Vector<double, NBins> shifts = llt_solver.matrixL() * param_map;
 
     std::transform(backgroundSpectrum.cbegin(), backgroundSpectrum.cend(), result.begin(),
                    [rate](double x) { return std::max(x * rate, 0.0); });
 
-    std::transform(shifts.cbegin(), shifts.cend(), result.cbegin(), result.begin(), std::plus<>());
+    std::transform(shifts.cbegin(), shifts.cend(), result.cbegin(), result.begin(), std::p
+      lus<>());
   }
 }
