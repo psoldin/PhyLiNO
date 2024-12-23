@@ -1,16 +1,32 @@
-//
-// Created by Philipp Soldin on 10.11.24.
-//
+#pragma once
+#include "EnergyCorrection.h"
+#include "Oscillator.h"
 
-#ifndef LIKELIHOOD_SHAPECORRECTION_H
-#define LIKELIHOOD_SHAPECORRECTION_H
+namespace ana::dc {
 
+  class ShapeCorrection {
+  public:
+    explicit ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator);
 
+    ~ShapeCorrection() = default;
 
-class ShapeCorrection {
+    void check_and_recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
-};
+    [[nodiscard]] const auto& get_spectrum(params::dc::DetectorType type) const noexcept {
+      return m_Cache.at(type);
+    }
 
+  private:
+    std::shared_ptr<io::Options> m_Options;
+    std::shared_ptr<ana::dc::Oscillator> m_Oscillator;
 
+    template <typename T>
+    using uo_map = std::unordered_map<params::dc::DetectorType, T>;
 
-#endif //LIKELIHOOD_SHAPECORRECTION_H
+    uo_map<Eigen::Array<double, 80, 1>>   m_Cache;
+    uo_map<Eigen::Matrix<double, 43, 43>> m_CovMatrix;
+
+    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+  };
+
+}
