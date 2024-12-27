@@ -1,8 +1,9 @@
-//
-// Created by Philipp Soldin on 28.12.24.
-//
+#pragma once
 
-#ifndef DCOPTIONS_H
-#define DCOPTIONS_H
+namespace io::dc {
 
-#endif //DCOPTIONS_H
+  class DCOptions {
+
+  };
+
+} // namespace io::dc
