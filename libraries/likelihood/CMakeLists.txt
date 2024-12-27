@@ -9,11 +9,9 @@ set(files
         SpectrumBase.h
     DoubleChooz/Oscillator.h
     DoubleChooz/Oscillator.cpp
-    DoubleChooz/DCBackground.h
-    DoubleChooz/Calculate_Spectrum.h
+        DoubleChooz/Calculate_Spectrum.h
     DoubleChooz/AccidentalBackground.cpp
     DoubleChooz/AccidentalBackground.h
-    DoubleChooz/DCBackground.cpp
         SpectrumBase.h
     DoubleChooz/LithiumBackground.h
     DoubleChooz/LithiumBackground.cpp
