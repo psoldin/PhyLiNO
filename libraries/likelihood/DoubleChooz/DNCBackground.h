@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Constants.h>
+
 #include "../Definitions.h"
 #include "../ParameterWrapper.h"
 #include "../SpectrumBase.h"
@@ -13,16 +15,19 @@ namespace ana::dc {
 
     ~DNCBackground() override = default;
 
-    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate(const ParameterWrapper& parameter) override;
 
-    [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept override;
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override;
 
    private:
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
-    std::unordered_map<params::dc::DetectorType, return_t> m_Cache;
-    std::unordered_map<params::dc::DetectorType, return_t> m_SpectrumTemplate_Gd;
-    std::unordered_map<params::dc::DetectorType, return_t> m_SpectrumTemplate_Hy;
+    using array_t = std::array<double, io::Constants::number_of_energy_bins>;
+    using uo_map_t = std::unordered_map<params::dc::DetectorType, array_t>;
+
+    uo_map_t m_Cache;
+    uo_map_t m_SpectrumTemplate_Gd;
+    uo_map_t m_SpectrumTemplate_Hy;
   };
 
 }  // namespace ana::dc

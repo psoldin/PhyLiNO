@@ -8,23 +8,22 @@ namespace ana::dc {
 
     bool has_changed = false;
     for (auto detector : {ND, FDI, FDII}) {
-      has_changed |= parameter.parameter_changed(params::index(detector, BkgRDNCGd));
-      has_changed |= parameter.parameter_changed(params::index(detector, BkgRDNCHy));
+      has_changed |= parameter.check_parameter_changed(params::index(detector, BkgRDNCGd));
+      has_changed |= parameter.check_parameter_changed(params::index(detector, BkgRDNCHy));
     }
 
     return has_changed;
   }
 
-  bool DNCBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
+  bool DNCBackground::check_and_recalculate(const ParameterWrapper& parameter) {
     bool has_changed = parameter_changed(parameter);
     if (has_changed) {
       recalculate_spectra(parameter);
     }
     return has_changed;
-
   }
 
-  void DNCBackground::recalculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
+  void DNCBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
 
@@ -37,11 +36,14 @@ namespace ana::dc {
 
       double lifetime = m_Options->dataBase().on_lifetime(detector);
 
-      m_Cache[detector] = (lifetime * (gd_rate * gd_shape + hy_rate * hy_shape)).unaryExpr([](double x) { return std::max(x, 0.); });
+      auto& result = m_Cache[detector];
+      for (int i = 0; i < io::Constants::number_of_energy_bins; ++i) {
+        result[i] = std::max(lifetime * ((gd_rate * gd_shape[i]) + (hy_rate * hy_shape[i])), 0.0);
+      }
     }
   }
 
-  const Eigen::Array<double, 44, 1>& DNCBackground::get_spectrum(params::dc::DetectorType type) const noexcept {
+  std::span<const double> DNCBackground::get_spectrum(params::dc::DetectorType type) const noexcept {
     return m_Cache.at(type);
   }
 }
