@@ -91,7 +91,9 @@ namespace io {
 
     [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
 
-    [[nodiscard]] bool use_reactor_split() const noexcept;
+    [[nodiscard]] bool use_reactor_split() const noexcept {
+      return false; // TODO
+    }
 
    private:
     long m_Seed;                  /**< The global random seed. */

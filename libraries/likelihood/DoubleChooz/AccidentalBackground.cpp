@@ -43,9 +43,9 @@ namespace ana::dc {
     return recalculate;
   }
 
-  bool AccidentalBackground::check_and_recalculate_spectra(const ParameterWrapper &parameter) {
+  bool AccidentalBackground::check_and_recalculate(const ParameterWrapper &parameter) {
     const bool recalculate = check_parameters(parameter);
-    if (!check_parameters(parameter)) {
+    if (recalculate) {
       recalculate_spectra(parameter);
     }
     return recalculate;

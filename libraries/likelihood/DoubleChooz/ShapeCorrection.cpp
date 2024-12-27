@@ -40,21 +40,21 @@ namespace ana::dc {
 
     using enum params::dc::DetectorType;
     using namespace params::dc;
-
-    for (auto detector : {ND, FDI, FDII}) {
-      const auto& shape = m_Oscillator->get_spectrum(detector);
-      auto shape_parameter = parameter.sub_range(params::index(detector, Detector::NuShape01),
-                                                 params::index(detector, Detector::NuShape43) + 1);
-
-      const auto& covMatrix = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Reactor);
-      auto& result = m_Cache[detector];
-
-      calculate_spectrum<43>(1.0,
-                             shape,
-                             shape_parameter,
-                             covMatrix.block<43, 43>(0, 0),
-                             result);
-    }
+    //
+    // for (auto detector : {ND, FDI, FDII}) {
+    //   const auto& shape = m_Oscillator->get_spectrum(detector);
+    //   auto shape_parameter = parameter.sub_range(params::index(detector, Detector::NuShape01),
+    //                                              params::index(detector, Detector::NuShape43) + 1);
+    //
+    //   const auto& covMatrix = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Reactor);
+    //   auto& result = m_Cache[detector];
+    //
+    //   calculate_spectrum<43>(1.0,
+    //                          shape,
+    //                          shape_parameter,
+    //                          covMatrix.block<43, 43>(0, 0),
+    //                          result);
+    // }
   }
 
 }

@@ -19,7 +19,7 @@ namespace ana::dc {
     return has_changed;
   }
 
-  bool FastNBackground::check_and_recalculate_spectra(const ParameterWrapper &parameter) {
+  bool FastNBackground::check_and_recalculate(const ParameterWrapper &parameter) {
     bool has_changed = parameter_changed(parameter);
     if (has_changed) {
       recalculate_spectra(parameter);
@@ -31,20 +31,20 @@ namespace ana::dc {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
     using namespace params;
-
-    for (auto detector : {ND, FDI, FDII}) {
-      double      rate            = parameter[params::index(detector, BkgRFNSM)];
-      const auto& shape           = m_SpectrumTemplate[detector];
-      auto        shape_parameter = parameter.sub_range(index(detector, FNSMShape01), index(detector, FNSMShape44) + 1);
-      const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::FastN);
-      auto&       result          = m_Cache[detector];
-
-      calculate_spectrum<44>(rate,
-                             shape,
-                             shape_parameter,
-                             covMatrix,
-                             result);
-    }
+    //
+    // for (auto detector : {ND, FDI, FDII}) {
+    //   double      rate            = parameter[params::index(detector, BkgRFNSM)];
+    //   const auto& shape           = m_SpectrumTemplate[detector];
+    //   auto        shape_parameter = parameter.sub_range(index(detector, FNSMShape01), index(detector, FNSMShape44) + 1);
+    //   const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::FastN);
+    //   auto&       result          = m_Cache[detector];
+    //
+    //   calculate_spectrum<44>(rate,
+    //                          shape,
+    //                          shape_parameter,
+    //                          covMatrix,
+    //                          result);
+    // }
   }
 
 }  // namespace ana::dc

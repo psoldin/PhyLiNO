@@ -1,5 +1,5 @@
 #pragma once
-#include "EnergyCorrection.h"
+
 #include "Oscillator.h"
 
 namespace ana::dc {

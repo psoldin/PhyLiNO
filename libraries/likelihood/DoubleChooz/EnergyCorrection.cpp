@@ -115,6 +115,10 @@ namespace ana::dc {
     return recalculate;
   }
 
+  std::span<const double> EnergyCorrection::get_spectrum(params::dc::DetectorType type) const noexcept {
+    return m_Cache.at(type);
+  }
+
   void EnergyCorrection::calculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
     using namespace params;
     using namespace params::dc;

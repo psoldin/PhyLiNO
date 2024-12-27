@@ -66,7 +66,6 @@ namespace ana::dc {
     std::transform(backgroundSpectrum.cbegin(), backgroundSpectrum.cend(), result.begin(),
                    [rate](double x) { return std::max(x * rate, 0.0); });
 
-    std::transform(shifts.cbegin(), shifts.cend(), result.cbegin(), result.begin(), std::p
-      lus<>());
+    std::transform(shifts.cbegin(), shifts.cend(), result.cbegin(), result.begin(), std::plus<>());
   }
 }
