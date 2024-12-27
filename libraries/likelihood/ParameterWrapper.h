@@ -124,7 +124,7 @@ namespace ana::dc {
      * @param idx The index of the parameter to check.
      * @return True if the parameter has changed, false otherwise.
      */
-    [[nodiscard]] bool check_parameter_changed(int idx) const noexcept;
+    [[nodiscard]] bool check_parameter_changed(int idx) const;
 
     /**
      * @brief Checks if any parameter in the given range has changed.
@@ -136,7 +136,7 @@ namespace ana::dc {
      * @param to The ending index of the range.
      * @return True if any parameter in the range has changed, false otherwise.
      */
-    [[nodiscard]] bool check_parameter_changed(int from, int to) const noexcept;
+    [[nodiscard]] bool check_parameter_changed(int from, int to) const;
 
    private:
     std::vector<double> m_CurrentParameters;  // Unified parameters array
