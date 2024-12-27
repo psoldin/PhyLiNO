@@ -64,56 +64,56 @@ namespace ana::dc {
      *
      * @return An iterator to the beginning of the unified parameters.
      */
-    [[nodiscard]] inline auto begin() const noexcept { return m_CurrentParameters.begin(); }
+    [[nodiscard]] auto begin() const noexcept { return m_CurrentParameters.begin(); }
 
     /**
      * @brief Returns an iterator to the end of the unified parameters.
      *
      * @return An iterator to the end of the unified parameters.
      */
-    [[nodiscard]] inline auto end() const noexcept { return m_CurrentParameters.end(); }
+    [[nodiscard]] auto end() const noexcept { return m_CurrentParameters.end(); }
 
     /**
      * @brief Returns a reverse iterator to the beginning of the unified parameters.
      *
      * @return A reverse iterator to the beginning of the unified parameters.
      */
-    [[nodiscard]] inline auto rbegin() const noexcept { return m_CurrentParameters.rbegin(); }
+    [[nodiscard]] auto rbegin() const noexcept { return m_CurrentParameters.rbegin(); }
 
     /**
      * @brief Returns a reverse iterator to the end of the unified parameters.
      *
      * @return A reverse iterator to the end of the unified parameters.
      */
-    [[nodiscard]] inline auto rend() const noexcept { return m_CurrentParameters.rend(); }
+    [[nodiscard]] auto rend() const noexcept { return m_CurrentParameters.rend(); }
 
     /**
      * @brief Returns a constant iterator to the beginning of the unified parameters.
      *
      * @return A constant iterator to the beginning of the unified parameters.
      */
-    [[nodiscard]] inline auto cbegin() const noexcept { return m_CurrentParameters.cbegin(); }
+    [[nodiscard]] auto cbegin() const noexcept { return m_CurrentParameters.cbegin(); }
 
     /**
      * @brief Returns a constant iterator to the end of the unified parameters.
      *
      * @return A constant iterator to the end of the unified parameters.
      */
-    [[nodiscard]] inline auto cend() const noexcept { return m_CurrentParameters.cend(); }
+    [[nodiscard]] auto cend() const noexcept { return m_CurrentParameters.cend(); }
 
     /**
      * @brief Returns a constant reverse iterator to the beginning of the unified parameters.
      *
      * @return A constant reverse iterator to the beginning of the unified parameters.
      */
-    [[nodiscard]] inline auto crbegin() const noexcept { return m_CurrentParameters.crbegin(); }
+    [[nodiscard]] auto crbegin() const noexcept { return m_CurrentParameters.crbegin(); }
 
     /**
      * @brief Returns a constant reverse iterator to the end of the unified parameters.
      *
      * @return A constant reverse iterator to the end of the unified parameters.
      */
-    [[nodiscard]] inline auto crend() const noexcept { return m_CurrentParameters.crend(); }
+    [[nodiscard]] auto crend() const noexcept { return m_CurrentParameters.crend(); }
 
     /**
      * @brief Checks if the parameter at the given index has changed.
