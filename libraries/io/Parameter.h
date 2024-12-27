@@ -13,7 +13,7 @@ namespace params {
      * Each detector type is represented as a bit flag, which can be combined
      * using bitwise OR to represent multiple detector types.
      */
-    enum DetectorType : int {
+    enum DetectorType : char {
       FD     = 1 << 0,
       ND     = 1 << 1,
       V1     = 1 << 2,
