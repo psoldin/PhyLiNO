@@ -12,6 +12,7 @@ set(files
         ReactorData.h
         ReactorData.cpp
         ParameterValue.h
+        DCOptions.h
 )
 
 add_library(io SHARED ${files})
