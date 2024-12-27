@@ -6,7 +6,7 @@
 
 namespace ana::dc {
 
-  ParameterWrapper::ParameterWrapper(std::size_t nParameter)
+  ParameterWrapper::ParameterWrapper(const std::size_t nParameter)
     : m_CurrentParameters(nParameter, 0.0)
     , m_PreviousParameters(nParameter, 0.0)
     , m_ParameterChanged(nParameter, false)
@@ -23,12 +23,23 @@ namespace ana::dc {
     }
   }
 
-  bool ParameterWrapper::check_parameter_changed(int idx) const noexcept {
+  bool ParameterWrapper::check_parameter_changed(const int idx) const {
+    if (idx < 0 || idx >= m_NParameter) {
+      throw std::out_of_range("Parameter index out of range");
+    }
     const bool same = static_cast<bool>(m_ParameterChanged[idx]);
     return !same;
   }
 
-  bool ParameterWrapper::check_parameter_changed(int from, int to) const noexcept {
+  bool ParameterWrapper::check_parameter_changed(const int from, const int to) const {
+    if (from < 0 || to >= m_NParameter) {
+      throw std::out_of_range("Parameter index out of range");
+    }
+
+    if (to < from) {
+      throw std::invalid_argument("Invalid range");
+    }
+
     const auto same_count = std::accumulate(m_ParameterChanged.begin() + from, m_ParameterChanged.begin() + (to + 1), 0);
     const bool same = same_count == (to - from + 1);
     return !same;
