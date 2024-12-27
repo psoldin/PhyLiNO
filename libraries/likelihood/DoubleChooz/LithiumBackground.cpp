@@ -10,14 +10,14 @@ namespace ana::dc {
 
     bool recalculate = parameter.check_parameter_changed(General::LiShape01, General::LiShape38);
 
-    for (auto detector : {ND, FDI, FDII}) {
-      recalculate |= parameter.check_parameter_changed(index(detector, Detector::BkgRLi));
-    }
+    recalculate |= parameter.check_parameter_changed(index(ND, BkgRLi));
+    recalculate |= parameter.check_parameter_changed(index(FDI, BkgRLi));
+    recalculate |= parameter.check_parameter_changed(index(FDII, BkgRLi));
 
     return recalculate;
   }
 
-  bool LithiumBackground::check_and_recalculate_spectra(const ParameterWrapper& parameter) {
+  bool LithiumBackground::check_and_recalculate(const ParameterWrapper &parameter) {
     bool has_changed = check_parameters(parameter);
     if (has_changed) {
       recalculate_spectra(parameter);
@@ -44,5 +44,4 @@ namespace ana::dc {
                              result);
     }
   }
-
 }  // namespace ana::dc
