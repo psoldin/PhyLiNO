@@ -75,7 +75,7 @@ namespace ana::dc {
     perform_cpu_oscillation(parameter);
   }
 
-  bool Oscillator::check_and_recalculate(const ParameterWrapper &parameter, bool previous_calculation_step) noexcept {
+  bool Oscillator::check_and_recalculate(const ParameterWrapper &parameter) noexcept {
     bool recalculate = check_parameter(parameter);
 
     if (recalculate) {

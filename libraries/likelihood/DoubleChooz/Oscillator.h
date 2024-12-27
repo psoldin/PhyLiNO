@@ -25,7 +25,7 @@ namespace ana::dc {
      */
     ~Oscillator() override = default;
 
-    bool check_and_recalculate(const ParameterWrapper& parameter, bool previous_calculation_step=true) noexcept override;
+    bool check_and_recalculate(const ParameterWrapper& parameter) noexcept override;
 
     /**
      * @brief Returns the calculated spectra for the given detector type.
