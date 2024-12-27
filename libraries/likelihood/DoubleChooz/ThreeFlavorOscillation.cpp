@@ -7,8 +7,7 @@ namespace ana::dc {
   }
 
   #pragma omp declare simd
-  template <typename T>
-  auto pow_2(T&& x) noexcept {
+  inline double pow_2(const double x) noexcept {
     return x * x;
   }
 
