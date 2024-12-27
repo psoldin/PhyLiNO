@@ -35,7 +35,7 @@ namespace ana::dc {
      * @param parameter The parameter to be checked, encapsulated in a ParameterWrapper object.
      * @return True if the spectra were recalculated, false otherwise.
      */
-    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate(const ParameterWrapper& parameter) override;
 
     /**
      * @brief Retrieves the spectrum for a given detector type.
@@ -46,7 +46,7 @@ namespace ana::dc {
      * @param detector The type of detector for which the spectrum is requested.
      * @return A constant span of doubles representing the spectrum for the specified detector.
      */
-    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const override {
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const noexcept override {
       return m_Spectra.at(detector);
     }
 
