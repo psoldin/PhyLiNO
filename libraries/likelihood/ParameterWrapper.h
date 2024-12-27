@@ -20,6 +20,7 @@ namespace ana::dc {
     /**
      * @brief Constructs a ParameterWrapper object with a raw double pointer to the parameter array.
      *
+     * @param nParameter
      * @param parameter A pointer to the parameter array.
      */
     explicit ParameterWrapper(std::size_t nParameter);
