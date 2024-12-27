@@ -4,21 +4,23 @@
 
 namespace ana::dc {
 
-  class ShapeCorrection {
+  class ShapeCorrection : public SpectrumBase {
   public:
-    explicit ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator);
+    explicit ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator)
+      : SpectrumBase(std::move(options))
+      , m_Oscillator(std::move(oscillator)) {};
 
-    ~ShapeCorrection() = default;
+    ~ShapeCorrection() override = default;
 
-    void check_and_recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+    bool check_and_recalculate(const ParameterWrapper& parameter) noexcept override;
 
-    [[nodiscard]] const auto& get_spectrum(params::dc::DetectorType type) const noexcept {
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override {
       return m_Cache.at(type);
     }
 
   private:
     std::shared_ptr<io::Options> m_Options;
-    std::shared_ptr<ana::dc::Oscillator> m_Oscillator;
+    std::shared_ptr<Oscillator> m_Oscillator;
 
     template <typename T>
     using uo_map = std::unordered_map<params::dc::DetectorType, T>;

@@ -4,10 +4,6 @@
 
 namespace ana::dc {
 
-  ShapeCorrection::ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator)
-    : m_Options(std::move(options))
-    , m_Oscillator(std::move(oscillator)) { }
-
   [[nodiscard]] bool parameter_changed(const ParameterWrapper& parameter) noexcept {
 
       using enum params::dc::DetectorType;
@@ -27,12 +23,17 @@ namespace ana::dc {
       return parameter_changed;
   }
 
-  void ShapeCorrection::check_and_recalculate_spectra(const ParameterWrapper& parameter) noexcept {
-    m_Oscillator->check_and_recalculate_spectra(parameter);
+  bool ShapeCorrection::check_and_recalculate(const ParameterWrapper &parameter) noexcept {
 
-    if (parameter_changed(parameter)) {
+    const bool previous_step = m_Oscillator->check_and_recalculate(parameter);
+    const bool this_step = parameter_changed(parameter);
+    const bool recalculate = previous_step | this_step;
+
+    if (recalculate) {
       recalculate_spectra(parameter);
     }
+
+    return recalculate;
   }
 
   void ShapeCorrection::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
