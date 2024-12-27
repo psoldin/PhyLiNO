@@ -20,8 +20,6 @@ namespace ana::dc {
    * @return The calculated Poisson likelihood.
    */
   inline double calculate_poisson_likelihood(std::span<const double> data, std::span<const double> signal, std::span<const double> bkg) noexcept {
-    auto model = bkg + signal;
-
     double return_value = 0.0;
     for (size_t i = 0; i < data.size(); ++i) {
       const double model_i = signal[i] + bkg[i];
@@ -38,9 +36,9 @@ namespace ana::dc {
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
     if (m_Options->inputOptions().use_reactor_split()) {
-      return calculate_reactor_split_likelihood(parameter);
+      return calculate_reactor_split_likelihood(m_Parameter);
     } else {
-      return calculate_default_likelihood(parameter);
+      return calculate_default_likelihood(m_Parameter);
     }
   }
 

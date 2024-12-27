@@ -9,13 +9,15 @@ namespace ana::dc {
   class DCLikelihood : public Likelihood {
    public:
     explicit DCLikelihood(std::shared_ptr<io::Options> options)
-      : Likelihood(std::move(options)) {}
+      : Likelihood(std::move(options))
+      , m_Parameter(params::number_of_parameters())
+    {}
 
     ~DCLikelihood() override = default;
 
     [[nodiscard]] double calculate_likelihood(const double* parameter) override;
 
-    [[nodiscard]] const return_t& get_measurement_data(params::dc::DetectorType type) const noexcept {
+    [[nodiscard]] std::span<const double> get_measurement_data(params::dc::DetectorType type) const noexcept {
       return m_MeasurementData.at(type);
     }
 
@@ -31,7 +33,9 @@ namespace ana::dc {
     ParameterWrapper m_Parameter;
     DCBackground     m_Background;
 
-    std::unordered_map<params::dc::DetectorType, return_t> m_MeasurementData;
+    std::vector<SpectrumBase*> m_Spectra;
+
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;
   };
 
 }  // namespace ana::dc
