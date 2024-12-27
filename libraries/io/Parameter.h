@@ -35,12 +35,12 @@ namespace params {
      * @param type DetectorType
      * @return boolean whether the types is either ND, FDI, FDII
      */
-    inline constexpr bool is_base_type(DetectorType type) noexcept {
+    constexpr bool is_base_type(DetectorType type) noexcept {
       using enum DetectorType;
       return static_cast<bool>((type == ND) + (type == FDII) + (type == FDI));
     }
 
-    inline constexpr DetectorType cast_to_base_type(DetectorType type) noexcept {
+    constexpr DetectorType cast_to_base_type(DetectorType type) noexcept {
       using enum DetectorType;
       constexpr int base_type = ND | FDI | FDII;
       return static_cast<DetectorType>(type & base_type);
@@ -54,7 +54,7 @@ namespace params {
      * @param type The original DetectorType to cast.
      * @return The new DetectorType without the reactor split bit.
      */
-    inline constexpr DetectorType cast_to_no_reactor_split(DetectorType type) noexcept {
+    constexpr DetectorType cast_to_no_reactor_split(DetectorType type) noexcept {
       using enum DetectorType;
       constexpr unsigned int base_type = FD | ND | V1 | V2;
       return static_cast<DetectorType>(type & base_type);
@@ -66,7 +66,7 @@ namespace params {
      * @param type The detector type to check.
      * @return True if the detector type is a reactor split detector, false otherwise.
      */
-    inline constexpr bool is_reactor_split(DetectorType type) noexcept {
+     constexpr bool is_reactor_split(DetectorType type) noexcept {
       using enum DetectorType;
       constexpr int split_type = B1 | B2;
       return static_cast<bool>(type & split_type);
@@ -77,7 +77,7 @@ namespace params {
      * @param type DetectorType
      * @return boolean: Is B1 split
      */
-    inline constexpr bool is_B1_split(DetectorType type) noexcept {
+     constexpr bool is_B1_split(DetectorType type) noexcept {
       using enum DetectorType;
       return static_cast<bool>(type & B1);
     }
@@ -88,7 +88,7 @@ namespace params {
      * @param type The detector type to check.
      * @return True if the detector type is a B2 split detector, false otherwise.
      */
-    inline constexpr bool is_B2_split(DetectorType type) noexcept {
+     constexpr bool is_B2_split(DetectorType type) noexcept {
       using enum DetectorType;
       return static_cast<bool>(type & B2);
     }
@@ -103,7 +103,7 @@ namespace params {
      * @param type The DetectorType to be cast.
      * @return The casted DetectorType if it is a base type, otherwise the original type.
      */
-    inline constexpr DetectorType cast_to_B1_split(DetectorType type) noexcept {
+     constexpr DetectorType cast_to_B1_split(DetectorType type) noexcept {
       using enum DetectorType;
       return is_base_type(type) ? static_cast<DetectorType>(type | B1) : type;
     }
@@ -118,7 +118,7 @@ namespace params {
      * @param type The DetectorType to be cast.
      * @return The casted DetectorType if it is a base type, otherwise the original type.
      */
-    inline constexpr DetectorType cast_to_B2_split(DetectorType type) noexcept {
+     constexpr DetectorType cast_to_B2_split(DetectorType type) noexcept {
       using enum DetectorType;
       return is_base_type(type) ? static_cast<DetectorType>(type | B2) : type;
     }
@@ -128,7 +128,7 @@ namespace params {
      * @param type DetectorType
      * @return boolean: Is far detector type
      */
-    inline constexpr bool is_far_detector(DetectorType type) noexcept {
+     constexpr bool is_far_detector(DetectorType type) noexcept {
       using enum DetectorType;
       return static_cast<bool>(type & FD);
     }
@@ -138,7 +138,7 @@ namespace params {
      * @param type DetectorType
      * @return boolean: Is near detector type
      */
-    inline constexpr bool is_near_detector(DetectorType type) noexcept {
+     constexpr bool is_near_detector(DetectorType type) noexcept {
       using enum DetectorType;
       return static_cast<bool>(type & ND);
     }
@@ -149,7 +149,7 @@ namespace params {
      * @param type The detector type to get the name of.
      * @return The name of the detector type as a string.
      */
-    inline std::string get_detector_name(DetectorType type) noexcept {
+     inline std::string get_detector_name(DetectorType type) noexcept {
       std::stringstream ss;
       using enum DetectorType;
       const bool is_fd = is_far_detector(type);
@@ -397,24 +397,24 @@ namespace params {
   };
 
   /** Get the number of parameters in the General namespace */
-  inline constexpr int number_of_general_parameters() noexcept {
+   constexpr int number_of_general_parameters() noexcept {
     constexpr int num = static_cast<int>(_last_of_General_);
     return num;
   }
 
   /** Get the number of parameters in the DoubleChooz Detector namespace */
-  inline constexpr int number_of_DoubleChooz_detector_parameters() noexcept {
+   constexpr int number_of_DoubleChooz_detector_parameters() noexcept {
     constexpr int num = static_cast<int>(dc::Detector::_last_of_detector_);
     return num;
   }
 
   /** Number of data sets that are used in the Likelihood analysis */
-  inline constexpr int number_of_data_sets() noexcept {
+   constexpr int number_of_data_sets() noexcept {
     return 3;  // ND, FDI, FDII
   }
 
   /** Get the total number of parameters used in the Likelihood fit */
-  inline constexpr int number_of_parameters() noexcept {
+   constexpr int number_of_parameters() noexcept {
     return number_of_general_parameters() + number_of_data_sets() * number_of_DoubleChooz_detector_parameters();
   }
 
@@ -425,7 +425,7 @@ namespace params {
    * @param d The detector type
    * @return index of the detector data set: ND, FDI, FDII, NDB1, NDB2, FDIB1, FDIB2, FDIIB1, FDIIB2
    */
-  inline constexpr int get_index(params::dc::DetectorType d) noexcept {
+   constexpr int get_index(params::dc::DetectorType d) noexcept {
     using enum dc::DetectorType;
     bool is_split = is_reactor_split(d);                                                                // if the reactor data are split, the index is different
     int  idx      = static_cast<bool>(d & FD) & (1 + static_cast<bool>(d & V2));                        // get base type
@@ -439,7 +439,7 @@ namespace params {
    * @param p Index of the parameter in the Detector namespace
    * @return Absolute index
    */
-  inline constexpr int index(params::dc::DetectorType d, int p) noexcept {
+   constexpr int index(params::dc::DetectorType d, int p) noexcept {
     return number_of_general_parameters() + get_index(d) * number_of_DoubleChooz_detector_parameters() + p;
   }
 
@@ -450,12 +450,19 @@ namespace params {
    * @param idx
    * @return Index of the general parameter
    */
-  inline constexpr int index(General idx) noexcept {
+   constexpr int index(General idx) noexcept {
     return static_cast<int>(idx);
   }
 
-  // TODO: Documentation missing
-  inline int index(params::dc::DetectorType d, General idx) {
+  /**
+   * @brief Throws an exception indicating that General parameters are not associated with a detector type.
+   *
+   * @param d The detector type (dc::DetectorType).
+   * @param idx The general index (General).
+   * @return This function always throws an exception and never returns a value.
+   * @throws std::invalid_argument Always throws this exception with a message indicating the invalid index.
+   */
+  inline int index(dc::DetectorType d, General idx) {
     throw std::invalid_argument("Invalid Index, General parameters are not associated with a detector type.");
     return -1;
   }
@@ -468,7 +475,7 @@ namespace params {
    * @param p Index of the parameter in the Detector index
    * @return Absolute index
    */
-  inline constexpr int index(params::dc::DetectorType d, dc::Detector p) noexcept {
+   constexpr int index(dc::DetectorType d, dc::Detector p) noexcept {
     return index(d, static_cast<int>(p));
   }
 }  // namespace params
