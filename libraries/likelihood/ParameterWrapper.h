@@ -139,9 +139,10 @@ namespace ana::dc {
     [[nodiscard]] bool check_parameter_changed(int from, int to) const noexcept;
 
    private:
-    std::vector<double> m_CurrentParameters;   // Unified parameters array
+    std::vector<double> m_CurrentParameters;  // Unified parameters array
     std::vector<double> m_PreviousParameters;  // Previous parameter set for comparison
-
+    std::vector<char> m_ParameterChanged;  // Array to store the changed parameters
+    std::size_t m_NParameter;  // Number of parameters
     const double* m_RawParameter;  // Pointer to the raw parameter array
 
     /**

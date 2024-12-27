@@ -1,31 +1,36 @@
 #include "ParameterWrapper.h"
+
+#include <numeric>
+
 #include "../utilities/FuzzyCompare.h"
 
 namespace ana::dc {
 
   ParameterWrapper::ParameterWrapper(std::size_t nParameter)
-    : m_CurrentParameters(nParameter)
-    , m_PreviousParameters(nParameter)
+    : m_CurrentParameters(nParameter, 0.0)
+    , m_PreviousParameters(nParameter, 0.0)
+    , m_ParameterChanged(nParameter, false)
+    , m_NParameter(nParameter)
     , m_RawParameter(nullptr) { }
 
   void ParameterWrapper::reset_parameter(const double* parameter) {
     m_RawParameter = parameter;
-    std::copy(m_CurrentParameters.cbegin(), m_CurrentParameters.cend(), m_PreviousParameters.begin());
-    std::copy(parameter, parameter + params::number_of_parameters(), m_CurrentParameters.begin());
-    unify_parameters();
+    std::swap(m_CurrentParameters, m_PreviousParameters);
+    std::copy_n(parameter, m_NParameter, m_CurrentParameters.begin());
+
+    for (std::size_t i = 0; i < m_NParameter; ++i) {
+      m_ParameterChanged[i] = static_cast<char>(utilities::fuzzyCompare(m_CurrentParameters[i], m_PreviousParameters[i]));
+    }
   }
 
   bool ParameterWrapper::check_parameter_changed(int idx) const noexcept {
-    bool same = utilities::fuzzyCompare(m_CurrentParameters[idx], m_PreviousParameters[idx]);
+    const bool same = static_cast<bool>(m_ParameterChanged[idx]);
     return !same;
   }
 
   bool ParameterWrapper::check_parameter_changed(int from, int to) const noexcept {
-    bool same = std::equal(m_CurrentParameters.cbegin() + from,
-                           m_CurrentParameters.cbegin() + (to + 1),
-                           m_PreviousParameters.cbegin() + from,
-                           [](auto a, auto b) { return utilities::fuzzyCompare(a, b); });
-
+    const auto same_count = std::accumulate(m_ParameterChanged.begin() + from, m_ParameterChanged.begin() + (to + 1), 0);
+    const bool same = same_count == (to - from + 1);
     return !same;
   }
 
