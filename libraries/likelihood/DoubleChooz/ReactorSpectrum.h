@@ -9,29 +9,26 @@ namespace ana::dc {
   class ReactorSpectrum : public SpectrumBase {
   public:
     explicit ReactorSpectrum(std::shared_ptr<io::Options> options)
-      : SpectrumBase(options)
-      , m_Oscillator(options)
-      , m_EnergyCorrection(options) {}
+      : SpectrumBase(std::move(options)) {
+      m_Oscillator = std::make_shared<Oscillator>(m_Options);
+      m_ShapeCorrection = std::make_shared<ShapeCorrection>(m_Options, m_Oscillator);
+      m_EnergyCorrection = std::make_shared<EnergyCorrection>(m_Options, m_ShapeCorrection);
+    }
 
-    [[nodiscard]] bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
+    [[nodiscard]] bool check_and_recalculate(const ParameterWrapper& parameter) override;
 
-    [[nodiscard]] const Eigen::Array<double, 44, 1>& get_spectrum(params::dc::DetectorType type) const noexcept override;
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override;
+
+    [[nodiscard]] const auto& oscillator() const noexcept { return m_Oscillator; }
+
+    [[nodiscard]] const auto& shape_correction() const noexcept { return m_ShapeCorrection; }
+
+    [[nodiscard]] const auto& energy_correction() const noexcept { return m_EnergyCorrection; }
 
   private:
-    void recalculate_oscillation_spectra(const ParameterWrapper& parameter) noexcept {
-      m_Oscillator.recalculate_spectra(parameter);
-    }
-
-    void recalculate_energy_correction(const ParameterWrapper& parameter) noexcept {
-      m_EnergyCorrection.calculate_energy_correction(parameter, m_Oscillator);
-    }
-
-    void recalculate_shape_correction(const ParameterWrapper& parameter) noexcept {
-
-    }
-
-    Oscillator m_Oscillator;
-    EnergyCorrection m_EnergyCorrection;
+    std::shared_ptr<Oscillator> m_Oscillator;
+    std::shared_ptr<ShapeCorrection> m_ShapeCorrection;
+    std::shared_ptr<EnergyCorrection> m_EnergyCorrection;
   };
 
 }
