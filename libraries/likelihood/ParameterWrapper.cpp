@@ -14,10 +14,16 @@ namespace ana::dc {
     , m_RawParameter(nullptr) { }
 
   void ParameterWrapper::reset_parameter(const double* parameter) {
+    // Set the raw parameter pointer to the new parameter array
     m_RawParameter = parameter;
+
+    // Swap the current parameters with the previous parameters
     std::swap(m_CurrentParameters, m_PreviousParameters);
+
+    // Copy the new parameter values into the current parameters array
     std::copy_n(parameter, m_NParameter, m_CurrentParameters.begin());
 
+    // Update the parameter changed status for each parameter
     for (std::size_t i = 0; i < m_NParameter; ++i) {
       m_ParameterChanged[i] = static_cast<char>(utilities::fuzzyCompare(m_CurrentParameters[i], m_PreviousParameters[i]));
     }
