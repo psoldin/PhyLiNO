@@ -12,14 +12,14 @@ namespace ana::dc {
     bool has_changed = false;
 
     for (auto detector : {ND, FDI, FDII}) {
-      has_changed |= parameter.range_changed(index(detector, FNSMShape01), index(detector, FNSMShape44) + 1);
-      has_changed |= parameter.parameter_changed(index(detector, BkgRFNSM));
+      has_changed |= parameter.check_parameter_changed(index(detector, FNSMShape01), index(detector, FNSMShape44) + 1);
+      has_changed |= parameter.check_parameter_changed(index(detector, BkgRFNSM));
     }
 
     return has_changed;
   }
 
-  bool FastNBackground::check_and_recalculate_spectra(const ana::dc::ParameterWrapper &parameter) {
+  bool FastNBackground::check_and_recalculate_spectra(const ParameterWrapper &parameter) {
     bool has_changed = parameter_changed(parameter);
     if (has_changed) {
       recalculate_spectra(parameter);
@@ -27,7 +27,7 @@ namespace ana::dc {
     return has_changed;
   }
 
-  void FastNBackground::recalculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
+  void FastNBackground::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
     using namespace params;

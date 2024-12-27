@@ -10,18 +10,27 @@ namespace ana::dc {
     explicit FastNBackground(std::shared_ptr<io::Options> options)
       : SpectrumBase(std::move(options)) {}
 
-    ~FastNBackground() = default;
+    ~FastNBackground() override = default;
 
-    bool check_and_recalculate_spectra(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate(const ParameterWrapper& parameter) override {
+      const bool recalculate = check_parameters(parameter);
+      if (!check_parameters(parameter)) {
+        recalculate_spectra(parameter);
+      }
+      return recalculate;
+    }
 
-    [[nodiscard]] const return_t& get_spectrum(params::dc::DetectorType type) const noexcept override {
-      return m_Cache.at(type);
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const noexcept override {
+      return m_Spectra.at(detector);
     }
 
    private:
-    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 44, 1>> m_Spectra;
 
-    std::unordered_map<params::dc::DetectorType, return_t>                    m_Cache;
-    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 44, 1>> m_SpectrumTemplate;
+    void recalculate_spectra(const ParameterWrapper& parameter) {
+      // Recalculate the lithium background spectrum
+    }
+
+    [[nodiscard]] static bool check_parameters(const ParameterWrapper& parameter) noexcept;
   };
 }  // namespace ana::dc
