@@ -1,18 +1,18 @@
 set(files
     Fit.h
     Fit.cpp
-        ParameterWrapper.h
-        ParameterWrapper.cpp
+    ParameterWrapper.h
+    ParameterWrapper.cpp
     Likelihood.h
     DoubleChooz/Oscillator.cpp
     Definitions.h
-        SpectrumBase.h
+    SpectrumBase.h
     DoubleChooz/Oscillator.h
     DoubleChooz/Oscillator.cpp
-        DoubleChooz/Calculate_Spectrum.h
+    DoubleChooz/Calculate_Spectrum.h
     DoubleChooz/AccidentalBackground.cpp
     DoubleChooz/AccidentalBackground.h
-        SpectrumBase.h
+    SpectrumBase.h
     DoubleChooz/LithiumBackground.h
     DoubleChooz/LithiumBackground.cpp
     DoubleChooz/FastNBackground.cpp
@@ -28,6 +28,8 @@ set(files
     DoubleChooz/EnergyCorrection.cpp
     DoubleChooz/ShapeCorrection.cpp
     DoubleChooz/ShapeCorrection.h
+    DoubleChooz/DCLikelihood.h
+    DoubleChooz/DCLikelihood.cpp
 )
 
 add_library(likelihood SHARED ${files})
