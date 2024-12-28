@@ -1,7 +1,7 @@
 #include "DataBase.h"
 
 // includes
-#include "TreeEntry.h"
+#include "../TreeEntry.h"
 
 // STL includes
 #include <string>

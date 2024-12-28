@@ -1,8 +1,8 @@
 #pragma once
 
-#include "InputOptions.h"
-#include "Parameter.h"
-#include "ReactorData.h"
+#include "../InputOptions.h"
+#include "../Parameter.h"
+#include "../ReactorData.h"
 
 #include <span>
 #include <string>
@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <Eigen/Core>
+#include <../../../external/eigen/Eigen/Core>
 
 namespace io::dc {
 

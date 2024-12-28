@@ -7,8 +7,8 @@ set(files
         InputPaths.h
         TreeEntry.h
         Parameter.h
-        DataBase.h
-        DataBase.cpp
+        DoubleChooz/DataBase.h
+        DoubleChooz/DataBase.cpp
         ReactorData.h
         ReactorData.cpp
         ParameterValue.h
