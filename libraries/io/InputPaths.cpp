@@ -26,7 +26,7 @@ namespace io {
 
     using enum params::BackgroundType;
     try {
-      for (auto background : {accidental, lithium, fastN}) {
+      for (const auto background : {accidental, lithium, fastN}) {
         std::string name = params::get_background_name(background);
         m_BackgroundPath.push_back(tree.get<std::string>(name));
         m_BackgroundTree.push_back(tree.get<std::string>(name + "_tree"));
