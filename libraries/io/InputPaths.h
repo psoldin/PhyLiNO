@@ -11,7 +11,7 @@
 // boost includes
 #include <boost/property_tree/ptree.hpp>
 
-namespace io {
+namespace io::dc {
 
   /**
    * @class InputPaths
@@ -171,4 +171,4 @@ namespace io {
     std::vector<std::string> m_BackgroundBranch;
   };
 
-}  // namespace io
+}  // namespace io::dc
