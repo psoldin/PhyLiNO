@@ -13,7 +13,6 @@ set(files
         ReactorData.cpp
         ParameterValue.h
         DataBase.cpp
-        DataBase.h
         DoubleChooz/DCOptions.h
 )
 
