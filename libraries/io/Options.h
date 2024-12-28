@@ -1,9 +1,9 @@
 #pragma once
 
-#include "DataBase.h"
+#include "DoubleChooz/DataBase.h"
 #include "InputOptions.h"
 #include "StartingParameter.h"
-#include "DCOptions.h"
+#include "DoubleChooz/DCOptions.h"
 
 namespace io {
 
