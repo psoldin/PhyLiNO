@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <../../../external/eigen/Eigen/Core>
+#include <Eigen/Core>
 
 namespace io::dc {
 
