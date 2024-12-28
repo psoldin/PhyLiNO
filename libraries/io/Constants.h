@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 
-namespace io {
+namespace io::dc {
 
   class Constants {
    public:
@@ -41,4 +41,4 @@ namespace io {
     static constexpr int number_of_energy_bins = 38;  // Number of energy bins used in the Double Chooz experiment
   };
 
-}  // namespace io
+}  // namespace io::dc
