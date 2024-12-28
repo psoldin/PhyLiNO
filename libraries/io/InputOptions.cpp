@@ -9,7 +9,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-namespace io {
+namespace io::dc {
 
   InputOptions::InputOptions(int argc, char** argv) {
     std::string inputFile;
@@ -95,4 +95,4 @@ namespace io {
       std::cout << e.what() << '\n';
     }
   }
-}  // namespace io
+}  // namespace io::dc

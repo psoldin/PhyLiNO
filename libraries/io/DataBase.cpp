@@ -15,7 +15,7 @@
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
 
-namespace io {
+namespace io::dc {
 
   /**
    * @brief Represents a dynamic array of double values.
@@ -205,4 +205,4 @@ namespace io {
     }
   }
 
-}  // namespace io
+}  // namespace io::dc

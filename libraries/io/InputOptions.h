@@ -7,7 +7,7 @@
 #include "InputParameter.h"
 #include "InputPaths.h"
 
-namespace io {
+namespace io::dc {
 
   // TODO Documentation
 
@@ -110,4 +110,4 @@ namespace io {
     std::unique_ptr<InputParameter>                m_InputParameter; /**< The input parameter object. */
     std::map<params::dc::DetectorType, InputPaths> m_InputPaths;     /**< The input paths map. */
   };
-}  // namespace io
+}  // namespace io::dc

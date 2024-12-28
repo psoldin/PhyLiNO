@@ -12,7 +12,7 @@
 
 #include <Eigen/Core>
 
-namespace io {
+namespace io::dc {
 
   enum class SpectrumType {
     Reactor,
@@ -120,4 +120,4 @@ namespace io {
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
   };
 
-}  // namespace io
+}  // namespace io::dc
