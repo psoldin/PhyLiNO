@@ -9,8 +9,6 @@
 
 namespace io::dc {
 
-  // TODO Documentation
-
   /**
    * @brief Class representing input options for the program.
    *
