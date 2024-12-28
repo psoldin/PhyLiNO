@@ -6,12 +6,14 @@
 
 namespace ana::dc {
 
-  ParameterWrapper::ParameterWrapper(const std::size_t nParameter)
+  ParameterWrapper::ParameterWrapper(const std::size_t nParameter, std::shared_ptr<io::Options> options, transform_fn_t transform_fn)
     : m_CurrentParameters(nParameter, 0.0)
     , m_PreviousParameters(nParameter, 0.0)
     , m_ParameterChanged(nParameter, false)
     , m_NParameter(nParameter)
-    , m_RawParameter(nullptr) { }
+    , m_Options(std::move(options))
+    , m_RawParameter(nullptr)
+    , m_TransformFn(transform_fn) { }
 
   void ParameterWrapper::reset_parameter(const double* parameter) {
     // Set the raw parameter pointer to the new parameter array
@@ -22,6 +24,10 @@ namespace ana::dc {
 
     // Copy the new parameter values into the current parameters array
     std::copy_n(parameter, m_NParameter, m_CurrentParameters.begin());
+
+    if (m_TransformFn) {
+      m_TransformFn(*m_Options, m_CurrentParameters);
+    }
 
     // Update the parameter changed status for each parameter
     for (std::size_t i = 0; i < m_NParameter; ++i) {
