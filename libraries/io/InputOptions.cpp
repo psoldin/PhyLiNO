@@ -69,6 +69,10 @@ namespace io::dc {
 
       po::notify(vm);
 
+      if (!boost::filesystem::exists(m_ConfigFile)) {
+        throw std::invalid_argument("Error: Config File " + m_ConfigFile + " not found");
+      }
+
       pt::ptree tree;
       pt::read_json(m_ConfigFile, tree);
 
