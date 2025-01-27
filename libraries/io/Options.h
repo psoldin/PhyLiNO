@@ -18,7 +18,9 @@ namespace io {
      * @param argc Command line argc
      * @param argv Command line argv
      */
-    Options(int argc, char** argv);
+    Options(int argc, char** argv)
+      : m_InputOptions(argc, argv)
+      , m_DCOptions(m_InputOptions) {}
 
     /** Default constructor */
     Options()
@@ -29,11 +31,11 @@ namespace io {
 
     [[nodiscard]] const dc::DCOptions& dc_options() const noexcept { return m_DCOptions; }
 
-    [[nodiscard]] const StartingParameter& starting_parameter() const noexcept { return m_StartingParameter; }
+    [[nodiscard]] const InputOptions& inputOptions() const noexcept { return m_InputOptions; }
 
    private:
+    InputOptions m_InputOptions;
     dc::DCOptions m_DCOptions;
-    StartingParameter m_StartingParameter;
   };
 
 }  // namespace io
