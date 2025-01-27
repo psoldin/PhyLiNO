@@ -13,7 +13,7 @@ void print_argument(std::ostream& os, std::string_view name, std::string_view ar
   os << '\t' << std::left << std::setw(30) << name << argument << std::endl;
 }
 
-namespace io {
+namespace io::dc {
 
   InputPaths::InputPaths(std::string section, const boost::property_tree::ptree& tree)
     : m_DetectorSection(std::move(section)) {
@@ -24,7 +24,7 @@ namespace io {
     //   std::cout << "Key: " << entry.first << ", Value: " << entry.second.get_value<std::string>() << std::endl;
     // }
 
-    using enum params::BackgroundType;
+    using enum params::dc::BackgroundType;
     try {
       for (const auto background : {accidental, lithium, fastN}) {
         std::string name = params::get_background_name(background);
@@ -60,4 +60,4 @@ namespace io {
       std::cout << e.what() << '\n';
     }
   }
-}  // namespace io
+}  // namespace io::dc
