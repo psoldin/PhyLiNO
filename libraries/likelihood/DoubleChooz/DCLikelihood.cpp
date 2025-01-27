@@ -14,6 +14,8 @@ namespace ana::dc {
    *
    * where \f$ model_i = signal_i + bkg_i \f$.
    *
+   * This assumes that the sum over background and signal prediction is larger than zero.
+   *
    * @param data A span of observed data values.
    * @param signal A span of expected signal values.
    * @param bkg A span of expected background values.
