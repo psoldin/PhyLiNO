@@ -305,8 +305,6 @@ namespace params {
       _last_of_detector_
     };
 
-  }  // namespace dc
-
   /**
    * @brief Enumeration of background types used in the Double Chooz experiment.
    *
@@ -319,6 +317,8 @@ namespace params {
     fastN,      /**< Fast neutron background */
     dnc         /**< Delayed neutron capture background */
   };
+
+  }  // namespace dc
 
   /**
    * Returns the name of the background type as a string.
