@@ -7,7 +7,7 @@
 #include "InputParameter.h"
 #include "InputPaths.h"
 
-namespace io::dc {
+namespace io {
 
   /**
    * @brief Class representing input options for the program.
@@ -106,6 +106,6 @@ namespace io::dc {
     std::string m_ConfigFile; /**< The configuration file path. */
 
     std::unique_ptr<InputParameter>                m_InputParameter; /**< The input parameter object. */
-    std::map<params::dc::DetectorType, InputPaths> m_InputPaths;     /**< The input paths map. */
+    std::map<params::dc::DetectorType, dc::InputPaths> m_InputPaths;     /**< The input paths map. */
   };
-}  // namespace io::dc
+}  // namespace io
