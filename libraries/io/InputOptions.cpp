@@ -23,7 +23,7 @@ namespace io::dc {
 
       generic_options.add_options()
       ("help,h", "Print help message")
-      ("config,c", po::value<std::string>(&m_ConfigFile)->default_value("config.json"), "Set Config File")
+      ("config,c", po::value<std::string>(&m_ConfigFile)->default_value("config.json")->required(), "Set Config File")
       ("seed", po::value<long>(&m_Seed)->default_value(current_time), "Set seed for simulation")
       ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
       ("useData", po::bool_switch(&m_UseData), "Use measurement Data")
