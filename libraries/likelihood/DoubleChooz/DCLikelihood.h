@@ -67,7 +67,8 @@ namespace ana::dc {
      * @param type The type of detector being used (as defined in params::dc::DetectorType).
      * @return A double representing the calculated off-off likelihood.
      */
-    [[nodiscard]] double calculate_off_off_likelihood(const return_t& bkg, params::dc::DetectorType type);
+    // TODO
+    [[nodiscard]] double calculate_off_off_likelihood(std::span<const double> bkg, params::dc::DetectorType type) { return 0.0; }
 
    private:
     /**
