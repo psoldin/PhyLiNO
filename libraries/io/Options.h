@@ -29,8 +29,16 @@ namespace io {
     /** Default destructor */
     ~Options() = default;
 
+    /**
+     * Accessor for the Double Chooz specific options
+     * @return DCOptions
+     */
     [[nodiscard]] const dc::DCOptions& dc_options() const noexcept { return m_DCOptions; }
 
+    /**
+     * Accessor for the Input Options handed over at program start
+     * @return InputOptions
+     */
     [[nodiscard]] const InputOptions& inputOptions() const noexcept { return m_InputOptions; }
 
    private:
