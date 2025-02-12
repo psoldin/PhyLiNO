@@ -305,42 +305,42 @@ namespace params {
       _last_of_detector_
     };
 
-  /**
-   * @brief Enumeration of background types used in the Double Chooz experiment.
-   *
-   * This enum class represents the different types of backgrounds that can be encountered in the Double Chooz experiment.
-   * The background types include accidental, lithium, fast neutron, and delayed neutron capture.
-   */
-  enum class BackgroundType : int {
-    accidental, /**< Accidental background */
-    lithium,    /**< Lithium background */
-    fastN,      /**< Fast neutron background */
-    dnc         /**< Delayed neutron capture background */
-  };
+    /**
+     * @brief Enumeration of background types used in the Double Chooz experiment.
+     *
+     * This enum class represents the different types of backgrounds that can be encountered in the Double Chooz experiment.
+     * The background types include accidental, lithium, fast neutron, and delayed neutron capture.
+     */
+    enum class BackgroundType : int {
+      accidental, /**< Accidental background */
+      lithium,    /**< Lithium background */
+      fastN,      /**< Fast neutron background */
+      dnc         /**< Delayed neutron capture background */
+    };
+
+    /**
+     * Returns the name of the background type as a string.
+     *
+     * @param type The background type.
+     * @return The name of the background type as a string.
+     * @throws std::invalid_argument if the background type is invalid.
+     */
+    inline std::string get_background_name(BackgroundType type) {
+      switch (type) {
+        case BackgroundType::accidental:
+          return "accidental";
+        case BackgroundType::lithium:
+          return "lithium";
+        case BackgroundType::fastN:
+          return "fnsm";
+        case BackgroundType::dnc:
+          return "dnc";
+        default:
+          throw std::invalid_argument("Invalid background type");
+      }
+    }
 
   }  // namespace dc
-
-  /**
-   * Returns the name of the background type as a string.
-   *
-   * @param type The background type.
-   * @return The name of the background type as a string.
-   * @throws std::invalid_argument if the background type is invalid.
-   */
-  inline std::string get_background_name(BackgroundType type) {
-    switch (type) {
-      case BackgroundType::accidental:
-        return "accidental";
-      case BackgroundType::lithium:
-        return "lithium";
-      case BackgroundType::fastN:
-        return "fnsm";
-      case BackgroundType::dnc:
-        return "dnc";
-      default:
-        throw std::invalid_argument("Invalid background type");
-    }
-  }
 
   /**
    * Enumeration of general parameters used in the Double Chooz experiment.
