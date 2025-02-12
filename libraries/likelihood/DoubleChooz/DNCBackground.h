@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Constants.h>
+#include <DoubleChooz/Constants.h>
 
 #include "../Definitions.h"
 #include "../ParameterWrapper.h"
@@ -22,7 +22,7 @@ namespace ana::dc {
    private:
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
-    using array_t = std::array<double, io::Constants::number_of_energy_bins>;
+    using array_t = std::array<double, io::dc::Constants::number_of_energy_bins>;
     using uo_map_t = std::unordered_map<params::dc::DetectorType, array_t>;
 
     uo_map_t m_Cache;
