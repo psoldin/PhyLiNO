@@ -27,7 +27,7 @@ namespace io::dc {
     using enum params::dc::BackgroundType;
     try {
       for (const auto background : {accidental, lithium, fastN}) {
-        std::string name = params::get_background_name(background);
+        std::string name = params::dc::get_background_name(background);
         m_BackgroundPath.push_back(tree.get<std::string>(name));
         m_BackgroundTree.push_back(tree.get<std::string>(name + "_tree"));
         m_BackgroundBranch.push_back(tree.get<std::string>(name + "_branch"));
