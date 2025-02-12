@@ -82,7 +82,7 @@ namespace io::dc {
        * @param k1 The detector type.
        * @param k2 The background type.
        */
-      KeyPair(params::dc::DetectorType k1, params::BackgroundType k2)
+      KeyPair(params::dc::DetectorType k1, params::dc::BackgroundType k2)
         : key1(params::get_index(k1))
         , key2(static_cast<int>(k2)) {}
 
