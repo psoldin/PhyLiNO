@@ -26,16 +26,17 @@ namespace io {
      *
      * @param tree The boost property tree containing the input parameters.
      */
-    InputParameter(const boost::property_tree::ptree& tree) {
+    explicit InputParameter(const boost::property_tree::ptree& tree) {
       try {
-        for (const auto& parameter : tree) {
-          m_Parameters.emplace_back(parameter.second);
-          m_Fixed.emplace_back(parameter.second.get<bool>("fixed"));
-          m_Constrained.emplace_back(parameter.second.get<bool>("constrained"));
-          m_Names.emplace_back(parameter.second.get<std::string>("name"));
+        for (const auto& [_, parameter] : tree) {
+          m_Parameters.emplace_back(parameter);
+          m_Fixed.emplace_back(parameter.get<bool>("fixed"));
+          m_Constrained.emplace_back(parameter.get<bool>("constrained"));
+          m_Names.emplace_back(parameter.get<std::string>("name"));
         }
       } catch (std::exception& e) {
-        std::cout << e.what() << '\n';
+        std::cout << "A problem occurred in InputParameters class: " << e.what() << '\n';
+        throw;
       }
     }
 
@@ -84,7 +85,7 @@ namespace io {
      *
      * @return The number of parameters.
      */
-    [[nodiscard]] int size() const noexcept { return m_Parameters.size(); }
+    [[nodiscard]] std::size_t size() const noexcept { return m_Parameters.size(); }
 
     /**
      * @brief Get the names of all parameters.
@@ -132,7 +133,7 @@ namespace io {
        *
        * @param parameter The boost::property_tree::ptree object containing the parameter information.
        */
-      Parameter(const boost::property_tree::ptree& parameter)
+      explicit Parameter(const boost::property_tree::ptree& parameter)
         : m_Value(parameter.get<double>("start"))
         , m_Uncertainty(parameter.get<double>("uncertainty")) {
       }
