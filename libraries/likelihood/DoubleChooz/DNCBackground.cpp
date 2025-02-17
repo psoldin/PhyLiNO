@@ -34,10 +34,10 @@ namespace ana::dc {
       const auto& gd_shape = m_SpectrumTemplate_Gd[detector];
       const auto& hy_shape = m_SpectrumTemplate_Hy[detector];
 
-      double lifetime = m_Options->dataBase().on_lifetime(detector);
+      double lifetime = -1.0; //m_Options->dataBase().on_lifetime(detector); TODO
 
       auto& result = m_Cache[detector];
-      for (int i = 0; i < io::Constants::number_of_energy_bins; ++i) {
+      for (int i = 0; i < io::dc::Constants::number_of_energy_bins; ++i) {
         result[i] = std::max(lifetime * ((gd_rate * gd_shape[i]) + (hy_rate * hy_shape[i])), 0.0);
       }
     }
