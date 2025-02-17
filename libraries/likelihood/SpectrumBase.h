@@ -15,7 +15,7 @@
  *
  * @tparam Derived The derived class type.
  */
-namespace ana::dc {
+namespace ana::dc { // TODO move class to ana namespace
 
   class SpectrumBase {
    public:
