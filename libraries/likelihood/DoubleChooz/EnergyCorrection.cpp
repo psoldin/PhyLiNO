@@ -2,7 +2,7 @@
 #include "FuzzyCompare.h"
 #include "ParameterValue.h"
 #include <unsupported/Eigen/Splines>
-#include <Constants.h>
+#include <DoubleChooz/Constants.h>
 
 namespace ana::dc {
 
@@ -124,33 +124,33 @@ namespace ana::dc {
     using namespace params::dc;
     using enum DetectorType;
 
-    auto starting_parameter = m_Options->starting_parameter();
-
-    const io::ParameterValue base_parA = starting_parameter.energy_correction_parameter_A();
-    const double parA = base_parA.value() + base_parA.error() * parameter[index(General::EnergyA)];
-
-    for (auto detector : {ND, FDI, FDII}) {
-      std::span<const double> oscillatedSpectrum = m_ShapeCorrection->get_spectrum(detector);
-
-      Eigen::Array<double, 80, 1> cumSum;
-      std::partial_sum(oscillatedSpectrum.data(), oscillatedSpectrum.data() + oscillatedSpectrum.size(), cumSum.data());
-
-      SplineFunction spline(m_XPos, cumSum);
-      const io::ParameterValue base_parB = starting_parameter.energy_correction_parameter_B(detector);
-      const io::ParameterValue base_parC = starting_parameter.energy_correction_parameter_C(detector);
-
-      const double parB = base_parB.value() + base_parB.error() * parameter[index(detector, Detector::EnergyB)];
-      const double parC = base_parC.value() + base_parC.error() * parameter[index(detector, Detector::EnergyC)];
-
-      auto& energy_corrected_spectrum = m_Cache[detector];
-
-      for (int i = 1; i < io::Constants::number_of_energy_bins; ++i) {
-        double e_upper = energy_scale_correction(parA, parB, parC, io::Constants::EnergyBinXaxis[i - 1]);
-        double e_lower = energy_scale_correction(parA, parB, parC, io::Constants::EnergyBinXaxis[i]);
-        double bin_content = spline(e_upper) - spline(e_lower);
-        energy_corrected_spectrum[i - 1] = std::max(0.0, bin_content);
-      }
-    }
+    // auto starting_parameter = m_Options->starting_parameter();
+    //
+    // const io::ParameterValue base_parA = starting_parameter.energy_correction_parameter_A();
+    // const double parA = base_parA.value() + base_parA.error() * parameter[index(General::EnergyA)];
+    //
+    // for (auto detector : {ND, FDI, FDII}) {
+    //   std::span<const double> oscillatedSpectrum = m_ShapeCorrection->get_spectrum(detector);
+    //
+    //   Eigen::Array<double, 80, 1> cumSum;
+    //   std::partial_sum(oscillatedSpectrum.data(), oscillatedSpectrum.data() + oscillatedSpectrum.size(), cumSum.data());
+    //
+    //   SplineFunction spline(m_XPos, cumSum);
+    //   const io::ParameterValue base_parB = starting_parameter.energy_correction_parameter_B(detector);
+    //   const io::ParameterValue base_parC = starting_parameter.energy_correction_parameter_C(detector);
+    //
+    //   const double parB = base_parB.value() + base_parB.error() * parameter[index(detector, Detector::EnergyB)];
+    //   const double parC = base_parC.value() + base_parC.error() * parameter[index(detector, Detector::EnergyC)];
+    //
+    //   auto& energy_corrected_spectrum = m_Cache[detector];
+    //
+    //   for (int i = 1; i < io::Constants::number_of_energy_bins; ++i) {
+    //     double e_upper = energy_scale_correction(parA, parB, parC, io::Constants::EnergyBinXaxis[i - 1]);
+    //     double e_lower = energy_scale_correction(parA, parB, parC, io::Constants::EnergyBinXaxis[i]);
+    //     double bin_content = spline(e_upper) - spline(e_lower);
+    //     energy_corrected_spectrum[i - 1] = std::max(0.0, bin_content);
+    //   }
+    // }
   }
 
 }  // namespace ana::dc
