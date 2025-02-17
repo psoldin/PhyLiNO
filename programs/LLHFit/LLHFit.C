@@ -1,5 +1,6 @@
 // STL includes
 #include <iostream>
+#include <ranges>
 
 // includes
 #include "Options.h"
@@ -9,9 +10,18 @@ int main(int argc, char** argv) {
   try {
     auto options = std::make_shared<io::Options>(argc, argv);
 
-    ana::Fit fit(options);
+    std::cout << std::boolalpha << options->inputOptions().silent() << '\n';
 
-    std::cout << options->inputOptions().seed() << std::endl;
+    const auto& parameters = options->inputOptions().input_parameter().parameters();
+    const auto& names = options->inputOptions().input_parameter().names();
+
+    for (int i = 0; i < parameters.size(); ++i) {
+      std::cout << names[i] << ": " << parameters[i].value() << '\n';
+    }
+
+    // ana::Fit fit(options);
+
+    // std::cout << options->inputOptions().seed() << std::endl;
 
     std::cout << "Hello World!" << std::endl;
   } catch (std::exception& e) {
