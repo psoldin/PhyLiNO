@@ -4,7 +4,64 @@
 #include "ParameterWrapper.h"
 #include "Options.h"
 
+#include "AccidentalBackground.h"
+#include "LithiumBackground.h"
+#include "FastNBackground.h"
+#include "DNCBackground.h"
+#include "ReactorSpectrum.h"
+
 namespace ana::dc {
+
+  inline void correlate_parameters(const io::Options& options, std::span<double> parameters) {
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+    using namespace params;
+
+    // FDI and FDII lithium background rates are fully correlated
+    parameters[index(FDI, BkgRLi)] = parameters[index(FDII, BkgRLi)];
+
+    Eigen::Vector<double, 7> correlated_energy = {parameters[EnergyA],
+                                              parameters[index(FDI,  EnergyB)],
+                                              parameters[index(ND,   EnergyB)],
+                                              parameters[index(FDII, EnergyB)],
+                                              parameters[index(FDI,  EnergyC)],
+                                              parameters[index(ND,   EnergyC)],
+                                              parameters[index(FDII, EnergyC)]};
+
+    const auto& covEigVecMatrix = options.starting_parameter().correlations().energy_correlation_matrix();
+
+
+  }
+  /*
+  void correlate_parameters(const io::Options& options, std::span<double> parameters) {
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+    using namespace params;
+
+    // FDI and FDII lithium background rates are fully correlated
+    parameters[index(FDI, BkgRLi)] = parameters[index(FDII, BkgRLi)];
+
+    Eigen::Vector<double, 7> correlated_energy = {parameters[EnergyA],
+                                                  parameters[index(FDI,  EnergyB)],
+                                                  parameters[index(ND,   EnergyB)],
+                                                  parameters[index(FDII, EnergyB)],
+                                                  parameters[index(FDI,  EnergyC)],
+                                                  parameters[index(ND,   EnergyC)],
+                                                  parameters[index(FDII, EnergyC)]};
+
+    const auto& covEigVecMatrix = options.starting_parameter().correlations().energy_correlation_matrix();
+
+    correlated_energy = covEigVecMatrix * correlated_energy;
+
+    parameters[EnergyA] = correlated_energy[0];
+    parameters[index(FDI,  EnergyB)] = correlated_energy[1];
+    parameters[index(ND,   EnergyB)] = correlated_energy[2];
+    parameters[index(FDII, EnergyB)] = correlated_energy[3];
+    parameters[index(FDI,  EnergyC)] = correlated_energy[4];
+    parameters[index(ND,   EnergyC)] = correlated_energy[5];
+    parameters[index(FDII, EnergyC)] = correlated_energy[6];
+  }
+  */
 
   /**
    * @class DCLikelihood
@@ -25,7 +82,12 @@ namespace ana::dc {
      */
     explicit DCLikelihood(std::shared_ptr<io::Options> options)
       : Likelihood(std::move(options))
-      , m_Parameter(params::number_of_parameters()) {}
+      , m_Parameter(params::number_of_parameters(), m_Options)
+      , m_Accidental(m_Options)
+      , m_Lithium(m_Options)
+      , m_FastN(m_Options)
+      , m_DNC(m_Options)
+      , m_Reactor(m_Options) {}
 
     /**
      * @brief Default destructor for DCLikelihood class.
@@ -101,12 +163,19 @@ namespace ana::dc {
      *
      * @param parameter A constant reference to a ParameterWrapper object containing the parameters for recalculating the spectra.
      */
-    void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
+    bool recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
     ParameterWrapper m_Parameter; ///< The parameter wrapper object used for likelihood calculation.
-    DCBackground     m_Background; ///< The background object used for likelihood calculation.
+
+    AccidentalBackground m_Accidental; ///< The accidental background object.
+    LithiumBackground m_Lithium;       ///< The lithium background object.
+    FastNBackground m_FastN;           ///< The fast neutron background object.
+    DNCBackground m_DNC;               ///< The delayed neutron capture background object.
+    ReactorSpectrum m_Reactor;         ///< The reactor spectrum object.
 
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData; ///< The measurement data for each detector type.
+
+    void correlate_parameters(std::span<double> parameters) noexcept { }
   };
 
 }  // namespace ana::dc

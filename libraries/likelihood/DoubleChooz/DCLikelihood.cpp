@@ -31,17 +31,24 @@ namespace ana::dc {
     return -2.0 * return_value;
   }
 
-  void DCLikelihood::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
-    m_Background.check_and_recalculate_spectra(m_Parameter);
+  bool DCLikelihood::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
+
+    bool recalculate = false;
+
+    std::array<SpectrumBase*, 5> components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
+    for (auto* component : components) {
+      recalculate |= component->check_and_recalculate(parameter);
+    }
+
+    return recalculate;
   }
 
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
     if (m_Options->inputOptions().use_reactor_split()) {
       return calculate_reactor_split_likelihood(m_Parameter);
-    } else {
-      return calculate_default_likelihood(m_Parameter);
     }
+    return calculate_default_likelihood(m_Parameter);
   }
 
   double DCLikelihood::calculate_default_likelihood(const ParameterWrapper& parameter) noexcept {
@@ -49,14 +56,23 @@ namespace ana::dc {
 
     double likelihood = 0.0;
 
-    std::vector<params::dc::DetectorType> detectors = {ND, FDI, FDII};
+    std::array<double, 45> bkg{};
 
     for (auto detector : {ND, FDI, FDII}) {
-      const auto& bkg    = m_Background.get_spectrum(detector);
-      const auto& data   = get_measurement_data(detector);
-      const auto& signal = m_Background.get_spectrum(detector);  // TODO
+      std::ranges::fill(bkg, 0.0);
+      auto acc     = m_Accidental.get_spectrum(detector);
+      auto li      = m_Lithium.get_spectrum(detector);
+      auto fastN   = m_FastN.get_spectrum(detector);
+      auto dnc     = m_DNC.get_spectrum(detector);
+      auto reactor = m_Reactor.get_spectrum(detector);
 
-      likelihood += calculate_poisson_likelihood(data, signal, bkg);
+      for (size_t i = 0; i < acc.size(); ++i) {
+        bkg[i] = acc[i] + li[i] + fastN[i] + dnc[i];
+      }
+
+      const auto& data = get_measurement_data(detector);
+
+      likelihood += calculate_poisson_likelihood(data, reactor, bkg);
 
       if (detector == ND || detector == FDII) {
         likelihood += calculate_off_off_likelihood(bkg, detector);
