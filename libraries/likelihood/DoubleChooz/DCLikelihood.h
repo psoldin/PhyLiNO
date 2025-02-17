@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Likelihood.h"
-#include "DCBackground.h"
 #include "ParameterWrapper.h"
+#include "Options.h"
 
 namespace ana::dc {
 
