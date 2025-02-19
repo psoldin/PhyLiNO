@@ -6,6 +6,11 @@
 
 namespace params {
 
+  enum class ExperimentType : char {
+    DoubleChooz,
+    JUNO
+  };
+
   namespace dc {
 
     /**

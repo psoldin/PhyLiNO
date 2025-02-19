@@ -1,9 +1,9 @@
 #pragma once
 
 // includes
-#include "InputOptions.h"
-#include "ParameterValue.h"
-#include "Parameter.h"
+#include "../InputOptions.h"
+#include "../ParameterValue.h"
+#include "../Parameter.h"
 
 // STL includes
 #include <array>
@@ -14,8 +14,7 @@ namespace io {
 
   class StartingParameter {
     public:
-      explicit StartingParameter(const InputOptions& inputOptions)
-        : m_InputOptions(inputOptions) { }
+      explicit StartingParameter(const InputOptions& inputOptions);
 
       ~StartingParameter() = default;
 
@@ -29,7 +28,6 @@ namespace io {
        */
       [[nodiscard]] std::span<const ParameterValue> parameterValues() const noexcept { return m_ParameterValues; }
 
-
       /**
        * @brief Get the on lifetime for a specific detector type.
        *
@@ -42,9 +40,10 @@ namespace io {
 
       [[nodiscard]] ParameterValue energy_correction_parameter_A() const noexcept { return m_EnergyCorrectionParameterA; }
 
-      [[nodiscard]] ParameterValue energy_correction_parameter_B(params::dc::DetectorType type) const noexcept { return m_EnergyCorrectionParameterB.at(params::dc::cast_to_base_type(type)); }
+      [[nodiscard]] ParameterValue energy_correction_parameter_B(params::dc::DetectorType type) const noexcept { return m_EnergyCorrectionParameterB.at(cast_to_base_type(type)); }
 
-      [[nodiscard]] ParameterValue energy_correction_parameter_C(params::dc::DetectorType type) const noexcept { return m_EnergyCorrectionParameterC.at(params::dc::cast_to_base_type(type)); }
+      [[nodiscard]] ParameterValue energy_correction_parameter_C(params::dc::DetectorType type) const noexcept { return m_EnergyCorrectionParameterC.at(cast_to_base_type(type)); }
+
     private:
       const io::InputOptions& m_InputOptions;
       std::vector<ParameterValue> m_ParameterValues;

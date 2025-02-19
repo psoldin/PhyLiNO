@@ -28,7 +28,7 @@ namespace ana::dc {
                                               parameters[index(ND,   EnergyC)],
                                               parameters[index(FDII, EnergyC)]};
 
-    const auto& covEigVecMatrix = options.starting_parameter().correlations().energy_correlation_matrix();
+    const auto& covEigVecMatrix = options.dc_options().starting_parameters().correlations().energy_correlation_matrix();
 
 
   }

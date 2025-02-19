@@ -196,7 +196,7 @@ namespace io::dc {
     for (auto detector : {ND, FDI, FDII}) {
       const auto& path = m_InputOptions.input_paths(detector);
 
-      if (inputOptions.use_data()) {
+      if (inputOptions.dc_input_options().use_data()) {
         // Read the measurement data from the ROOT file
         const std::string& dataPath   = path.data_path();
         // const std::string& treeName   = path.data_tree_name();

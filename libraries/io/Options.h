@@ -2,7 +2,6 @@
 
 #include "DoubleChooz/DataBase.h"
 #include "InputOptions.h"
-#include "StartingParameter.h"
 #include "DoubleChooz/DCOptions.h"
 
 namespace io {
