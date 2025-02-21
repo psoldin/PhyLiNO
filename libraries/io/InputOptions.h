@@ -49,7 +49,7 @@ namespace io {
 
     [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
 
-    [[nodiscard]] const auto& dc_input_options() const noexcept { return *m_DCInputOptions; }
+    [[nodiscard]] const auto& double_chooz() const noexcept { return *m_DCInputOptions; }
 
     [[nodiscard]] bool use_multi_threading() const noexcept { return m_MultiThreadingCores > 1; }
 
