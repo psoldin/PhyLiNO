@@ -32,7 +32,7 @@ namespace io {
      * Accessor for the Double Chooz specific options
      * @return DCOptions
      */
-    [[nodiscard]] const dc::DCOptions& dc_options() const noexcept { return m_DCOptions; }
+    [[nodiscard]] const dc::DCOptions& double_chooz() const noexcept { return m_DCOptions; }
 
     /**
      * Accessor for the Input Options handed over at program start

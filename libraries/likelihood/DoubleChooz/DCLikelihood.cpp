@@ -45,7 +45,7 @@ namespace ana::dc {
 
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
-    if (m_Options->inputOptions().use_reactor_split()) {
+    if (m_Options->inputOptions().double_chooz().reactor_split()) {
       return calculate_reactor_split_likelihood(m_Parameter);
     }
     return calculate_default_likelihood(m_Parameter);
