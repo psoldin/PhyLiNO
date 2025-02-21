@@ -3,8 +3,8 @@ set(files
         InputOptions.cpp
         Options.h
         Options.cpp
-        InputPaths.cpp
-        InputPaths.h
+        DoubleChooz/InputPaths.cpp
+        DoubleChooz/InputPaths.h
         TreeEntry.h
         Parameter.h
         DoubleChooz/DataBase.h

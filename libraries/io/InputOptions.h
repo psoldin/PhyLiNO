@@ -6,7 +6,7 @@
 // includes
 #include "InputOptionBase.h"
 #include "InputParameter.h"
-#include "InputPaths.h"
+#include "DoubleChooz/InputPaths.h"
 #include "DoubleChooz/DCInputOptions.h"
 
 namespace io {
