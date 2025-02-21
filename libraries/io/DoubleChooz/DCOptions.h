@@ -7,7 +7,7 @@ namespace io::dc {
 
   class DCOptions {
   public:
-    explicit DCOptions(InputOptions& inputOptions)
+    explicit DCOptions(const InputOptions& inputOptions)
       : m_DataBase(inputOptions)
       , m_StartingParameter(inputOptions)
     {}
