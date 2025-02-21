@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <TMatrixD.h>
+
 #include <Eigen/Core>
 
 namespace io::dc {
@@ -22,8 +24,11 @@ namespace io::dc {
     DNC
   };
 
-  /**
+/**
+   * \brief Class representing the database for Double Chooz data.
    *
+   * This class provides access to various types of data related to the Double Chooz experiment,
+   * including measurement data, reactor data, and covariance matrices.
    */
   class DataBase {
    public:
@@ -62,9 +67,13 @@ namespace io::dc {
       return m_CovarianceMatrices.at({detectorType, spectrumType});
     }
 
+    [[nodiscard]] const Eigen::MatrixXd& energy_correlation_matrix() const { return m_EnergyCorrelationMatrix; }
+
     [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return -1.0; };  // TODO: Implement this function
 
    private:
+    void construct_energy_correlation_matrix();
+
     const io::InputOptions& m_InputOptions;
 
     /**
@@ -118,6 +127,7 @@ namespace io::dc {
     using tuple_t      = std::tuple<params::dc::DetectorType, SpectrumType>;
     using cov_matrix_t = Eigen::Matrix<double, 44, 44>;
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
+    TMatrixD m_EnergyCorrelationMatrix; // TODO Replace with Eigen Matrix
   };
 
 }  // namespace io::dc

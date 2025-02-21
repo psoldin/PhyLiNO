@@ -14,6 +14,9 @@
 #include <TTree.h>
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
+#include <TMatrixD.h>
+#include <TVector.h>
+#include <TMatrixDSym.h>
 
 namespace io::dc {
 
@@ -189,6 +192,21 @@ namespace io::dc {
     return entries;
   }
 
+  void DataBase::construct_energy_correlation_matrix() {
+    m_InputOptions.double_chooz();
+
+    TMatrixD corrMatrix(7, 7);
+    TVectorD eigenValues(7);
+    TMatrixD eigenVectors(corrMatrix.EigenVectors(eigenValues));
+    TMatrixDSym eigenValueMatrix(7);
+
+    for (int i = 0; i < 7; ++i) {
+      eigenValueMatrix(i, i) = std::sqrt(eigenValues(i));
+    }
+
+    m_EnergyCorrelationMatrix.Mult(eigenVectors, eigenValueMatrix);
+  }
+
   DataBase::DataBase(const io::InputOptions& inputOptions)
     : m_InputOptions(inputOptions) {
     using enum params::dc::DetectorType;
@@ -196,7 +214,7 @@ namespace io::dc {
     for (auto detector : {ND, FDI, FDII}) {
       const auto& path = m_InputOptions.input_paths(detector);
 
-      if (inputOptions.dc_input_options().use_data()) {
+      if (inputOptions.double_chooz().use_data()) {
         // Read the measurement data from the ROOT file
         const std::string& dataPath   = path.data_path();
         // const std::string& treeName   = path.data_tree_name();
