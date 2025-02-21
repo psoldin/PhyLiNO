@@ -5,6 +5,9 @@
 #include "../ParameterValue.h"
 #include "../Parameter.h"
 
+// Eigen includes
+#include <Eigen/Dense>
+
 // STL includes
 #include <array>
 #include <span>
@@ -45,7 +48,7 @@ namespace io {
       [[nodiscard]] ParameterValue energy_correction_parameter_C(params::dc::DetectorType type) const noexcept { return m_EnergyCorrectionParameterC.at(cast_to_base_type(type)); }
 
     private:
-      const io::InputOptions& m_InputOptions;
+      const InputOptions& m_InputOptions;
       std::vector<ParameterValue> m_ParameterValues;
 
       std::array<double, params::number_of_data_sets()> m_OnLifeTime;
