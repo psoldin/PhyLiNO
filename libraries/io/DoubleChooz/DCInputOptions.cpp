@@ -33,17 +33,6 @@ namespace io::dc {
       throw std::invalid_argument("Error: Config File " + m_ConfigFile + " not found");
     }
 
-    auto get_detectorType_from_String = [](const std::string& name) {
-      if (name == "ND")
-        return params::dc::DetectorType::ND;
-      if (name == "FDI")
-        return params::dc::DetectorType::FDI;
-      if (name == "FDII")
-        return params::dc::DetectorType::FDII;
-
-      throw std::invalid_argument("Error: DetectorType " + name + " not known");
-    };
-
     std::cout << "Reading Double Chooz Config File: " << m_ConfigFile << '\n';
     pt::read_json(m_ConfigFile, m_ConfigTree);
 
