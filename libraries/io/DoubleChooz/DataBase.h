@@ -67,7 +67,13 @@ namespace io::dc {
       return m_CovarianceMatrices.at({detectorType, spectrumType});
     }
 
-    [[nodiscard]] const Eigen::MatrixXd& energy_correlation_matrix() const { return m_EnergyCorrelationMatrix; }
+    [[nodiscard]] const TMatrixD& energy_correlation_matrix() const { return m_EnergyCorrelationMatrix; }
+
+    [[nodiscard]] const TMatrixD& mcNorm_correlation_matrix() const { return m_MCNormCorrelationMatrix; }
+
+    [[nodiscard]] const TMatrixD& interDetector_correlation_matrix() const { return m_InterDetectorCorrelationMatrix; }
+
+    [[nodiscard]] double off_lifetime(params::dc::DetectorType type) const noexcept { return -1.0; };  // TODO: Implement this function
 
     [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return -1.0; };  // TODO: Implement this function
 
@@ -128,6 +134,8 @@ namespace io::dc {
     using cov_matrix_t = Eigen::Matrix<double, 44, 44>;
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
     TMatrixD m_EnergyCorrelationMatrix; // TODO Replace with Eigen Matrix
+    TMatrixD m_MCNormCorrelationMatrix; // TODO Replace with Eigen Matrix
+    TMatrixD m_InterDetectorCorrelationMatrix; // TODO Replace with Eigen Matrix
   };
 
 }  // namespace io::dc
