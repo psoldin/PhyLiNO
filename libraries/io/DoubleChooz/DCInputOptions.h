@@ -1,8 +1,10 @@
 #pragma once
-#include "InputOptions.h"
 #include "../InputOptionBase.h"
+#include "DCDetectorPaths.h"
+#include "Parameter.h"
 
 namespace io::dc {
+  class DCDetectorPaths;
 
   /**
    * @class DCInputOptions
@@ -14,13 +16,13 @@ namespace io::dc {
    * variables map, and to check the status of various options.
    */
   class DCInputOptions : public InputOptionBase {
-    public:
+   public:
     /**
      * @brief Constructor for the DCInputOptions class.
      *
      * This constructor initializes an instance of the DCInputOptions class.
      */
-     DCInputOptions();
+    DCInputOptions();
 
     /**
      * Default Destructor for the DCInputOptions class.
@@ -103,9 +105,7 @@ namespace io::dc {
      */
     [[nodiscard]] bool reactor_split() const noexcept { return m_ReactorSplit; }
 
-    [[nodiscard]] const io::dc::DetectorPaths& input_paths(params::dc::DetectorType type) const {
-      return m_InputPaths.at(type);
-    }
+    [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
 
     [[nodiscard]] const boost::property_tree::ptree& config_tree() const noexcept { return m_ConfigTree; }
 
@@ -113,29 +113,29 @@ namespace io::dc {
 
     [[nodiscard]] const InputParameter& input_parameter() const noexcept { return *m_InputParameter; }
 
-    private:
+   private:
     /**
      * @brief Sets up the input options for the application.
      *
      * This function initializes and configures the necessary input options
      * required for the application to run properly.
      */
-     void setup_options();
+    void setup_options();
 
-     std::unordered_map<params::dc::DetectorType, io::dc::DetectorPaths> m_InputPaths; // < The input paths for the Double Chooz experiment
+    std::unordered_map<params::dc::DetectorType, DCDetectorPaths> m_InputPaths;  // < The input paths for the Double Chooz experiment
 
-     std::string m_ConfigFile; // < The configuration file path
+    std::string m_ConfigFile;  // < The configuration file path
 
-     std::unique_ptr<InputParameter> m_InputParameter; // < The input parameter object.
+    std::unique_ptr<InputParameter> m_InputParameter;  // < The input parameter object.
 
-     boost::property_tree::ptree m_ConfigTree; // < The configuration tree
+    boost::property_tree::ptree m_ConfigTree;  // < The configuration tree
 
-     bool m_UseData; // < Use Double Chooz Measurement Data
-     bool m_UseStatisticalErrors; // < Use Statistics Errors for toy-Spectra creation
-     bool m_UseSystematicErrors; // < Use Systematic Errors for toy-Spectra creation
-     bool m_FakeBump; // < Add fake bump to fake data
-     bool m_LikelihoodScan; // < Perform a likelihood scan
-     bool m_UseSterile; // < Use Sterile Neutrino Parameters
-     bool m_ReactorSplit; // < Use reactor split
+    bool m_UseData;               // < Use Double Chooz Measurement Data
+    bool m_UseStatisticalErrors;  // < Use Statistics Errors for toy-Spectra creation
+    bool m_UseSystematicErrors;   // < Use Systematic Errors for toy-Spectra creation
+    bool m_FakeBump;              // < Add fake bump to fake data
+    bool m_LikelihoodScan;        // < Perform a likelihood scan
+    bool m_UseSterile;            // < Use Sterile Neutrino Parameters
+    bool m_ReactorSplit;          // < Use reactor split
   };
-} // namespace io::dc
+}  // namespace io::dc
