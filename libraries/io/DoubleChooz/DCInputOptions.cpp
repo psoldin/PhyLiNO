@@ -1,5 +1,10 @@
 #include "DCInputOptions.h"
 
+// boost includes
+#include <boost/filesystem.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 namespace io::dc {
 
   DCInputOptions::DCInputOptions()
@@ -17,10 +22,50 @@ namespace io::dc {
     ("dc.llhScan", po::bool_switch(&m_LikelihoodScan), "Perform a likelihood scan")
     ("dc.useSterile", po::bool_switch(&m_UseSterile), "Use Sterile Neutrino Parameters")
     ("dc.reactorSplit,r", po::bool_switch(&m_ReactorSplit), "Use reactor split")
+    ("dc.config,c", po::value<std::string>(&m_ConfigFile)->default_value("dc_config.json")->required(), "Set Double Chooz Config file path")
     ;
   }
 
   void DCInputOptions::read(const boost::program_options::variables_map& vm) {
+    namespace pt = boost::property_tree;
+
+    if (!boost::filesystem::exists(m_ConfigFile)) {
+      throw std::invalid_argument("Error: Config File " + m_ConfigFile + " not found");
+    }
+
+    auto get_detectorType_from_String = [](const std::string& name) {
+      if (name == "ND")
+        return params::dc::DetectorType::ND;
+      if (name == "FDI")
+        return params::dc::DetectorType::FDI;
+      if (name == "FDII")
+        return params::dc::DetectorType::FDII;
+
+      throw std::invalid_argument("Error: DetectorType " + name + " not known");
+    };
+
+    std::cout << "Reading Double Chooz Config File: " << m_ConfigFile << '\n';
+    pt::read_json(m_ConfigFile, m_ConfigTree);
+
+    /*
+    m_InputParameter = std::make_unique<InputParameter>(tree.get_child("Parameters"));
+
+    for (const auto& [section_name, paths] : tree.get_child("Inputs")) {
+      std::cout << "--- Reading Input Data for '" << section_name << "' ---\n";
+
+      if (section_name == "DoubleChooz") {
+        try {
+          for (const auto& [path_name, path] : paths) {
+            // This is the name of the section, so ND, FDI and FDII in the first part.
+            // The second part are the individual paths in the same format. It is strictly required that they are in the same format.
+            m_InputPaths.emplace(get_detectorType_from_String(path_name), dc::InputPaths(path_name, path));
+          }
+        } catch (std::exception& e) {
+          std::cout << e.what() << '\n';
+        }
+      }
+    }
+   */
 
   }
 
