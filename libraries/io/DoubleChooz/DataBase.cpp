@@ -73,7 +73,7 @@ namespace io::dc {
 
   // Reads a branch from a root file with a given file path
   // Returns a pointer to the TTree object containing the branch
-  std::vector<TreeEntry> read_reactor_root_file(const std::string& filePath, const InputPaths& paths) {
+  std::vector<TreeEntry> read_reactor_root_file(const std::string& filePath, const DetectorPaths& paths) {
     // Open the root file
     TFile* file = TFile::Open(filePath.c_str());
 
