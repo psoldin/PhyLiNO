@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Likelihood.h"
-#include "ParameterWrapper.h"
 #include "Options.h"
+#include "ParameterWrapper.h"
+#include "TVectorD.h"
 
 #include "AccidentalBackground.h"
-#include "LithiumBackground.h"
-#include "FastNBackground.h"
 #include "DNCBackground.h"
+#include "FastNBackground.h"
+#include "LithiumBackground.h"
 #include "ReactorSpectrum.h"
 
 namespace ana::dc {
@@ -20,17 +21,62 @@ namespace ana::dc {
     // FDI and FDII lithium background rates are fully correlated
     parameters[index(FDI, BkgRLi)] = parameters[index(FDII, BkgRLi)];
 
-    Eigen::Vector<double, 7> correlated_energy = {parameters[EnergyA],
-                                              parameters[index(FDI,  EnergyB)],
-                                              parameters[index(ND,   EnergyB)],
-                                              parameters[index(FDII, EnergyB)],
-                                              parameters[index(FDI,  EnergyC)],
-                                              parameters[index(ND,   EnergyC)],
-                                              parameters[index(FDII, EnergyC)]};
+    const auto& dco = options.double_chooz().dataBase();
 
-    const auto& covEigVecMatrix = options.double_chooz().starting_parameters().correlations().energy_correlation_matrix();
+    {  // Correlate Energy Parameters
+      // EnergyA is fully correlated among all detectors
+      constexpr std::array<int, 7> energy_indices = {EnergyA,
+                                                     index(FDI, EnergyB),
+                                                     index(ND, EnergyB),
+                                                     index(FDII, EnergyB),
+                                                     index(FDI, EnergyC),
+                                                     index(ND, EnergyC),
+                                                     index(FDII, EnergyC)};
 
+      TVectorD energy_correlations(7);
 
+      for (std::size_t i = 0; i < energy_indices.size(); ++i) {
+        energy_correlations[i] = parameters[energy_indices[i]];
+      }
+
+      energy_correlations *= dco.energy_correlation_matrix();
+
+      for (std::size_t i = 0; i < energy_indices.size(); ++i) {
+        parameters[energy_indices[i]] = energy_correlations[i];
+      }
+    }
+
+    {
+      constexpr std::array mcNorm_indices = {index(FDI, MCNorm),
+                                             index(ND, MCNorm),
+                                             index(FDII, MCNorm)};
+
+      TVectorD mcNorm_correlations(3);
+      for (std::size_t i = 0; i < mcNorm_indices.size(); ++i) {
+        mcNorm_correlations[i] = parameters[mcNorm_indices[i]];
+      }
+
+      mcNorm_correlations *= dco.mcNorm_correlation_matrix();
+
+      for (std::size_t i = 0; i < mcNorm_indices.size(); ++i) {
+        parameters[mcNorm_indices[i]] = mcNorm_correlations[i];
+      }
+    }
+    {
+      const auto& covMatrix = dco.interDetector_correlation_matrix();
+      TVectorD reactor_correlations(3);
+      for (int i = NuShape01; i <= NuShape43; ++i) {
+        reactor_correlations[0] = parameters[index(FDI, i)];
+        reactor_correlations[1] = parameters[index(ND, i)];
+        reactor_correlations[2] = parameters[index(FDII, i)];
+
+        reactor_correlations *= covMatrix;
+
+        parameters[index(FDI, i)] = reactor_correlations[0];
+        parameters[index(ND, i)] = reactor_correlations[1];
+        parameters[index(FDII, i)] = reactor_correlations[2];
+      }
+    }
   }
   /*
   void correlate_parameters(const io::Options& options, std::span<double> parameters) {
@@ -154,7 +200,10 @@ namespace ana::dc {
      *                  the parameters required for the likelihood calculation.
      * @return A double representing the calculated likelihood.
      */
-    [[nodiscard]] double calculate_reactor_split_likelihood(const ParameterWrapper& parameter) noexcept;
+    // TODO
+    [[nodiscard]] double calculate_reactor_split_likelihood(const ParameterWrapper& parameter) noexcept {
+      return 0.0;
+    }
 
     /**
      * @brief Recalculates the spectra based on the provided parameters.
@@ -165,17 +214,17 @@ namespace ana::dc {
      */
     bool recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
-    ParameterWrapper m_Parameter; ///< The parameter wrapper object used for likelihood calculation.
+    ParameterWrapper m_Parameter;  ///< The parameter wrapper object used for likelihood calculation.
 
-    AccidentalBackground m_Accidental; ///< The accidental background object.
-    LithiumBackground m_Lithium;       ///< The lithium background object.
-    FastNBackground m_FastN;           ///< The fast neutron background object.
-    DNCBackground m_DNC;               ///< The delayed neutron capture background object.
-    ReactorSpectrum m_Reactor;         ///< The reactor spectrum object.
+    AccidentalBackground m_Accidental;  ///< The accidental background object.
+    LithiumBackground    m_Lithium;     ///< The lithium background object.
+    FastNBackground      m_FastN;       ///< The fast neutron background object.
+    DNCBackground        m_DNC;         ///< The delayed neutron capture background object.
+    ReactorSpectrum      m_Reactor;     ///< The reactor spectrum object.
 
-    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData; ///< The measurement data for each detector type.
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;  ///< The measurement data for each detector type.
 
-    void correlate_parameters(std::span<double> parameters) noexcept { }
+    void correlate_parameters(std::span<double> parameters) noexcept {}
   };
 
 }  // namespace ana::dc

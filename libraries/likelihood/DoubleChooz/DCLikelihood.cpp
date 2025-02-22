@@ -70,7 +70,7 @@ namespace ana::dc {
         bkg[i] = acc[i] + li[i] + fastN[i] + dnc[i];
       }
 
-      const auto& data = get_measurement_data(detector);
+      auto data = get_measurement_data(detector);
 
       likelihood += calculate_poisson_likelihood(data, reactor, bkg);
 
