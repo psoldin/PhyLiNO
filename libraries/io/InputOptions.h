@@ -6,7 +6,6 @@
 // includes
 #include "InputOptionBase.h"
 #include "InputParameter.h"
-#include "DoubleChooz/DetectorPaths.h"
 #include "DoubleChooz/DCInputOptions.h"
 
 namespace io {
@@ -47,8 +46,6 @@ namespace io {
 
     [[nodiscard]] const auto& input_parameter() const noexcept { return *m_InputParameter; }
 
-    [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
-
     [[nodiscard]] const auto& double_chooz() const noexcept { return *m_DCInputOptions; }
 
     [[nodiscard]] bool use_multi_threading() const noexcept { return m_MultiThreadingCores > 1; }
@@ -63,7 +60,6 @@ namespace io {
     std::string m_ConfigFile; /**< The configuration file path. */
 
     std::unique_ptr<InputParameter>                m_InputParameter; /**< The input parameter object. */
-    std::map<params::dc::DetectorType, dc::DetectorPaths> m_InputPaths;     /**< The input paths map. */
 
     std::shared_ptr<dc::DCInputOptions> m_DCInputOptions; /**< The Double Chooz input options. */
   };
