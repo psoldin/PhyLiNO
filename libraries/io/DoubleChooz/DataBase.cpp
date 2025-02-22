@@ -73,7 +73,7 @@ namespace io::dc {
 
   // Reads a branch from a root file with a given file path
   // Returns a pointer to the TTree object containing the branch
-  std::vector<TreeEntry> read_reactor_root_file(const std::string& filePath, const DetectorPaths& paths) {
+  std::vector<TreeEntry> read_reactor_root_file(const std::string& filePath, const DCDetectorPaths& paths) {
     // Open the root file
     TFile* file = TFile::Open(filePath.c_str());
 
@@ -193,7 +193,6 @@ namespace io::dc {
   }
 
   void DataBase::construct_energy_correlation_matrix() {
-    m_InputOptions.double_chooz();
 
     TMatrixD corrMatrix(7, 7);
     TVectorD eigenValues(7);
@@ -212,11 +211,11 @@ namespace io::dc {
     using enum params::dc::DetectorType;
 
     for (auto detector : {ND, FDI, FDII}) {
-      const auto& path = m_InputOptions.input_paths(detector);
+      // const auto& path = m_InputOptions.input_paths(detector);
 
       if (inputOptions.double_chooz().use_data()) {
         // Read the measurement data from the ROOT file
-        const std::string& dataPath   = path.data_path();
+        // const std::string& dataPath   = path.data_path();
         // const std::string& treeName   = path.data_tree_name();
         // const std::string& branchName = path.data_branch_name();
       }
