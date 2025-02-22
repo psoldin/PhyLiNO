@@ -1,5 +1,5 @@
-#include "DetectorPaths.h"
 #include "../Parameter.h"
+#include "DCDetectorPaths.h"
 
 // STL includes
 #include <iomanip>
@@ -15,7 +15,7 @@ void print_argument(std::ostream& os, std::string_view name, std::string_view ar
 
 namespace io::dc {
 
-  DetectorPaths::DetectorPaths(std::string section, const InputOptions& input_options)
+  DCDetectorPaths::DCDetectorPaths(std::string section, const boost::property_tree::ptree& tree)
     : m_DetectorSection(std::move(section)) {
     // Define enum for less writing
 
@@ -23,10 +23,6 @@ namespace io::dc {
     // for (const auto& entry : tree) {
     //   std::cout << "Key: " << entry.first << ", Value: " << entry.second.get_value<std::string>() << std::endl;
     // }
-
-    const auto& double_chooz = input_options.double_chooz();
-
-    const auto& tree = double_chooz.config_tree().get_child(m_DetectorSection);
 
     using enum params::dc::BackgroundType;
     try {

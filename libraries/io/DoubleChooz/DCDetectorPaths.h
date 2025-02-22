@@ -1,6 +1,7 @@
 #pragma once
 
 // includes
+#include "../InputOptions.h"
 #include "../Parameter.h"
 
 // STL includes
@@ -8,31 +9,28 @@
 #include <iostream>
 #include <string>
 
-// boost includes
-#include <boost/property_tree/ptree.hpp>
-#include "../InputOptions.h"
 
 namespace io::dc {
 
   /**
-   * @class DetectorPaths
+   * @class DCDetectorPaths
    * @brief Class representing input paths for a detector.
    * This class stores the paths to various input files and data for a detector.
    * It is used to initialize the paths by reading them from a boost::property_tree.
    */
-  class DetectorPaths {
+  class DCDetectorPaths {
    public:
     /**
      * @brief Constructor for InputPaths class.
      * @param section The section name.
      * @param input_options The input options.
      */
-    DetectorPaths(std::string section, const InputOptions& input_options);
+    DCDetectorPaths(std::string section, const boost::property_tree::ptree& tree);
 
     /**
      * @brief Destructor for InputPaths class.
      */
-    ~DetectorPaths() = default;
+    ~DCDetectorPaths() = default;
 
     /**
      * @brief Getter function for detector section name.
