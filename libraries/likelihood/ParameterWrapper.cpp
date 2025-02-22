@@ -9,11 +9,11 @@ namespace ana::dc {
   ParameterWrapper::ParameterWrapper(const std::size_t nParameter, std::shared_ptr<io::Options> options, transform_fn_t transform_fn)
     : m_CurrentParameters(nParameter, 0.0)
     , m_PreviousParameters(nParameter, 0.0)
-    , m_ParameterChanged(nParameter, false)
+    , m_ParameterChanged(nParameter, true)
     , m_NParameter(nParameter)
     , m_Options(std::move(options))
     , m_RawParameter(nullptr)
-    , m_TransformFn(transform_fn) { }
+    , m_TransformFn(transform_fn) {}
 
   void ParameterWrapper::reset_parameter(const double* parameter) {
     // Set the raw parameter pointer to the new parameter array
@@ -53,7 +53,7 @@ namespace ana::dc {
     }
 
     const auto same_count = std::accumulate(m_ParameterChanged.begin() + from, m_ParameterChanged.begin() + (to + 1), 0);
-    const bool same = same_count == (to - from + 1);
+    const bool same       = same_count == (to - from + 1);
     return !same;
   }
 
