@@ -30,14 +30,6 @@ namespace io::dc {
                                                               9., 9.5, 10., 11., 12., 14., 16., 18., 20.,
                                                               25., 30., 35., 40., 45., 50.};
 
-    static constexpr double DistanceB1ND = 468.761;  // meter (DocDB# 6286 slide 7)
-
-    static constexpr double DistanceB2ND = 355.388;  // meter (DocDB# 6286 slide 7)
-
-    static constexpr double DistanceB1FD = 1114.656;  // meter (DocDB# 6286 slide 7)
-
-    static constexpr double DistanceB2FD = 997.839;  // meter (DocDB# 6286 slide 7)
-
     static constexpr int number_of_energy_bins = 38;  // Number of energy bins used in the Double Chooz experiment
   };
 
