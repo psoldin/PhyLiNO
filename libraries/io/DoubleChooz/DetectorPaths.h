@@ -10,28 +10,29 @@
 
 // boost includes
 #include <boost/property_tree/ptree.hpp>
+#include "../InputOptions.h"
 
 namespace io::dc {
 
   /**
-   * @class InputPaths
+   * @class DetectorPaths
    * @brief Class representing input paths for a detector.
    * This class stores the paths to various input files and data for a detector.
    * It is used to initialize the paths by reading them from a boost::property_tree.
    */
-  class InputPaths {
+  class DetectorPaths {
    public:
     /**
      * @brief Constructor for InputPaths class.
      * @param section The section name.
-     * @param tree The boost::property_tree object.
+     * @param input_options The input options.
      */
-    InputPaths(std::string section, const boost::property_tree::ptree& tree);
+    DetectorPaths(std::string section, const InputOptions& input_options);
 
     /**
      * @brief Destructor for InputPaths class.
      */
-    ~InputPaths() = default;
+    ~DetectorPaths() = default;
 
     /**
      * @brief Getter function for detector section name.
