@@ -5,6 +5,8 @@ set(files
         Options.cpp
         DoubleChooz/InputPaths.cpp
         DoubleChooz/InputPaths.h
+        DoubleChooz/DetectorPaths.cpp
+        DoubleChooz/DetectorPaths.h
         TreeEntry.h
         Parameter.h
         DoubleChooz/DataBase.h
