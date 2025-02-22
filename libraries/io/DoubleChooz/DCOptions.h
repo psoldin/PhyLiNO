@@ -1,5 +1,6 @@
 #pragma once
 
+// includes
 #include "DataBase.h"
 #include "StartingParameter.h"
 
@@ -9,14 +10,17 @@ namespace io::dc {
   public:
     explicit DCOptions(const InputOptions& inputOptions)
       : m_DataBase(inputOptions)
-      , m_StartingParameter(inputOptions)
-    {}
+      , m_StartingParameter(inputOptions) { }
 
     ~DCOptions() = default;
 
-    [[nodiscard]] const DataBase& dataBase() const noexcept { return m_DataBase; }
+    [[nodiscard]] const DataBase& dataBase() const noexcept {
+      return m_DataBase;
+    }
 
-    [[nodiscard]] const StartingParameter& starting_parameters() const noexcept { return m_StartingParameter; }
+    [[nodiscard]] const StartingParameter& starting_parameters() const noexcept {
+      return m_StartingParameter;
+    }
 
   private:
     DataBase m_DataBase;
