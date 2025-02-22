@@ -6,7 +6,7 @@
 // includes
 #include "InputOptionBase.h"
 #include "InputParameter.h"
-#include "DoubleChooz/InputPaths.h"
+#include "DoubleChooz/DetectorPaths.h"
 #include "DoubleChooz/DCInputOptions.h"
 
 namespace io {
@@ -63,8 +63,8 @@ namespace io {
     std::string m_ConfigFile; /**< The configuration file path. */
 
     std::unique_ptr<InputParameter>                m_InputParameter; /**< The input parameter object. */
-    std::map<params::dc::DetectorType, dc::InputPaths> m_InputPaths;     /**< The input paths map. */
+    std::map<params::dc::DetectorType, dc::DetectorPaths> m_InputPaths;     /**< The input paths map. */
 
-    std::unique_ptr<dc::DCInputOptions> m_DCInputOptions; /**< The Double Chooz input options. */
+    std::shared_ptr<dc::DCInputOptions> m_DCInputOptions; /**< The Double Chooz input options. */
   };
 }  // namespace io

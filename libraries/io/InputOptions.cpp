@@ -47,40 +47,16 @@ namespace io {
 
       notify(vm);
 
-      if (!boost::filesystem::exists(m_ConfigFile)) {
-        throw std::invalid_argument("Error: Config File " + m_ConfigFile + " not found");
-      }
+      using option_ptr_t = std::shared_ptr<InputOptionBase>;
 
-      pt::ptree tree;
-      read_json(m_ConfigFile, tree);
+      // Add the experiment specific options here
+      std::vector<option_ptr_t> options = {m_DCInputOptions};
 
-      m_InputParameter = std::make_unique<InputParameter>(tree.get_child("Parameters"));
+      for (auto option : options) {
+        if (option == nullptr)
+          continue;
 
-      auto get_detectorType_from_String = [](const std::string& name) {
-        if (name == "ND")
-          return params::dc::DetectorType::ND;
-        if (name == "FDI")
-          return params::dc::DetectorType::FDI;
-        if (name == "FDII")
-          return params::dc::DetectorType::FDII;
-
-        throw std::invalid_argument("Error: DetectorType " + name + " not known");
-      };
-
-      for (const auto& [section_name, paths] : tree.get_child("Inputs")) {
-        std::cout << "--- Reading Input Data for '" << section_name << "' ---\n";
-
-        if (section_name == "DoubleChooz") {
-          try {
-            for (const auto& [path_name, path] : paths) {
-              // This is the name of the section, so ND, FDI and FDII in the first part.
-              // The second part are the individual paths in the same format. It is strictly required that they are in the same format.
-              m_InputPaths.emplace(get_detectorType_from_String(path_name), dc::InputPaths(path_name, path));
-            }
-          } catch (std::exception& e) {
-            std::cout << e.what() << '\n';
-          }
-        }
+        option->read(vm);
       }
 
     } catch (std::exception& e) {
