@@ -1,12 +1,11 @@
 set(files
         InputOptions.h
         InputOptions.cpp
+        InputOptionBase.h
         Options.h
         Options.cpp
-        DoubleChooz/InputPaths.cpp
-        DoubleChooz/InputPaths.h
-        DoubleChooz/DetectorPaths.cpp
-        DoubleChooz/DetectorPaths.h
+        DoubleChooz/DCDetectorPaths.cpp
+        DoubleChooz/DCDetectorPaths.h
         TreeEntry.h
         Parameter.h
         DoubleChooz/DataBase.h
