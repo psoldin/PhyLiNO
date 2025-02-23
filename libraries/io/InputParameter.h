@@ -32,8 +32,8 @@ namespace io {
         for (const auto& [_, parameter] : tree) {
           m_Parameters.emplace_back(parameter);
           m_Fixed.emplace_back(parameter.get<bool>("Fixed"));
-          m_Constrained.emplace_back(parameter.get<bool>("constrained"));
-          m_Names.emplace_back(parameter.get<std::string>("name"));
+          m_Constrained.emplace_back(parameter.get<bool>("Constrained"));
+          m_Names.emplace_back(parameter.get<std::string>("Name"));
         }
       } catch (std::exception& e) {
         std::cout << "A problem occurred in InputParameters class: " << e.what() << '\n';
@@ -135,8 +135,8 @@ namespace io {
        * @param parameter The boost::property_tree::ptree object containing the parameter information.
        */
       explicit Parameter(const boost::property_tree::ptree& parameter)
-        : m_Value(parameter.get<double>("start"))
-        , m_Uncertainty(parameter.get<double>("uncertainty")) {
+        : m_Value(parameter.get<double>("StartValue"))
+        , m_Uncertainty(parameter.get<double>("StepWidth")) {
       }
 
       /**
