@@ -30,8 +30,7 @@ namespace io {
       ("seed", po::value<long>(&m_Seed)->default_value(current_time), "Set seed for simulation")
       ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
       ("multiThreading,m", po::value<int>(&m_MultiThreadingCores)->default_value(1), "Use multiple threads for fitting")
-      ("config,c", po::value<std::string>(&m_ConfigFile)->default_value("dc_config.json")->required(), "Set the Config file path");
-
+      ;
       po::variables_map vm;
       store(po::parse_command_line(argc, argv, generic_options), vm);
 
