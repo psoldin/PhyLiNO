@@ -4,9 +4,9 @@
 #include <map>
 
 // includes
+#include "DoubleChooz/DCInputOptions.h"
 #include "InputOptionBase.h"
 #include "InputParameter.h"
-#include "DoubleChooz/DCInputOptions.h"
 
 namespace io {
 
@@ -44,7 +44,7 @@ namespace io {
      */
     [[nodiscard]] bool silent() const noexcept { return m_Silent; }
 
-    [[nodiscard]] const auto& input_parameter() const noexcept { return *m_InputParameter; }
+    [[nodiscard]] const auto& input_parameters() const noexcept { return *m_InputParameter; }
 
     [[nodiscard]] const auto& double_chooz() const noexcept { return *m_DCInputOptions; }
 
@@ -52,14 +52,18 @@ namespace io {
 
     [[nodiscard]] int multi_threading_cores() const noexcept { return m_MultiThreadingCores; }
 
+    [[nodiscard]] const boost::property_tree::ptree& config_tree() const noexcept { return m_ConfigTree; }
+
    private:
-    long m_Seed;                  /**< The global random seed. */
-    bool m_Silent;                /**< Flag indicating if the program should run in silent mode. */
-    int m_MultiThreadingCores;    /**< The number of cores to use for multi-threading. */
+    long m_Seed;                /**< The global random seed. */
+    bool m_Silent;              /**< Flag indicating if the program should run in silent mode. */
+    int  m_MultiThreadingCores; /**< The number of cores to use for multi-threading. */
 
     std::string m_ConfigFile; /**< The configuration file path. */
 
-    std::unique_ptr<InputParameter>                m_InputParameter; /**< The input parameter object. */
+    boost::property_tree::ptree m_ConfigTree;  // < The configuration tree
+
+    std::shared_ptr<InputParameter> m_InputParameter; /**< The input parameter object. */
 
     std::shared_ptr<dc::DCInputOptions> m_DCInputOptions; /**< The Double Chooz input options. */
   };

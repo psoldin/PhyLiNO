@@ -1,8 +1,8 @@
 #pragma once
 
 // STL includes
-#include <string>
 #include <iostream>
+#include <string>
 
 // boost includes
 #include <boost/property_tree/ptree.hpp>
@@ -20,6 +20,7 @@ namespace io {
    */
   class InputParameter {
     class Parameter;
+
    public:
     /**
      * @brief Constructor for InputParameter.
@@ -30,7 +31,7 @@ namespace io {
       try {
         for (const auto& [_, parameter] : tree) {
           m_Parameters.emplace_back(parameter);
-          m_Fixed.emplace_back(parameter.get<bool>("fixed"));
+          m_Fixed.emplace_back(parameter.get<bool>("Fixed"));
           m_Constrained.emplace_back(parameter.get<bool>("constrained"));
           m_Names.emplace_back(parameter.get<std::string>("name"));
         }
