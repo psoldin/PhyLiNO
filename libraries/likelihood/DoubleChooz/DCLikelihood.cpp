@@ -32,7 +32,6 @@ namespace ana::dc {
   }
 
   bool DCLikelihood::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
-
     bool recalculate = false;
 
     std::array<SpectrumBase*, 5> components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
@@ -51,34 +50,59 @@ namespace ana::dc {
     return calculate_default_likelihood(m_Parameter);
   }
 
+  double DCLikelihood::calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType detector) {
+    constexpr int nBins = 44;
+    using map_t = Eigen::Map<const Eigen::Array<double, 44, 1>>;
+
+    // Get the off-off data
+    map_t off_off_data(get_off_off_data(detector).data(), nBins);
+
+    // Get the on and off lifetimes
+    const double on_lifetime  = m_Options->double_chooz().dataBase().on_lifetime(detector);
+    const double off_lifetime = m_Options->double_chooz().dataBase().off_lifetime(detector);
+
+    // Rescale the background to the off time
+    auto off_off_bkg = (off_lifetime / on_lifetime) * bkg;
+
+    // Exclude the bins up to 3 MeV due to residual neutrinos
+    constexpr std::size_t idx = std::distance(io::dc::Constants::EnergyBinXaxis.cbegin(), std::ranges::lower_bound(io::dc::Constants::EnergyBinXaxis, 3.0));
+
+    // Calculate Poisson Likelihood
+    return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail<nBins - idx>().sum();
+  }
   double DCLikelihood::calculate_default_likelihood(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
 
     double likelihood = 0.0;
 
-    std::array<double, 45> bkg{};
+    constexpr int nBins = 44;
 
     for (auto detector : {ND, FDI, FDII}) {
-      std::ranges::fill(bkg, 0.0);
-      auto acc     = m_Accidental.get_spectrum(detector);
-      auto li      = m_Lithium.get_spectrum(detector);
-      auto fastN   = m_FastN.get_spectrum(detector);
-      auto dnc     = m_DNC.get_spectrum(detector);
-      auto reactor = m_Reactor.get_spectrum(detector);
+      using map_t   = Eigen::Map<const Eigen::Array<double, nBins, 1>>;
+      using array_t = Eigen::Array<double, nBins, 1>;
 
-      for (size_t i = 0; i < acc.size(); ++i) {
-        bkg[i] = acc[i] + li[i] + fastN[i] + dnc[i];
-      }
+      map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
+      map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
+      map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
+      map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
+      map_t reactor(m_Reactor.get_spectrum(detector).data(), nBins);
 
-      auto data = get_measurement_data(detector);
+      const array_t bkg = acc + li + fastN + dnc;
 
-      likelihood += calculate_poisson_likelihood(data, reactor, bkg);
+      map_t data(get_measurement_data(detector).data(), nBins);
+
+      const double mcNorm = parameter[params::index(detector, params::dc::Detector::MCNorm)];
+
+      auto prediction = bkg + (mcNorm * reactor);
+
+      // Calculate Poisson Likelihood
+      likelihood += -2.0 * (data * prediction.log() - prediction).sum();
 
       if (detector == ND || detector == FDII) {
         likelihood += calculate_off_off_likelihood(bkg, detector);
       }
     }
 
-    return likelihood;
+    return std::isfinite(likelihood) ? likelihood : 1.0e25;
   }
 }  // namespace ana::dc

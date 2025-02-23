@@ -165,6 +165,11 @@ namespace ana::dc {
       return m_MeasurementData.at(type);
     }
 
+    [[nodiscard]] std::span<const double> get_off_off_data(params::dc::DetectorType type) const noexcept {
+      // TODO
+      return {};
+    }
+
     /**
      * @brief Calculates the off-off likelihood for the given background and detector type.
      *
@@ -175,8 +180,7 @@ namespace ana::dc {
      * @param type The type of detector being used (as defined in params::dc::DetectorType).
      * @return A double representing the calculated off-off likelihood.
      */
-    // TODO
-    [[nodiscard]] double calculate_off_off_likelihood(std::span<const double> bkg, params::dc::DetectorType type) { return 0.0; }
+    [[nodiscard]] double calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType type);
 
    private:
     /**
