@@ -38,7 +38,7 @@ namespace io::dc {
      * @param vm A constant reference to a Boost program options variables map
      *           containing the input options to be read.
      */
-    void read(const boost::program_options::variables_map& vm) final;
+    void read(const boost::program_options::variables_map& vm, const boost::property_tree::ptree& config) final;
 
     /**
      * @brief Checks if data usage is enabled.
@@ -107,11 +107,7 @@ namespace io::dc {
 
     [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
 
-    [[nodiscard]] const boost::property_tree::ptree& config_tree() const noexcept { return m_ConfigTree; }
-
     [[nodiscard]] const std::string& config_file_path() const noexcept { return m_ConfigFile; }
-
-    [[nodiscard]] const InputParameter& input_parameter() const noexcept { return *m_InputParameter; }
 
    private:
     /**
@@ -125,10 +121,6 @@ namespace io::dc {
     std::unordered_map<params::dc::DetectorType, DCDetectorPaths> m_InputPaths;  // < The input paths for the Double Chooz experiment
 
     std::string m_ConfigFile;  // < The configuration file path
-
-    std::unique_ptr<InputParameter> m_InputParameter;  // < The input parameter object.
-
-    boost::property_tree::ptree m_ConfigTree;  // < The configuration tree
 
     bool m_UseData;               // < Use Double Chooz Measurement Data
     bool m_UseStatisticalErrors;  // < Use Statistics Errors for toy-Spectra creation
