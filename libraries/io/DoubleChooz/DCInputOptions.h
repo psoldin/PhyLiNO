@@ -4,7 +4,6 @@
 #include "Parameter.h"
 
 namespace io::dc {
-  class DCDetectorPaths;
 
   /**
    * @class DCInputOptions
