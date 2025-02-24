@@ -64,7 +64,7 @@ namespace ana::dc { // TODO move class to ana namespace
      * @return std::span<const double> A span containing the spectrum data.
      * It is a span to incorporate all possible shapes.
      */
-    [[nodiscard]] virtual std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept = 0;
+    [[nodiscard]] virtual std::span<const double> get_spectrum(params::dc::DetectorType type) const = 0;
 
    protected:
     std::shared_ptr<io::Options> m_Options;
