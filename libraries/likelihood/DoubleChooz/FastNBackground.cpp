@@ -1,6 +1,13 @@
 #include "FastNBackground.h"
 #include "Calculate_Spectrum.h"
 #include "Parameter.h"
+#include <DoubleChooz/Constants.h>
+
+// STL includes
+#include <numeric>
+
+// ROOT includes
+#include <TH1D.h>
 
 namespace ana::dc {
 
@@ -17,6 +24,11 @@ namespace ana::dc {
     }
 
     return has_changed;
+  }
+
+  FastNBackground::FastNBackground(std::shared_ptr<io::Options> options)
+    : SpectrumBase(std::move(options)) {
+    fill_data();
   }
 
   bool FastNBackground::check_and_recalculate(const ParameterWrapper &parameter) {
@@ -45,6 +57,40 @@ namespace ana::dc {
     //                          covMatrix,
     //                          result);
     // }
+  }
+
+  void FastNBackground::fill_data() {
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(params::dc::BackgroundType::fastN);
+
+    const auto& binning = io::dc::Constants::EnergyBinXaxis;
+
+    auto h = std::make_unique<TH1D>("h", "", binning.size() - 1, binning.data());
+
+    for (auto E : acc_data) {
+      h->Fill(E);
+    }
+
+    std::array<double, 44> background_template{};
+
+    for (int i = 0; i < 44; ++i) {
+      background_template[i] = h->GetBinContent(i + 1);
+    }
+
+    using enum params::dc::DetectorType;
+
+    const double sum = std::accumulate(background_template.begin(), background_template.end(), 0.0);
+
+    for (auto detector : {ND, FDI, FDII}) {
+      const double lifeTime = m_Options->double_chooz().dataBase().on_lifetime(detector);
+
+      std::array<double, 44> background_spectrum;
+
+      for (int i = 0; i < 44; ++i) {
+        background_spectrum[i] = (lifeTime / sum) * background_template[i];
+      }
+
+      m_BackgroundTemplate[detector] = background_spectrum;
+    }
   }
 
 }  // namespace ana::dc
