@@ -2,6 +2,8 @@ set(files
         InputOptions.h
         InputOptions.cpp
         InputOptionBase.h
+        DoubleChooz/DCInputOptions.h
+        DoubleChooz/DCInputOptions.cpp
         Options.h
         Options.cpp
         DoubleChooz/DCDetectorPaths.cpp
