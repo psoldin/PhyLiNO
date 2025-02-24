@@ -24,6 +24,11 @@ namespace ana::dc {
     return recalculate;
   }
 
+  LithiumBackground::LithiumBackground(std::shared_ptr<io::Options> options)
+    : SpectrumBase(std::move(options)) {
+    fill_data();
+  }
+
   bool LithiumBackground::check_and_recalculate(const ParameterWrapper &parameter) {
     bool has_changed = check_parameters(parameter);
     if (has_changed) {
@@ -74,6 +79,7 @@ namespace ana::dc {
     const double sum = std::accumulate(background_template.begin(), background_template.end(), 0.0);
 
     for (auto detector : {ND, FDI, FDII}) {
+      std::cout << params::dc::get_detector_name(detector) << '\n';
       const double lifeTime = m_Options->double_chooz().dataBase().on_lifetime(detector);
 
       std::array<double, 44> background_spectrum;
