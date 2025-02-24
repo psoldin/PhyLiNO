@@ -301,21 +301,21 @@ namespace io::dc {
           num_samples = 6'000'000;
           p1          = 355.0;
           p2          = 470.0;
-          name = "ND";
+          name        = "ND";
           break;
         case FDI:
           ratio       = 0.5;
           num_samples = 5'000'000;
           p1          = 355.0;
           p2          = 470.0;
-          name = "FDI";
+          name        = "FDI";
           break;
         case FDII:
           ratio       = 0.55;
           num_samples = 10'000'000;
           p1          = 997.0;
           p2          = 1115.0;
-          name = "FDII";
+          name        = "FDII";
           break;
         default:;  // Do nothing
       }
@@ -329,8 +329,10 @@ namespace io::dc {
     using enum params::dc::BackgroundType;
     std::cout << "Generating " << std::setw(10) << 40'000 << " samples for Accidental Background\n";
     m_BackgroundData[accidental] = generate_accidental_background(gen, 40'000);
+
     std::cout << "Generating " << std::setw(10) << 650'000 << " samples for Lithium Background\n";
     m_BackgroundData[lithium] = generate_lithium_background(gen, 650'000);
+
     std::cout << "Generating " << std::setw(10) << 2'000'000 << " samples for fastN Background\n";
     m_BackgroundData[fastN] = generate_fastN_background(gen, 2'000'000);
   }
