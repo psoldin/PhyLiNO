@@ -85,9 +85,6 @@ namespace ana::dc {
 
       std::array<double, 44> background_spectrum;
 
-      std::cout << "LifeTime: " << lifeTime << '\n';
-      std::cout << "Scaling: " << (lifeTime / sum) << '\n';
-
       for (int i = 0; i < 44; ++i) {
         background_spectrum[i] = (lifeTime / sum) * background_template[i];
       }
