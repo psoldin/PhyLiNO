@@ -42,6 +42,72 @@ namespace ana::dc {
     return recalculate;
   }
 
+  void correlate_parameters(const io::Options& options, std::span<double> parameters) {
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+    using namespace params;
+
+    // FDI and FDII lithium background rates are fully correlated
+    parameters[index(FDI, BkgRLi)] = parameters[index(FDII, BkgRLi)];
+
+    const auto& dco = options.double_chooz().dataBase();
+
+    {  // Correlate Energy Parameters
+      // EnergyA is fully correlated among all detectors
+      constexpr std::array<int, 7> energy_indices = {EnergyA,
+                                                     index(FDI, EnergyB),
+                                                     index(ND, EnergyB),
+                                                     index(FDII, EnergyB),
+                                                     index(FDI, EnergyC),
+                                                     index(ND, EnergyC),
+                                                     index(FDII, EnergyC)};
+
+      TVectorD energy_correlations(7);
+
+      for (std::size_t i = 0; i < energy_indices.size(); ++i) {
+        energy_correlations[i] = parameters[energy_indices[i]];
+      }
+
+      energy_correlations *= dco.energy_correlation_matrix();
+
+      for (std::size_t i = 0; i < energy_indices.size(); ++i) {
+        parameters[energy_indices[i]] = energy_correlations[i];
+      }
+    }
+
+    {
+      constexpr std::array mcNorm_indices = {index(FDI, MCNorm),
+                                             index(ND, MCNorm),
+                                             index(FDII, MCNorm)};
+
+      TVectorD mcNorm_correlations(3);
+      for (std::size_t i = 0; i < mcNorm_indices.size(); ++i) {
+        mcNorm_correlations[i] = parameters[mcNorm_indices[i]];
+      }
+
+      mcNorm_correlations *= dco.mcNorm_correlation_matrix();
+
+      for (std::size_t i = 0; i < mcNorm_indices.size(); ++i) {
+        parameters[mcNorm_indices[i]] = mcNorm_correlations[i];
+      }
+    }
+    {
+      const auto& covMatrix = dco.interDetector_correlation_matrix();
+      TVectorD    reactor_correlations(3);
+      for (int i = NuShape01; i <= NuShape43; ++i) {
+        reactor_correlations[0] = parameters[index(FDI, i)];
+        reactor_correlations[1] = parameters[index(ND, i)];
+        reactor_correlations[2] = parameters[index(FDII, i)];
+
+        reactor_correlations *= covMatrix;
+
+        parameters[index(FDI, i)]  = reactor_correlations[0];
+        parameters[index(ND, i)]   = reactor_correlations[1];
+        parameters[index(FDII, i)] = reactor_correlations[2];
+      }
+    }
+  }
+
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
     if (m_Options->inputOptions().double_chooz().reactor_split()) {
@@ -52,7 +118,7 @@ namespace ana::dc {
 
   double DCLikelihood::calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType detector) {
     constexpr int nBins = 44;
-    using map_t = Eigen::Map<const Eigen::Array<double, 44, 1>>;
+    using map_t         = Eigen::Map<const Eigen::Array<double, 44, 1>>;
 
     // Get the off-off data
     map_t off_off_data(get_off_off_data(detector).data(), nBins);
@@ -70,6 +136,7 @@ namespace ana::dc {
     // Calculate Poisson Likelihood
     return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail<nBins - idx>().sum();
   }
+
   double DCLikelihood::calculate_default_likelihood(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
 

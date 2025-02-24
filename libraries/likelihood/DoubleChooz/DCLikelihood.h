@@ -13,72 +13,6 @@
 
 namespace ana::dc {
 
-  inline void correlate_parameters(const io::Options& options, std::span<double> parameters) {
-    using enum params::dc::DetectorType;
-    using enum params::dc::Detector;
-    using namespace params;
-
-    // FDI and FDII lithium background rates are fully correlated
-    parameters[index(FDI, BkgRLi)] = parameters[index(FDII, BkgRLi)];
-
-    const auto& dco = options.double_chooz().dataBase();
-
-    {  // Correlate Energy Parameters
-      // EnergyA is fully correlated among all detectors
-      constexpr std::array<int, 7> energy_indices = {EnergyA,
-                                                     index(FDI, EnergyB),
-                                                     index(ND, EnergyB),
-                                                     index(FDII, EnergyB),
-                                                     index(FDI, EnergyC),
-                                                     index(ND, EnergyC),
-                                                     index(FDII, EnergyC)};
-
-      TVectorD energy_correlations(7);
-
-      for (std::size_t i = 0; i < energy_indices.size(); ++i) {
-        energy_correlations[i] = parameters[energy_indices[i]];
-      }
-
-      energy_correlations *= dco.energy_correlation_matrix();
-
-      for (std::size_t i = 0; i < energy_indices.size(); ++i) {
-        parameters[energy_indices[i]] = energy_correlations[i];
-      }
-    }
-
-    {
-      constexpr std::array mcNorm_indices = {index(FDI, MCNorm),
-                                             index(ND, MCNorm),
-                                             index(FDII, MCNorm)};
-
-      TVectorD mcNorm_correlations(3);
-      for (std::size_t i = 0; i < mcNorm_indices.size(); ++i) {
-        mcNorm_correlations[i] = parameters[mcNorm_indices[i]];
-      }
-
-      mcNorm_correlations *= dco.mcNorm_correlation_matrix();
-
-      for (std::size_t i = 0; i < mcNorm_indices.size(); ++i) {
-        parameters[mcNorm_indices[i]] = mcNorm_correlations[i];
-      }
-    }
-    {
-      const auto& covMatrix = dco.interDetector_correlation_matrix();
-      TVectorD reactor_correlations(3);
-      for (int i = NuShape01; i <= NuShape43; ++i) {
-        reactor_correlations[0] = parameters[index(FDI, i)];
-        reactor_correlations[1] = parameters[index(ND, i)];
-        reactor_correlations[2] = parameters[index(FDII, i)];
-
-        reactor_correlations *= covMatrix;
-
-        parameters[index(FDI, i)] = reactor_correlations[0];
-        parameters[index(ND, i)] = reactor_correlations[1];
-        parameters[index(FDII, i)] = reactor_correlations[2];
-      }
-    }
-  }
-
   /**
    * @class DCLikelihood
    * @brief A class that represents the likelihood calculation for the Double Chooz experiment.
@@ -152,6 +86,8 @@ namespace ana::dc {
      */
     [[nodiscard]] double calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType type);
 
+    [[nodiscard]] const AccidentalBackground& accidental_background() const noexcept { return m_Accidental; }
+
    private:
     /**
      * @brief Calculates the default likelihood for the given parameter.
@@ -197,8 +133,6 @@ namespace ana::dc {
     ReactorSpectrum      m_Reactor;     ///< The reactor spectrum object.
 
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;  ///< The measurement data for each detector type.
-
-    void correlate_parameters(std::span<double> parameters) noexcept {}
   };
 
 }  // namespace ana::dc
