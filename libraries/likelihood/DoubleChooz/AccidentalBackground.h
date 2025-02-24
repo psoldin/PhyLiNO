@@ -13,15 +13,15 @@ namespace ana::dc {
    * the spectra based on given parameters.
    */
   class AccidentalBackground : public SpectrumBase {
-  public:
+   public:
     explicit AccidentalBackground(std::shared_ptr<io::Options> options);
 
-   /**
-    * @brief Default destructor for the AccidentalBackground class.
-    *
-    * This destructor overrides the base class destructor and is marked as default,
-    * indicating that the compiler should generate the default implementation.
-    */
+    /**
+     * @brief Default destructor for the AccidentalBackground class.
+     *
+     * This destructor overrides the base class destructor and is marked as default,
+     * indicating that the compiler should generate the default implementation.
+     */
     ~AccidentalBackground() override = default;
 
     /**
@@ -45,24 +45,23 @@ namespace ana::dc {
      * @param detector The type of detector for which the spectrum is requested.
      * @return A constant span of doubles representing the spectrum for the specified detector.
      */
-    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const noexcept override {
-      // TODO
-      return {};
+    [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const override {
+      return m_AccSpectrum.at(detector);
     }
 
-    [[nodiscard]] std::span<const double> get_background_template(params::dc::DetectorType detector) const noexcept {
+    [[nodiscard]] std::span<const double> get_background_template(params::dc::DetectorType detector) const {
       return m_BackgroundTemplate.at(detector);
     }
 
-  private:
-    std::map<params::dc::DetectorType, std::array<double, 44>> m_BackgroundTemplate;
+   private:
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_BackgroundTemplate;
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_AccSpectrum;
 
     void fill_data();
 
     void recalculate_spectra(const ParameterWrapper& parameter) {
       // Recalculate the accidental background spectrum
     }
-
   };
 
-}
+}  // namespace ana::dc
