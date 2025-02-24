@@ -18,6 +18,9 @@ namespace io {
     , m_MultiThreadingCores(-1) {
     std::string inputFile;
     try {
+
+      m_DCInputOptions = std::make_shared<dc::DCInputOptions>();
+
       namespace po = boost::program_options;
       namespace pt = boost::property_tree;
 
@@ -31,8 +34,12 @@ namespace io {
       ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
       ("multiThreading,m", po::value<int>(&m_MultiThreadingCores)->default_value(1), "Use multiple threads for fitting")
       ;
+
+      po::options_description cmdline_options;
+      cmdline_options.add(generic_options).add(m_DCInputOptions->options());
+
       po::variables_map vm;
-      store(po::parse_command_line(argc, argv, generic_options), vm);
+      store(po::parse_command_line(argc, argv, cmdline_options), vm);
 
       if (vm.count("help")) {
         std::stringstream ss;
@@ -57,11 +64,13 @@ namespace io {
       m_InputParameter = std::make_shared<InputParameter>(m_ConfigTree.get_child("Parameter"));
 
       // Add the experiment specific options here
-      std::vector<option_ptr_t> options = {m_DCInputOptions};
+      std::map<std::string, option_ptr_t> options = {{"DoubleChooz", m_DCInputOptions}};
 
-      for (auto option : options) {
-        if (option == nullptr)
+      for (const auto& [name, option] : options) {
+        if (option == nullptr) {
+          std::cout << "Option " << name << " is not initialized\n";
           continue;
+        }
 
         option->read(vm, m_ConfigTree);
       }

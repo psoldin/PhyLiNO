@@ -65,6 +65,6 @@ namespace io {
 
     std::shared_ptr<InputParameter> m_InputParameter; /**< The input parameter object. */
 
-    std::shared_ptr<dc::DCInputOptions> m_DCInputOptions; /**< The Double Chooz input options. */
+    std::shared_ptr<io::dc::DCInputOptions> m_DCInputOptions; /**< The Double Chooz input options. */
   };
 }  // namespace io
