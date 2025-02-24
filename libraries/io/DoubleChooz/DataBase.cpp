@@ -336,6 +336,27 @@ namespace io::dc {
 
     std::cout << "Generating " << std::setw(10) << 2'000'000 << " samples for fastN Background\n";
     m_BackgroundData[fastN] = generate_fastN_background(gen, 2'000'000);
+
+    auto string_to_DetectorType = [](std::string_view name) -> params::dc::DetectorType {
+      if (name == "ND") {
+        return ND;
+      } if (name == "FDI") {
+        return FDI;
+      } if (name == "FDII") {
+        return FDII;
+      }
+      throw std::invalid_argument("Invalid detector type");
+    };
+
+    try {
+      for (const auto& [section, data] : inputOptions.config_tree().get_child("DoubleChooz")) {
+        m_OnLifeTime[string_to_DetectorType(section)] = data.get<double>("on_lifetime");
+        m_OffLifeTime[string_to_DetectorType(section)] = data.get<double>("off_lifetime");
+      }
+    } catch (const boost::property_tree::ptree_bad_path& e) {
+      std::cout << e.what() << '\n';
+      throw;
+    }
   }
 
 }  // namespace io::dc

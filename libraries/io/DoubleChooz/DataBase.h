@@ -83,9 +83,13 @@ namespace io::dc {
 
     [[nodiscard]] const TMatrixD& interDetector_correlation_matrix() const { return m_InterDetectorCorrelationMatrix; }
 
-    [[nodiscard]] double off_lifetime(params::dc::DetectorType type) const noexcept { return -1.0; };  // TODO: Implement this function
+    [[nodiscard]] double off_lifetime(params::dc::DetectorType type) const noexcept { return m_OffLifeTime.at(type); }
 
-    [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return -1.0; };  // TODO: Implement this function
+    [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return m_OnLifeTime.at(type); }
+
+    [[nodiscard]] std::span<const double> background_data(params::dc::BackgroundType type) const {
+      return m_BackgroundData.at(type);
+    }
 
    private:
     void construct_energy_correlation_matrix();
@@ -129,6 +133,9 @@ namespace io::dc {
     std::unordered_map<params::dc::DetectorType, std::shared_ptr<ReactorData>> m_ReactorData;
 
     std::unordered_map<params::dc::BackgroundType, std::vector<double>> m_BackgroundData;
+
+    std::unordered_map<params::dc::DetectorType, double> m_OnLifeTime;
+    std::unordered_map<params::dc::DetectorType, double> m_OffLifeTime;
 
     std::vector<std::vector<double>> m_SignalData;
     std::vector<std::vector<double>> m_MeasurementData;
