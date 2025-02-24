@@ -14,15 +14,14 @@ namespace ana::dc {
    */
   class AccidentalBackground : public SpectrumBase {
   public:
-    explicit AccidentalBackground(std::shared_ptr<io::Options> options)
-      : SpectrumBase(std::move(options)) { }
+    explicit AccidentalBackground(std::shared_ptr<io::Options> options);
 
-    /**
-     * @brief Default destructor for the AccidentalBackground class.
-     *
-     * This destructor overrides the base class destructor and is marked as default,
-     * indicating that the compiler should generate the default implementation.
-     */
+   /**
+    * @brief Default destructor for the AccidentalBackground class.
+    *
+    * This destructor overrides the base class destructor and is marked as default,
+    * indicating that the compiler should generate the default implementation.
+    */
     ~AccidentalBackground() override = default;
 
     /**
@@ -47,11 +46,18 @@ namespace ana::dc {
      * @return A constant span of doubles representing the spectrum for the specified detector.
      */
     [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const noexcept override {
-      return m_Spectra.at(detector);
+      // TODO
+      return {};
+    }
+
+    [[nodiscard]] std::span<const double> get_background_template(params::dc::DetectorType detector) const noexcept {
+      return m_BackgroundTemplate.at(detector);
     }
 
   private:
-    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 44, 1>> m_Spectra;
+    std::map<params::dc::DetectorType, std::array<double, 44>> m_BackgroundTemplate;
+
+    void fill_data();
 
     void recalculate_spectra(const ParameterWrapper& parameter) {
       // Recalculate the accidental background spectrum

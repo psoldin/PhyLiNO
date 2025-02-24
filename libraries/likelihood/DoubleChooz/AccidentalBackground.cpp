@@ -1,13 +1,24 @@
+// includes
 #include "AccidentalBackground.h"
 
+// STL includes
 #include <algorithm>
+#include <numeric>
+#include <ranges>
+
+// Eigen includes
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
+
+// ROOT includes
+#include <TH1.h>
+
+#include "DoubleChooz/Constants.h"
 
 namespace ana::dc {
 
   template <typename T1, typename T2>
-  inline void scale_and_clip_vector(const T1& v, T2& result,  double scale) noexcept {
+  inline void scale_and_clip_vector(const T1& v, T2& result, double scale) noexcept {
     std::transform(v.cbegin(),
                    v.cend(),
                    result.begin(),
@@ -43,7 +54,48 @@ namespace ana::dc {
     return recalculate;
   }
 
-  bool AccidentalBackground::check_and_recalculate(const ParameterWrapper &parameter) {
+  AccidentalBackground::AccidentalBackground(std::shared_ptr<io::Options> options)
+    : SpectrumBase(std::move(options)) {
+    fill_data();
+  }
+
+  void AccidentalBackground::fill_data() {
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(params::dc::BackgroundType::accidental);
+
+    const auto& binning = io::dc::Constants::EnergyBinXaxis;
+    auto        h       = std::make_unique<TH1D>("h", "", binning.size() - 1, binning.data());
+
+    for (auto E : acc_data) {
+      h->Fill(E);
+    }
+
+    std::array<double, 44> background_template{};
+
+    for (int i = 0; i < 44; ++i) {
+      background_template[i] = h->GetBinContent(i + 1);
+    }
+
+    using enum params::dc::DetectorType;
+
+    const double sum = std::accumulate(background_template.begin(), background_template.end(), 0.0);
+
+    for (auto detector : {ND, FDI, FDII}) {
+      const double lifeTime = m_Options->double_chooz().dataBase().on_lifetime(detector);
+
+      std::array<double, 44> background_spectrum;
+
+      std::cout << "LifeTime: " << lifeTime << '\n';
+      std::cout << "Scaling: " << (lifeTime / sum) << '\n';
+
+      for (int i = 0; i < 44; ++i) {
+        background_spectrum[i] = (lifeTime / sum) * background_template[i];
+      }
+
+      m_BackgroundTemplate[detector] = background_spectrum;
+    }
+  }
+
+  bool AccidentalBackground::check_and_recalculate(const ParameterWrapper& parameter) {
     const bool recalculate = check_parameters(parameter);
     if (recalculate) {
       recalculate_spectra(parameter);
@@ -51,6 +103,4 @@ namespace ana::dc {
     return recalculate;
   }
 
-
-}
-
+}  // namespace ana::dc
