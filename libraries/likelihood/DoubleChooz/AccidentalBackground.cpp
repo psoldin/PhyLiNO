@@ -63,7 +63,8 @@ namespace ana::dc {
     auto acc_data = m_Options->double_chooz().dataBase().background_data(params::dc::BackgroundType::accidental);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
-    auto        h       = std::make_unique<TH1D>("h", "", binning.size() - 1, binning.data());
+
+    auto h = std::make_unique<TH1D>("h", "", binning.size() - 1, binning.data());
 
     for (auto E : acc_data) {
       h->Fill(E);
