@@ -317,7 +317,8 @@ namespace io::dc {
           p2          = 1115.0;
           name        = "FDII";
           break;
-        default:;  // Do nothing
+        default:
+          throw std::invalid_argument("Detector type unknown");
       }
 
       std::cout << "Generating " << std::setw(10) << num_samples << " samples for reactor data set for " << name << '\n';
