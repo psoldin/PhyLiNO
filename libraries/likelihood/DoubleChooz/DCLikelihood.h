@@ -88,6 +88,14 @@ namespace ana::dc {
 
     [[nodiscard]] const AccidentalBackground& accidental_background() const noexcept { return m_Accidental; }
 
+    [[nodiscard]] const LithiumBackground& lithium_background() const noexcept { return m_Lithium; }
+
+    [[nodiscard]] const FastNBackground& fastn_background() const noexcept { return m_FastN; }
+
+    [[nodiscard]] const DNCBackground& dnc_background() const noexcept { return m_DNC; }
+
+    [[nodiscard]] const ReactorSpectrum& reactor_spectrum() const noexcept { return m_Reactor; }
+
    private:
     /**
      * @brief Calculates the default likelihood for the given parameter.
