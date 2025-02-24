@@ -128,6 +128,8 @@ namespace io::dc {
 
     std::unordered_map<params::dc::DetectorType, std::shared_ptr<ReactorData>> m_ReactorData;
 
+    std::unordered_map<params::dc::BackgroundType, std::vector<double>> m_BackgroundData;
+
     std::vector<std::vector<double>> m_SignalData;
     std::vector<std::vector<double>> m_MeasurementData;
 

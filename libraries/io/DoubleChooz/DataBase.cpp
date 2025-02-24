@@ -4,6 +4,8 @@
 #include "../TreeEntry.h"
 
 // STL includes
+#include <random>
+#include <ranges>
 #include <string>
 
 // boost includes
@@ -11,12 +13,12 @@
 
 // ROOT includes
 #include <TFile.h>
+#include <TMatrixD.h>
+#include <TMatrixDSym.h>
 #include <TTree.h>
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
-#include <TMatrixD.h>
 #include <TVector.h>
-#include <TMatrixDSym.h>
 
 namespace io::dc {
 
@@ -76,7 +78,7 @@ namespace io::dc {
   std::vector<TreeEntry> read_reactor_root_file(const DCDetectorPaths& paths) {
     // Open the root file
     const std::string& filePath = paths.reactor_neutrino_data_path();
-    TFile* file = TFile::Open(filePath.c_str());
+    TFile*             file     = TFile::Open(filePath.c_str());
 
     // Throw an exception if the file could not be opened
     if (!file)
@@ -129,9 +131,9 @@ namespace io::dc {
 
     // Sort the vector of TreeEntry objects by visible energy
     std::ranges::sort(treeEntries,
-              [](const TreeEntry& a, const TreeEntry& b) {
-                return a.Evis < b.Evis;
-              });
+                      [](const TreeEntry& a, const TreeEntry& b) {
+                        return a.Evis < b.Evis;
+                      });
 
     // Close the file and delete the TFile object
     file->Close();
@@ -193,10 +195,9 @@ namespace io::dc {
   }
 
   void DataBase::construct_energy_correlation_matrix() {
-
-    TMatrixD corrMatrix(7, 7);
-    TVectorD eigenValues(7);
-    TMatrixD eigenVectors(corrMatrix.EigenVectors(eigenValues));
+    TMatrixD    corrMatrix(7, 7);
+    TVectorD    eigenValues(7);
+    TMatrixD    eigenVectors(corrMatrix.EigenVectors(eigenValues));
     TMatrixDSym eigenValueMatrix(7);
 
     for (int i = 0; i < 7; ++i) {
@@ -206,27 +207,132 @@ namespace io::dc {
     m_EnergyCorrelationMatrix.Mult(eigenVectors, eigenValueMatrix);
   }
 
+  std::vector<double> generate_lithium_background(std::default_random_engine& gen, std::size_t num_samples) {
+    std::normal_distribution dist(5.0, 2.0);
+    std::vector<double>      sample(num_samples);
+    for (std::size_t i = 0; i < num_samples; ++i) {
+      double value;
+      do {
+        value = dist(gen);
+      } while (value < 1.0 && value > 10.0);
+      sample[i] = value;
+    }
+    return sample;
+  }
+
+  std::vector<double> generate_accidental_background(std::default_random_engine& gen, std::size_t num_samples) {
+    std::exponential_distribution dist(1.0);
+    std::vector<double>           sample(num_samples);
+    for (std::size_t i = 0; i < num_samples; ++i) {
+      sample[i] = dist(gen) + 1.0;
+    }
+    return sample;
+  }
+
+  std::vector<double> generate_fastN_background(std::default_random_engine& gen, std::size_t num_samples) {
+    std::exponential_distribution dist(50.0);
+    std::vector<double>           samples(num_samples);
+    for (std::size_t i = 0; i < num_samples; ++i) {
+      samples[i] = dist(gen) + 1.0;
+    }
+    return samples;
+  }
+
+  std::vector<TreeEntry> generate_reactor_entries(std::default_random_engine& gen, std::size_t num_samples, double ratio, double p1, double p2) {
+    std::normal_distribution dist_truth(4.0, 1.5);
+
+    std::vector<double> nuE_truth(num_samples);
+    std::vector<double> nuE_vis(num_samples);
+
+    double truth_value, reco_value;
+    for (std::size_t i = 0; i < num_samples; ++i) {
+      do {
+        truth_value = dist_truth(gen);
+      } while (truth_value < 0.0);
+      nuE_truth[i] = truth_value;
+
+      std::normal_distribution reco_dist(truth_value, 0.5);
+      do {
+        reco_value = reco_dist(gen);
+      } while (reco_value < 0.0);
+      nuE_vis[i] = reco_value;
+    }
+
+    std::vector<double> distances(num_samples);
+    const std::size_t   num_dist1 = static_cast<std::size_t>(ratio * num_samples);
+
+    std::normal_distribution dist_dist1(p1, 1.0);
+    for (std::size_t i = 0; i < num_dist1; ++i) {
+      distances[i] = dist_dist1(gen);
+    }
+    std::normal_distribution dist_dist2(p2, 1.0);
+    for (std::size_t i = num_dist1; i < num_samples; ++i) {
+      distances[i] = dist_dist2(gen);
+    }
+
+    std::ranges::shuffle(distances, gen);
+
+    std::vector<TreeEntry> reactor_tree_entries;
+    reactor_tree_entries.reserve(num_samples);
+    for (std::size_t i = 0; i < num_samples; ++i) {
+      reactor_tree_entries.emplace_back(nuE_vis[i], nuE_truth[i], distances[i], 0);
+    }
+
+    return reactor_tree_entries;
+  }
+
   DataBase::DataBase(const io::InputOptions& inputOptions)
     : m_InputOptions(inputOptions) {
     using enum params::dc::DetectorType;
 
-    for (auto detector : {ND, FDI, FDII}) {
+    std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
 
+    for (auto detector : {ND, FDI, FDII}) {
       const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
 
-      std::vector<TreeEntry> reactor_tree_entries = read_reactor_root_file(paths);
+      // std::vector<TreeEntry> reactor_tree_entries = read_reactor_root_file(paths);
+
+      std::size_t num_samples;
+      double      ratio, p1, p2;
+      std::string name;
+      switch (detector) {
+        case ND:
+          ratio       = 0.6;
+          num_samples = 6'000'000;
+          p1          = 355.0;
+          p2          = 470.0;
+          name = "ND";
+          break;
+        case FDI:
+          ratio       = 0.5;
+          num_samples = 5'000'000;
+          p1          = 355.0;
+          p2          = 470.0;
+          name = "FDI";
+          break;
+        case FDII:
+          ratio       = 0.55;
+          num_samples = 10'000'000;
+          p1          = 997.0;
+          p2          = 1115.0;
+          name = "FDII";
+          break;
+        default:;  // Do nothing
+      }
+
+      std::cout << "Generating " << std::setw(10) << num_samples << " samples for reactor data set for " << name << '\n';
+      auto reactor_tree_entries = generate_reactor_entries(gen, num_samples, ratio, p1, p2);
 
       m_ReactorData[detector] = std::make_shared<ReactorData>(reactor_tree_entries, detector);
-
-      // const auto& path = m_InputOptions.input_paths(detector);
-
-      if (inputOptions.double_chooz().use_data()) {
-        // Read the measurement data from the ROOT file
-        // const std::string& dataPath   = path.data_path();
-        // const std::string& treeName   = path.data_tree_name();
-        // const std::string& branchName = path.data_branch_name();
-      }
     }
+
+    using enum params::dc::BackgroundType;
+    std::cout << "Generating " << std::setw(10) << 40'000 << " samples for Accidental Background\n";
+    m_BackgroundData[accidental] = generate_accidental_background(gen, 40'000);
+    std::cout << "Generating " << std::setw(10) << 650'000 << " samples for Lithium Background\n";
+    m_BackgroundData[lithium] = generate_lithium_background(gen, 650'000);
+    std::cout << "Generating " << std::setw(10) << 2'000'000 << " samples for fastN Background\n";
+    m_BackgroundData[fastN] = generate_fastN_background(gen, 2'000'000);
   }
 
 }  // namespace io::dc
