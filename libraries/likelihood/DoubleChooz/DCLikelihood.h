@@ -78,36 +78,6 @@ namespace ana::dc {
       }
     }
   }
-  /*
-  void correlate_parameters(const io::Options& options, std::span<double> parameters) {
-    using enum params::dc::DetectorType;
-    using enum params::dc::Detector;
-    using namespace params;
-
-    // FDI and FDII lithium background rates are fully correlated
-    parameters[index(FDI, BkgRLi)] = parameters[index(FDII, BkgRLi)];
-
-    Eigen::Vector<double, 7> correlated_energy = {parameters[EnergyA],
-                                                  parameters[index(FDI,  EnergyB)],
-                                                  parameters[index(ND,   EnergyB)],
-                                                  parameters[index(FDII, EnergyB)],
-                                                  parameters[index(FDI,  EnergyC)],
-                                                  parameters[index(ND,   EnergyC)],
-                                                  parameters[index(FDII, EnergyC)]};
-
-    const auto& covEigVecMatrix = options.starting_parameter().correlations().energy_correlation_matrix();
-
-    correlated_energy = covEigVecMatrix * correlated_energy;
-
-    parameters[EnergyA] = correlated_energy[0];
-    parameters[index(FDI,  EnergyB)] = correlated_energy[1];
-    parameters[index(ND,   EnergyB)] = correlated_energy[2];
-    parameters[index(FDII, EnergyB)] = correlated_energy[3];
-    parameters[index(FDI,  EnergyC)] = correlated_energy[4];
-    parameters[index(ND,   EnergyC)] = correlated_energy[5];
-    parameters[index(FDII, EnergyC)] = correlated_energy[6];
-  }
-  */
 
   /**
    * @class DCLikelihood
