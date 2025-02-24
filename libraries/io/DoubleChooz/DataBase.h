@@ -24,7 +24,7 @@ namespace io::dc {
     DNC
   };
 
-/**
+  /**
    * \brief Class representing the database for Double Chooz data.
    *
    * This class provides access to various types of data related to the Double Chooz experiment,
@@ -46,7 +46,7 @@ namespace io::dc {
      * @param type The detector type.
      * @return A read-only span of measurement data.
      */
-    [[nodiscard]] std::span<const double> measurement_data(params::dc::DetectorType type) const noexcept {
+    [[nodiscard]] std::span<const double> measurement_data(params::dc::DetectorType type) const {
       if (params::get_index(type) >= m_MeasurementData.size()) {
         return {};
       }
@@ -60,7 +60,17 @@ namespace io::dc {
      * @return A reference to the reactor data for the specified detector type.
      */
     [[nodiscard]] const ReactorData& reactor_data(params::dc::DetectorType type) const {
-      return m_ReactorData[params::get_index(type)];
+      if (!m_ReactorData.contains(type)) {
+        throw std::invalid_argument("Detector type not found in reactor data");
+      }
+
+      const auto reactor_data = m_ReactorData.at(type);
+
+      if (reactor_data == nullptr) {
+        throw std::invalid_argument("Reactor data is null");
+      }
+
+      return *reactor_data;
     }
 
     [[nodiscard]] const Eigen::Matrix<double, 44, 44>& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
@@ -116,7 +126,7 @@ namespace io::dc {
       int key2; /**< The second key. */
     };
 
-    std::vector<ReactorData> m_ReactorData;
+    std::unordered_map<params::dc::DetectorType, std::shared_ptr<ReactorData>> m_ReactorData;
 
     std::vector<std::vector<double>> m_SignalData;
     std::vector<std::vector<double>> m_MeasurementData;
@@ -133,9 +143,9 @@ namespace io::dc {
     using tuple_t      = std::tuple<params::dc::DetectorType, SpectrumType>;
     using cov_matrix_t = Eigen::Matrix<double, 44, 44>;
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
-    TMatrixD m_EnergyCorrelationMatrix; // TODO Replace with Eigen Matrix
-    TMatrixD m_MCNormCorrelationMatrix; // TODO Replace with Eigen Matrix
-    TMatrixD m_InterDetectorCorrelationMatrix; // TODO Replace with Eigen Matrix
+    TMatrixD                                           m_EnergyCorrelationMatrix;         // TODO Replace with Eigen Matrix
+    TMatrixD                                           m_MCNormCorrelationMatrix;         // TODO Replace with Eigen Matrix
+    TMatrixD                                           m_InterDetectorCorrelationMatrix;  // TODO Replace with Eigen Matrix
   };
 
 }  // namespace io::dc

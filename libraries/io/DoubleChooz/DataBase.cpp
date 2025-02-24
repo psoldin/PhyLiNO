@@ -73,8 +73,9 @@ namespace io::dc {
 
   // Reads a branch from a root file with a given file path
   // Returns a pointer to the TTree object containing the branch
-  std::vector<TreeEntry> read_reactor_root_file(const std::string& filePath, const DCDetectorPaths& paths) {
+  std::vector<TreeEntry> read_reactor_root_file(const DCDetectorPaths& paths) {
     // Open the root file
+    const std::string& filePath = paths.reactor_neutrino_data_path();
     TFile* file = TFile::Open(filePath.c_str());
 
     // Throw an exception if the file could not be opened
@@ -127,8 +128,7 @@ namespace io::dc {
     }
 
     // Sort the vector of TreeEntry objects by visible energy
-    std::sort(treeEntries.begin(),
-              treeEntries.end(),
+    std::ranges::sort(treeEntries,
               [](const TreeEntry& a, const TreeEntry& b) {
                 return a.Evis < b.Evis;
               });
@@ -211,6 +211,13 @@ namespace io::dc {
     using enum params::dc::DetectorType;
 
     for (auto detector : {ND, FDI, FDII}) {
+
+      const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
+
+      std::vector<TreeEntry> reactor_tree_entries = read_reactor_root_file(paths);
+
+      m_ReactorData[detector] = std::make_shared<ReactorData>(reactor_tree_entries, detector);
+
       // const auto& path = m_InputOptions.input_paths(detector);
 
       if (inputOptions.double_chooz().use_data()) {
