@@ -153,28 +153,35 @@ namespace ana::dc {
       using map_t   = Eigen::Map<const Eigen::Array<double, nBins, 1>>;
       using array_t = Eigen::Array<double, nBins, 1>;
 
+      // Get all spectrum components as Eigen::Map
       map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
       map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
       map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
       map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
       map_t reactor(m_Reactor.get_spectrum(detector).data(), nBins);
 
+      // Add all background components to the full background contribution
       const array_t bkg = acc + li + fastN + dnc;
 
+      // Get the measurement data as Eigen::Map
       map_t data(get_measurement_data(detector).data(), nBins);
 
+      // Get the MC normalization parameter
       const double mcNorm = parameter[params::index(detector, params::dc::Detector::MCNorm)];
 
+      // Calculate the full spectrum prediction
       auto prediction = bkg + (mcNorm * reactor);
 
       // Calculate Poisson Likelihood
       likelihood += -2.0 * (data * prediction.log() - prediction).sum();
 
+      // Calculate the off-off component of the likelihood
       if (detector == ND || detector == FDII) {
         likelihood += calculate_off_off_likelihood(bkg, detector);
       }
     }
 
+    // Return the likelihood parameter if it is finite, otherwise return a large number. This is to prevent the minimizer from crashing.
     return std::isfinite(likelihood) ? likelihood : 1.0e25;
   }
 }  // namespace ana::dc
