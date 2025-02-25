@@ -24,10 +24,11 @@ namespace ana::dc {
     : SpectrumBase(std::move(options)) {
     using enum params::dc::DetectorType;
 
-    // for (auto detector : {ND, FDI, FDII}) {
-    //   const auto& reactorData = m_Options->dataBase().reactor_data(detector);
-    //   add_reactor_data(reactorData, detector);
-    // }
+    for (const auto detector : {ND, FDI, FDII}) {
+      const auto& reactorData = m_Options->double_chooz().dataBase().reactor_data(detector);
+      add_reactor_data(reactorData, detector);
+    }
+
     //
     // if (m_Options->inputOptions().use_reactor_split()) {
     //   for (auto detector : {ND, FDII}) {
@@ -65,8 +66,13 @@ namespace ana::dc {
 
   inline bool check_parameter(const ParameterWrapper& parameter) noexcept {
     using enum params::General;
+
     bool recalculate = parameter.check_parameter_changed(SinSqT13);
     recalculate |= parameter.check_parameter_changed(DeltaM31);
+    recalculate |= parameter.check_parameter_changed(SinSqT12);
+    recalculate |= parameter.check_parameter_changed(DeltaM21);
+    recalculate |= parameter.check_parameter_changed(SinSqT14);
+    recalculate |= parameter.check_parameter_changed(DeltaM41);
 
     return recalculate;
   }
@@ -76,7 +82,7 @@ namespace ana::dc {
   }
 
   bool Oscillator::check_and_recalculate(const ParameterWrapper &parameter) noexcept {
-    bool recalculate = check_parameter(parameter);
+    const bool recalculate = check_parameter(parameter);
 
     if (recalculate) {
       recalculate_spectra(parameter);
