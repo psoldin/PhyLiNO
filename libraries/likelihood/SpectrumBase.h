@@ -52,7 +52,7 @@ namespace ana::dc { // TODO move class to ana namespace
      * This is only necessary if the previous calculation step is dependent on the current one.
      * @return bool A boolean indicating if the spectrum was recalculated.
      */
-    [[nodiscard]] virtual bool check_and_recalculate(const ParameterWrapper& parameter) = 0;
+    virtual bool check_and_recalculate(const ParameterWrapper& parameter) = 0;
 
     /**
      * @brief Get the spectrum for a specific detector type.
