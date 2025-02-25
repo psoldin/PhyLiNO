@@ -15,6 +15,17 @@ namespace ana::dc {
     return has_changed;
   }
 
+  DNCBackground::DNCBackground(std::shared_ptr<io::Options> options)
+    : SpectrumBase(std::move(options)) {
+    using enum params::dc::DetectorType;
+    for (auto detector : {ND, FDI, FDII}) {
+      for (std::size_t i = 0; i < 44; ++i) {
+        m_SpectrumTemplate_Gd[detector][i] = 0.0;
+        m_SpectrumTemplate_Hy[detector][i] = 0.0;
+      }
+    }
+  }
+
   bool DNCBackground::check_and_recalculate(const ParameterWrapper& parameter) {
     bool has_changed = parameter_changed(parameter);
     if (has_changed) {
@@ -34,7 +45,7 @@ namespace ana::dc {
       const auto& gd_shape = m_SpectrumTemplate_Gd[detector];
       const auto& hy_shape = m_SpectrumTemplate_Hy[detector];
 
-      double lifetime = -1.0; //m_Options->dataBase().on_lifetime(detector); TODO
+      double lifetime = m_Options->double_chooz().dataBase().on_lifetime(detector);
 
       auto& result = m_Cache[detector];
       for (int i = 0; i < io::dc::Constants::number_of_energy_bins; ++i) {
@@ -46,4 +57,4 @@ namespace ana::dc {
   std::span<const double> DNCBackground::get_spectrum(params::dc::DetectorType type) const noexcept {
     return m_Cache.at(type);
   }
-}
+}  // namespace ana::dc

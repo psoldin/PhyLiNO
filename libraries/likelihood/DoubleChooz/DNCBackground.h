@@ -10,8 +10,7 @@ namespace ana::dc {
 
   class DNCBackground : public SpectrumBase {
    public:
-    explicit DNCBackground(std::shared_ptr<io::Options> options)
-      : SpectrumBase(std::move(options)) {}
+    explicit DNCBackground(std::shared_ptr<io::Options> options);
 
     ~DNCBackground() override = default;
 
