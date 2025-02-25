@@ -38,8 +38,6 @@ namespace ana::dc {
     }
 
    private:
-    std::shared_ptr<io::Options> m_Options; /**< The options for the Oscillator. */
-
     using span_t = std::span<const double>;
 
     std::vector<OscillationData> m_CalculationData; /**< The data used for the actual computations. */
