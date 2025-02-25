@@ -13,6 +13,15 @@ namespace io::dc {
     setup_options();
   }
 
+  const DCDetectorPaths& DCInputOptions::input_paths(params::dc::DetectorType type) const {
+    if (!m_InputPaths.contains(type)) {
+      std::stringstream ss;
+      ss << "Input paths for detector " << params::dc::get_detector_name(type) << " not found";
+      throw std::runtime_error(ss.str());
+    }
+    return m_InputPaths.at(type);
+  }
+
   void DCInputOptions::setup_options() {
     namespace po = boost::program_options;
     m_Options.add_options()("dc.useData", po::bool_switch(&m_UseData), "Use Double Chooz Measurement Data")

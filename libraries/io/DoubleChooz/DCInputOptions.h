@@ -104,7 +104,7 @@ namespace io::dc {
      */
     [[nodiscard]] bool reactor_split() const noexcept { return m_ReactorSplit; }
 
-    [[nodiscard]] const auto& input_paths(params::dc::DetectorType type) const noexcept { return m_InputPaths.at(type); }
+    [[nodiscard]] const DCDetectorPaths& input_paths(params::dc::DetectorType type) const;
 
     [[nodiscard]] const std::string& config_file_path() const noexcept { return m_ConfigFile; }
 
