@@ -278,6 +278,9 @@ namespace io::dc {
       reactor_tree_entries.emplace_back(nuE_vis[i], nuE_truth[i], distances[i], 0);
     }
 
+    std::ranges::sort(reactor_tree_entries,
+              [](const auto& a, const auto& b) { return a.Evis < b.Evis; });
+
     return reactor_tree_entries;
   }
 
