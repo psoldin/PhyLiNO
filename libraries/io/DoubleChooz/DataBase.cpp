@@ -290,44 +290,49 @@ namespace io::dc {
 
     std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
 
-    for (auto detector : {ND, FDI, FDII}) {
-      const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
+    try {
+      for (auto detector : {ND, FDI, FDII}) {
+        const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
 
-      // std::vector<TreeEntry> reactor_tree_entries = read_reactor_root_file(paths);
+        // std::vector<TreeEntry> reactor_tree_entries = read_reactor_root_file(paths);
 
-      std::size_t num_samples;
-      double      ratio, p1, p2;
-      std::string name;
-      switch (detector) {
-        case ND:
-          ratio       = 0.6;
-          num_samples = 6'000'000;
-          p1          = 355.0;
-          p2          = 470.0;
-          name        = "ND";
-          break;
-        case FDI:
-          ratio       = 0.5;
-          num_samples = 5'000'000;
-          p1          = 355.0;
-          p2          = 470.0;
-          name        = "FDI";
-          break;
-        case FDII:
-          ratio       = 0.55;
-          num_samples = 10'000'000;
-          p1          = 997.0;
-          p2          = 1115.0;
-          name        = "FDII";
-          break;
-        default:
-          throw std::invalid_argument("Detector type unknown");
+        std::size_t num_samples;
+        double      ratio, p1, p2;
+        std::string name;
+        switch (detector) {
+          case ND:
+            ratio       = 0.6;
+            num_samples = 6'000'000;
+            p1          = 355.0;
+            p2          = 470.0;
+            name        = "ND";
+            break;
+          case FDI:
+            ratio       = 0.5;
+            num_samples = 5'000'000;
+            p1          = 997.0;
+            p2          = 1115.0;
+            name        = "FDI";
+            break;
+          case FDII:
+            ratio       = 0.55;
+            num_samples = 10'000'000;
+            p1          = 997.0;
+            p2          = 1115.0;
+            name        = "FDII";
+            break;
+          default:
+            throw std::invalid_argument("Detector type unknown");
+        }
+
+        std::cout << "Generating " << std::setw(10) << num_samples << " samples for reactor data set for " << name << '\n';
+        auto reactor_tree_entries = generate_reactor_entries(gen, num_samples, ratio, p1, p2);
+
+        m_ReactorData[detector] = std::make_shared<ReactorData>(reactor_tree_entries, detector);
       }
-
-      std::cout << "Generating " << std::setw(10) << num_samples << " samples for reactor data set for " << name << '\n';
-      auto reactor_tree_entries = generate_reactor_entries(gen, num_samples, ratio, p1, p2);
-
-      m_ReactorData[detector] = std::make_shared<ReactorData>(reactor_tree_entries, detector);
+    } catch (const std::exception& e) {
+      std::cout << e.what() << '\n';
+      throw;
     }
 
     using enum params::dc::BackgroundType;
@@ -343,9 +348,11 @@ namespace io::dc {
     auto string_to_DetectorType = [](std::string_view name) -> params::dc::DetectorType {
       if (name == "ND") {
         return ND;
-      } if (name == "FDI") {
+      }
+      if (name == "FDI") {
         return FDI;
-      } if (name == "FDII") {
+      }
+      if (name == "FDII") {
         return FDII;
       }
       throw std::invalid_argument("Invalid detector type");
@@ -353,7 +360,7 @@ namespace io::dc {
 
     try {
       for (const auto& [section, data] : inputOptions.config_tree().get_child("DoubleChooz")) {
-        m_OnLifeTime[string_to_DetectorType(section)] = data.get<double>("on_lifetime");
+        m_OnLifeTime[string_to_DetectorType(section)]  = data.get<double>("on_lifetime");
         m_OffLifeTime[string_to_DetectorType(section)] = data.get<double>("off_lifetime");
       }
     } catch (const boost::property_tree::ptree_bad_path& e) {
