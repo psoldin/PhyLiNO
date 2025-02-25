@@ -56,11 +56,11 @@ namespace ana::dc {
     // Get the target bin indices
     const std::vector<int> indices = get_indices(evis);
 
-    for (int i = 1; i < indices.size(); ++i) {
-      // Add the calculation data
-      m_CalculationData.emplace_back(LoverE.subspan(indices[i - 1], indices[i] - indices[i - 1]),
-                                     scaling.subspan(indices[i - 1], indices[i] - indices[i - 1]),
-                                     i, type);
+    for (unsigned int i = 1; i < indices.size(); ++i) {
+      m_CalculationData.emplace_back(std::span<const double>(&LoverE[indices[i - 1]], indices[i] - indices[i - 1]),
+                                    std::span<const double>(&scaling[indices[i - 1]], indices[i] - indices[i - 1]),
+                                    i,
+                                    type);
     }
   }
 
