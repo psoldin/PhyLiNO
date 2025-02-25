@@ -2,7 +2,8 @@
 
 namespace ana::dc {
 
-  ReactorSpectrum::ReactorSpectrum(std::shared_ptr<io::Options> options): SpectrumBase(std::move(options)) {
+  ReactorSpectrum::ReactorSpectrum(std::shared_ptr<io::Options> options)
+    : SpectrumBase(std::move(options)) {
     m_Oscillator = std::make_shared<Oscillator>(m_Options);
     m_ShapeCorrection = std::make_shared<ShapeCorrection>(m_Options, m_Oscillator);
     m_EnergyCorrection = std::make_shared<EnergyCorrection>(m_Options, m_ShapeCorrection);
