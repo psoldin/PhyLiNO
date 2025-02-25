@@ -12,7 +12,7 @@ namespace ana::dc {
 
     ~LithiumBackground() override = default;
 
-    [[nodiscard]] bool check_and_recalculate(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate(const ParameterWrapper& parameter) override;
 
     [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const noexcept override {
       return m_LiSpectrum.at(detector);
