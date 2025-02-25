@@ -37,7 +37,9 @@ namespace ana::dc {
       , m_Lithium(m_Options)
       , m_FastN(m_Options)
       , m_DNC(m_Options)
-      , m_Reactor(m_Options) {}
+      , m_Reactor(m_Options) {
+      m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
+    }
 
     /**
      * @brief Default destructor for DCLikelihood class.
@@ -139,6 +141,8 @@ namespace ana::dc {
     FastNBackground      m_FastN;       ///< The fast neutron background object.
     DNCBackground        m_DNC;         ///< The delayed neutron capture background object.
     ReactorSpectrum      m_Reactor;     ///< The reactor spectrum object.
+
+    std::array<SpectrumBase*, 5> m_Components;
 
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;  ///< The measurement data for each detector type.
   };

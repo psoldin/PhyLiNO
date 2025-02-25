@@ -110,6 +110,11 @@ namespace ana::dc {
 
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
+
+    for (auto* component : m_Components) {
+      component->check_and_recalculate(m_Parameter);
+    }
+
     if (m_Options->inputOptions().double_chooz().reactor_split()) {
       return calculate_reactor_split_likelihood(m_Parameter);
     }
@@ -144,7 +149,7 @@ namespace ana::dc {
 
     constexpr int nBins = 44;
 
-    for (auto detector : {ND, FDI, FDII}) {
+    for (const auto detector : {ND, FDI, FDII}) {
       using map_t   = Eigen::Map<const Eigen::Array<double, nBins, 1>>;
       using array_t = Eigen::Array<double, nBins, 1>;
 
