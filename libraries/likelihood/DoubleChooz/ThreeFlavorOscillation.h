@@ -15,6 +15,8 @@ namespace ana::dc {
     [[nodiscard]] double oscillate_events(const OscillationData& data) const noexcept override;
 
   private:
+    [[nodiscard]] static double get_MC_scaling_factor(bool is_far_detector) noexcept { return is_far_detector ? 0.01 : 0.1; }
+
     double m_t13;
     double m_dmee;
     double m_t12;

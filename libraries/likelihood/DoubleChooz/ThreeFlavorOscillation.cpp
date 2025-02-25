@@ -1,4 +1,5 @@
 #include "ThreeFlavorOscillation.h"
+#include <iostream>
 
 namespace ana::dc {
 
@@ -37,6 +38,6 @@ namespace ana::dc {
       result += scl[i] * (1 - t13Part - t12Part);
     }
 
-    return result;
+    return result * get_MC_scaling_factor(params::dc::is_far_detector(data.type));
   }
 }  // namespace ana::dc
