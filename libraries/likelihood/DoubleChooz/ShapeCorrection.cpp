@@ -1,4 +1,7 @@
 #include "ShapeCorrection.h"
+
+#include <numeric>
+
 #include "Calculate_Spectrum.h"
 #include "Oscillator.h"
 
@@ -9,18 +12,33 @@ namespace ana::dc {
     using namespace params;
     using namespace params::dc;
 
-    const bool fd1_changed = parameter.check_parameter_changed(index(FDI, Detector::NuShape01),
-                                                               index(FDI, Detector::NuShape43));
+    const bool fd1_changed = parameter.check_parameter_changed(index(FDI, NuShape01),
+                                                               index(FDI, NuShape43));
 
-    const bool fd2_changed = parameter.check_parameter_changed(index(FDII, Detector::NuShape01),
-                                                               index(FDII, Detector::NuShape43));
+    const bool fd2_changed = parameter.check_parameter_changed(index(FDII, NuShape01),
+                                                               index(FDII, NuShape43));
 
-    const bool nd_changed = parameter.check_parameter_changed(index(ND, Detector::NuShape01),
-                                                              index(ND, Detector::NuShape43));
+    const bool nd_changed = parameter.check_parameter_changed(index(ND, NuShape01),
+                                                              index(ND, NuShape43));
 
     const bool parameter_changed = fd1_changed | fd2_changed | nd_changed;
 
     return parameter_changed;
+  }
+
+  ShapeCorrection::ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator)
+    : SpectrumBase(std::move(options))
+    , m_Oscillator(std::move(oscillator)) {
+
+    using enum params::dc::DetectorType;
+
+    const auto& db = m_Options->double_chooz().dataBase();
+
+    // for (auto detector : {ND, FDI, FDII}) {
+    //   const auto& cov = db.covariance_matrix(detector, io::dc::SpectrumType::FastN);
+    //   m_CovMatrix[detector] = &cov;
+    // }
+
   }
 
   bool ShapeCorrection::check_and_recalculate(const ParameterWrapper& parameter) noexcept {
@@ -28,9 +46,12 @@ namespace ana::dc {
     const bool this_step     = parameter_changed(parameter);
     const bool recalculate   = previous_step | this_step;
 
-    if (recalculate) {
-      recalculate_spectra(parameter);
-    }
+    std::span<const double> r = m_Oscillator->get_spectrum(params::dc::FDII);
+    // if (recalculate) {
+    //   recalculate_spectra(parameter);
+    // }
+
+    std::cout << "ND SUM: " << std::accumulate(r.begin(), r.end(), 0.0) << std::endl;
 
     return recalculate;
   }
