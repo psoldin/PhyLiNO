@@ -1,6 +1,7 @@
 #include "DataBase.h"
 
 // includes
+#include <DoubleChooz/Constants.h>
 #include "../TreeEntry.h"
 
 // STL includes
@@ -13,6 +14,7 @@
 
 // ROOT includes
 #include <TFile.h>
+#include <TH1D.h>
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
 #include <TTree.h>
@@ -279,9 +281,75 @@ namespace io::dc {
     }
 
     std::ranges::sort(reactor_tree_entries,
-              [](const auto& a, const auto& b) { return a.Evis < b.Evis; });
+                      [](const auto& a, const auto& b) { return a.Evis < b.Evis; });
 
     return reactor_tree_entries;
+  }
+
+  // Eigen::MatrixXd generate_reactor_covariance_matrix(const std::vector<double>& binnedSpectrum) {
+  Eigen::MatrixXd generate_reactor_covariance_matrix(std::span<const double> samples) {
+    auto h = std::make_unique<TH1D>("h", "", io::dc::Constants::number_of_energy_bins, io::dc::Constants::EnergyBinXaxis.data());
+
+    for (auto E : samples) {
+      h->Fill(E);
+    }
+
+    std::vector<double> binnedSpectrum(38, 0.0);
+
+    for (int i = 0; i < 38; ++i) {
+      binnedSpectrum[i] = 0.01 * h->GetBinContent(i + 1);
+    }
+
+    constexpr int numBins = 38;
+    if (binnedSpectrum.size() != numBins) {
+      throw std::invalid_argument("Input spectrum must have exactly 38 bins.");
+    }
+
+    Eigen::MatrixXd covarianceMatrix = Eigen::MatrixXd::Zero(numBins, numBins);
+
+    // Define uncertainties that match the extracted pattern
+
+    // Variance scaling based on extracted trend
+    for (int i = 0; i < numBins; ++i) {
+      double varianceScaling = 1.0 + 3.0 * std::exp(2.0 * (static_cast<double>(i) / numBins - 1.0));
+      double statError       = (binnedSpectrum[i] > 0) ? varianceScaling * std::sqrt(binnedSpectrum[i]) : 1.0;
+      covarianceMatrix(i, i) = statError * statError;
+
+      for (int j = 0; j < numBins; ++j) {
+        if (i != j) {
+          constexpr double shapeUncertainty = 0.008;
+          constexpr double normUncertainty  = 0.015;
+          // Normalization correlation
+          covarianceMatrix(i, j) += normUncertainty * binnedSpectrum[i] * normUncertainty * binnedSpectrum[j];
+
+          // Shape uncertainty correlation
+          double shapeCorrFactor = shapeUncertainty * std::exp(-std::abs(i - j) / 3.0);
+          covarianceMatrix(i, j) += shapeCorrFactor * std::sqrt(covarianceMatrix(i, i) * covarianceMatrix(j, j));
+
+          // Localized adjacent bin correlation
+          if (std::abs(i - j) == 1) {
+            constexpr double neighborCorr = 0.05;
+            covarianceMatrix(i, j) += neighborCorr * std::sqrt(covarianceMatrix(i, i) * covarianceMatrix(j, j));
+          }
+        }
+      }
+    }
+
+    // Fractionalize the covariance matrix
+    using matrix_t = Eigen::MatrixXd;
+    matrix_t fractionalCovariance = matrix_t::Zero(43, 43);
+    for (int i = 0; i < numBins; ++i) {
+      for (int j = 0; j < numBins; ++j) {
+        fractionalCovariance(i, j) = covarianceMatrix(i, j);
+        if (binnedSpectrum[i] == 0 || binnedSpectrum[j] == 0) {
+          fractionalCovariance(i, j) = 0;
+        } else {
+          fractionalCovariance(i, j) /= (binnedSpectrum[i] * binnedSpectrum[j]);
+        }
+      }
+    }
+
+    return fractionalCovariance;
   }
 
   DataBase::DataBase(const io::InputOptions& inputOptions)
@@ -292,9 +360,9 @@ namespace io::dc {
 
     try {
       for (auto detector : {ND, FDI, FDII}) {
-        const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
-
-        // std::vector<TreeEntry> reactor_tree_entries = read_reactor_root_file(paths);
+        // In the usual case, the input paths are read from the configuration file.
+        // Here they are generated on the fly.
+        // const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
 
         std::size_t num_samples;
         double      ratio, p1, p2;
@@ -329,6 +397,10 @@ namespace io::dc {
         auto reactor_tree_entries = generate_reactor_entries(gen, num_samples, ratio, p1, p2);
 
         m_ReactorData[detector] = std::make_shared<ReactorData>(reactor_tree_entries, detector);
+
+        auto m = generate_reactor_covariance_matrix(m_ReactorData[detector]->evis());
+
+        m_CovarianceMatrices[{detector, SpectrumType::Reactor}] = m;
       }
     } catch (const std::exception& e) {
       std::cout << e.what() << '\n';

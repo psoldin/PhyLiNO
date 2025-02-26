@@ -73,7 +73,7 @@ namespace io::dc {
       return *reactor_data;
     }
 
-    [[nodiscard]] const Eigen::Matrix<double, 44, 44>& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
+    [[nodiscard]] const Eigen::MatrixXd& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
       return m_CovarianceMatrices.at({detectorType, spectrumType});
     }
 
@@ -150,7 +150,7 @@ namespace io::dc {
     };
 
     using tuple_t      = std::tuple<params::dc::DetectorType, SpectrumType>;
-    using cov_matrix_t = Eigen::Matrix<double, 44, 44>;
+    using cov_matrix_t = Eigen::MatrixXd;
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
     TMatrixD                                           m_EnergyCorrelationMatrix;         // TODO Replace with Eigen Matrix
     TMatrixD                                           m_MCNormCorrelationMatrix;         // TODO Replace with Eigen Matrix
