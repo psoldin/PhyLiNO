@@ -19,10 +19,10 @@ namespace ana::dc {
     : SpectrumBase(std::move(options)) {
     using enum params::dc::DetectorType;
     for (auto detector : {ND, FDI, FDII}) {
-      for (std::size_t i = 0; i < 44; ++i) {
-        m_SpectrumTemplate_Gd[detector][i] = 0.0;
-        m_SpectrumTemplate_Hy[detector][i] = 0.0;
-      }
+      std::array<double, 38> shape{};
+      std::ranges::fill(shape, 0.0);
+      m_SpectrumTemplate_Gd[detector] = shape;
+      m_SpectrumTemplate_Hy[detector] = shape;
     }
   }
 
