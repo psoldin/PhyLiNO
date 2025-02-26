@@ -1,8 +1,8 @@
 #include "EnergyCorrection.h"
+#include <DoubleChooz/Constants.h>
+#include <unsupported/Eigen/Splines>
 #include "FuzzyCompare.h"
 #include "ParameterValue.h"
-#include <unsupported/Eigen/Splines>
-#include <DoubleChooz/Constants.h>
 
 namespace ana::dc {
 
@@ -43,22 +43,22 @@ namespace ana::dc {
    public:
     SplineFunction(Eigen::VectorXd const& x_vec,
                    Eigen::VectorXd const& y_vec)
-        : x_min(x_vec.minCoeff())
-        , x_max(x_vec.maxCoeff())
-        ,
-        // Spline fitting here. X values are scaled down to [0, 1] for this.
-          spline_(Eigen::SplineFitting<Eigen::Spline<double, 1>>::Interpolate(
-              y_vec.transpose(),
-              // No more than cubic spline, but accept short vectors.
+      : x_min(x_vec.minCoeff())
+      , x_max(x_vec.maxCoeff())
+      ,
+      // Spline fitting here. X values are scaled down to [0, 1] for this.
+      spline_(Eigen::SplineFitting<Eigen::Spline<double, 1>>::Interpolate(
+          y_vec.transpose(),
+          // No more than cubic spline, but accept short vectors.
 
-              3,  //std::min<int>(x_vec.rows() - 1, 3),
-              scaled_values(x_vec))) {}
+          3,  // std::min<int>(x_vec.rows() - 1, 3),
+          scaled_values(x_vec))) {}
 
     double operator()(double x) const {
       // x values need to be scaled down in extraction as well.
       const auto tmp = spline_(scaled_value(x))(0);
       return (tmp < 0.0) ? 0.0 : tmp;
-      //return spline_(scaled_value(x))(0);
+      // return spline_(scaled_value(x))(0);
     }
 
     [[nodiscard]] double derivative(double x) const noexcept {
@@ -103,14 +103,13 @@ namespace ana::dc {
   }
 
   bool EnergyCorrection::check_and_recalculate(const ParameterWrapper& parameter) noexcept {
-
     const bool previous_step = m_ShapeCorrection->check_and_recalculate(parameter);
     const bool this_step     = parameter_changed(parameter);
-    const bool recalculate    = previous_step | this_step;
+    const bool recalculate   = previous_step | this_step;
 
-    if (recalculate) {
-      calculate_spectra(parameter);
-    }
+    // if (recalculate) {
+    //   calculate_spectra(parameter);
+    // }
 
     return recalculate;
   }
