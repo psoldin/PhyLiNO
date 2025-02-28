@@ -31,7 +31,7 @@ namespace ana::dc {
 
     // Update the parameter changed status for each parameter
     for (std::size_t i = 0; i < m_NParameter; ++i) {
-      m_ParameterChanged[i] = static_cast<char>(utilities::fuzzyCompare(m_CurrentParameters[i], m_PreviousParameters[i]));
+      m_ParameterChanged[i] = static_cast<char>(!utilities::fuzzyCompare(m_CurrentParameters[i], m_PreviousParameters[i]));
     }
   }
 
@@ -55,9 +55,6 @@ namespace ana::dc {
     const auto same_count = std::accumulate(m_ParameterChanged.begin() + from, m_ParameterChanged.begin() + (to + 1), 0);
     const bool same       = same_count == (to - from + 1);
     return !same;
-  }
-
-  void ParameterWrapper::unify_parameters() {
   }
 
 }  // namespace ana::dc
