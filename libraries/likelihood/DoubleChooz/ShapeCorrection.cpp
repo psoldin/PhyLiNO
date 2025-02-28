@@ -29,29 +29,25 @@ namespace ana::dc {
   ShapeCorrection::ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator)
     : SpectrumBase(std::move(options))
     , m_Oscillator(std::move(oscillator)) {
-
     using enum params::dc::DetectorType;
 
     const auto& db = m_Options->double_chooz().dataBase();
 
-    // for (auto detector : {ND, FDI, FDII}) {
-    //   const auto& cov = db.covariance_matrix(detector, io::dc::SpectrumType::FastN);
-    //   m_CovMatrix[detector] = &cov;
-    // }
-
+    for (auto detector : {ND, FDI, FDII}) {
+      const auto& cov       = db.covariance_matrix(detector, io::dc::SpectrumType::Reactor);
+      m_CovMatrix[detector] = cov;
+    }
   }
 
   bool ShapeCorrection::check_and_recalculate(const ParameterWrapper& parameter) noexcept {
+    std::cout << "SHAPECORRECTION\n";
     const bool previous_step = m_Oscillator->check_and_recalculate(parameter);
     const bool this_step     = parameter_changed(parameter);
     const bool recalculate   = previous_step | this_step;
 
-    std::span<const double> r = m_Oscillator->get_spectrum(params::dc::FDII);
-    // if (recalculate) {
-    //   recalculate_spectra(parameter);
-    // }
-
-    std::cout << "ND SUM: " << std::accumulate(r.begin(), r.end(), 0.0) << std::endl;
+    if (recalculate) {
+      recalculate_spectra(parameter);
+    }
 
     return recalculate;
   }
@@ -59,21 +55,29 @@ namespace ana::dc {
   void ShapeCorrection::recalculate_spectra(const ParameterWrapper& parameter) noexcept {
     using enum params::dc::DetectorType;
     using namespace params::dc;
-    //
-    // for (auto detector : {ND, FDI, FDII}) {
-    //   const auto& shape = m_Oscillator->get_spectrum(detector);
-    //   auto shape_parameter = parameter.sub_range(params::index(detector, Detector::NuShape01),
-    //                                              params::index(detector, Detector::NuShape43) + 1);
-    //
-    //   const auto& covMatrix = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::Reactor);
-    //   auto& result = m_Cache[detector];
-    //
-    //   calculate_spectrum<43>(1.0,
-    //                          shape,
-    //                          shape_parameter,
-    //                          covMatrix.block<43, 43>(0, 0),
-    //                          result);
-    // }
+
+    // The reactor spectrum does not need an explicit rate
+    // This is done later with other parameters, this here is just a placeholder for the function call
+    const double rate = 1.0;
+
+    for (const auto detector : {ND, FDI, FDII}) {
+      const std::span<const double> oscillated_spectrum = m_Oscillator->get_spectrum(detector);
+
+      const auto shape_parameter = parameter.sub_range(params::index(detector, NuShape01),
+                                                       params::index(detector, NuShape43) + 1);
+
+      assert(m_CovMatrix[detector] != nullptr);
+
+      const Eigen::MatrixXd& covMatrix = *m_CovMatrix[detector];
+
+      std::array<double, 80>& result = m_Cache[detector];
+
+      calculate_spectrum(rate,
+                         oscillated_spectrum,
+                         shape_parameter,
+                         covMatrix,
+                         result);
+    }
   }
 
 }  // namespace ana::dc

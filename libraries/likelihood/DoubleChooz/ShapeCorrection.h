@@ -7,7 +7,6 @@ namespace ana::dc {
   class ShapeCorrection : public SpectrumBase {
    public:
     explicit ShapeCorrection(std::shared_ptr<io::Options> options, std::shared_ptr<Oscillator> oscillator);
-    ;
 
     ~ShapeCorrection() override = default;
 
@@ -18,14 +17,13 @@ namespace ana::dc {
     }
 
    private:
-    std::shared_ptr<io::Options> m_Options;
-    std::shared_ptr<Oscillator>  m_Oscillator;
+    std::shared_ptr<Oscillator> m_Oscillator;
 
     template <typename T>
     using uo_map = std::unordered_map<params::dc::DetectorType, T>;
 
-    uo_map<Eigen::Array<double, 80, 1>> m_Cache;
-    uo_map<const Eigen::MatrixXd*>      m_CovMatrix;
+    uo_map<std::array<double, 80>>           m_Cache;
+    uo_map<std::shared_ptr<Eigen::MatrixXd>> m_CovMatrix;
 
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
   };
