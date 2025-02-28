@@ -73,9 +73,7 @@ namespace io::dc {
       return *reactor_data;
     }
 
-    [[nodiscard]] const Eigen::MatrixXd& covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
-      return m_CovarianceMatrices.at({detectorType, spectrumType});
-    }
+    [[nodiscard]] std::shared_ptr<Eigen::MatrixXd> covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const;
 
     [[nodiscard]] const TMatrixD& energy_correlation_matrix() const { return m_EnergyCorrelationMatrix; }
 
@@ -89,6 +87,13 @@ namespace io::dc {
 
     [[nodiscard]] std::span<const double> background_data(params::dc::BackgroundType type) const {
       return m_BackgroundData.at(type);
+    }
+
+    [[nodiscard]] std::pair<double, double> energy_central_values(int idx) const {
+      if (!m_EnergyCentralValues.contains(idx)) {
+        throw std::invalid_argument("Index not found in energy central values");
+      }
+      return m_EnergyCentralValues.at(idx);
     }
 
    private:
@@ -137,6 +142,8 @@ namespace io::dc {
     std::unordered_map<params::dc::DetectorType, double> m_OnLifeTime;
     std::unordered_map<params::dc::DetectorType, double> m_OffLifeTime;
 
+    std::unordered_map<int, std::pair<double, double>> m_EnergyCentralValues;
+
     std::vector<std::vector<double>> m_SignalData;
     std::vector<std::vector<double>> m_MeasurementData;
 
@@ -150,7 +157,7 @@ namespace io::dc {
     };
 
     using tuple_t      = std::tuple<params::dc::DetectorType, SpectrumType>;
-    using cov_matrix_t = Eigen::MatrixXd;
+    using cov_matrix_t = std::shared_ptr<Eigen::MatrixXd>;
     std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
     TMatrixD                                           m_EnergyCorrelationMatrix;         // TODO Replace with Eigen Matrix
     TMatrixD                                           m_MCNormCorrelationMatrix;         // TODO Replace with Eigen Matrix

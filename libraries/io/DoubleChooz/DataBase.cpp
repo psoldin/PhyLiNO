@@ -336,7 +336,7 @@ namespace io::dc {
     }
 
     // Fractionalize the covariance matrix
-    using matrix_t = Eigen::MatrixXd;
+    using matrix_t                = Eigen::MatrixXd;
     matrix_t fractionalCovariance = matrix_t::Zero(43, 43);
     for (int i = 0; i < numBins; ++i) {
       for (int j = 0; j < numBins; ++j) {
@@ -400,7 +400,8 @@ namespace io::dc {
 
         auto m = generate_reactor_covariance_matrix(m_ReactorData[detector]->evis());
 
-        m_CovarianceMatrices[{detector, SpectrumType::Reactor}] = m;
+        // Convert matrix to a shared pointer and store it in the map
+        m_CovarianceMatrices[{detector, SpectrumType::Reactor}] = std::make_shared<Eigen::MatrixXd>(m);
       }
     } catch (const std::exception& e) {
       std::cout << e.what() << '\n';
@@ -430,15 +431,67 @@ namespace io::dc {
       throw std::invalid_argument("Invalid detector type");
     };
 
+    std::map<params::dc::DetectorType, std::array<std::pair<double, double>, 3>> energy_central_values;
+
     try {
       for (const auto& [section, data] : inputOptions.config_tree().get_child("DoubleChooz")) {
         m_OnLifeTime[string_to_DetectorType(section)]  = data.get<double>("on_lifetime");
         m_OffLifeTime[string_to_DetectorType(section)] = data.get<double>("off_lifetime");
+
+        std::array e = {std::make_pair(data.get<double>("energy_A_CV"), data.get<double>("energy_A_Sig")),
+                        std::make_pair(data.get<double>("energy_B_CV"), data.get<double>("energy_B_Sig")),
+                        std::make_pair(data.get<double>("energy_C_CV"), data.get<double>("energy_C_Sig"))};
+
+        energy_central_values[string_to_DetectorType(section)] = std::move(e);
       }
     } catch (const boost::property_tree::ptree_bad_path& e) {
       std::cout << e.what() << '\n';
       throw;
     }
+
+    if (energy_central_values[ND][0] == energy_central_values[FDI][0] && energy_central_values[ND][0] == energy_central_values[FDII][0]) {
+      using enum params::General;
+      using enum params::dc::Detector;
+      // Energy A is the same for all detectors
+      m_EnergyCentralValues[EnergyA] = energy_central_values[ND][0];
+      // ND parameters
+      m_EnergyCentralValues[params::index(ND, EnergyB)] = energy_central_values[ND][1];
+      m_EnergyCentralValues[params::index(ND, EnergyC)] = energy_central_values[ND][2];
+      // FDI parameters
+      m_EnergyCentralValues[params::index(FDI, EnergyB)] = energy_central_values[FDI][1];
+      m_EnergyCentralValues[params::index(FDI, EnergyC)] = energy_central_values[FDI][2];
+      // FDII parameters
+      m_EnergyCentralValues[params::index(FDII, EnergyB)] = energy_central_values[FDII][1];
+      m_EnergyCentralValues[params::index(FDII, EnergyC)] = energy_central_values[FDII][2];
+    } else {
+      throw std::invalid_argument("Energy central values for the EnergyA parameter are not the same for all detectors!");
+    }
+  }
+
+  std::string get_spectrum_type_string(SpectrumType type) {
+    using enum SpectrumType;
+    switch (type) {
+      case Reactor:
+        return "Reactor";
+      case Accidental:
+        return "Accidental";
+      case FastN:
+        return "FastN";
+      case Lithium:
+        return "Lithium";
+      case DNC:
+        return "DNC";
+    }
+    throw std::invalid_argument("Spectrum Type not known");
+  }
+
+  std::shared_ptr<Eigen::MatrixXd> DataBase::covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
+    if (!m_CovarianceMatrices.contains({detectorType, spectrumType})) {
+      std::stringstream ss;
+      ss << "Covariance matrix not found for detector " << detectorType << " and spectrum type " << get_spectrum_type_string(spectrumType);
+      throw std::invalid_argument(ss.str());
+    }
+    return m_CovarianceMatrices.at({detectorType, spectrumType});
   }
 
 }  // namespace io::dc
