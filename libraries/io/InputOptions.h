@@ -54,10 +54,13 @@ namespace io {
 
     [[nodiscard]] const boost::property_tree::ptree& config_tree() const noexcept { return m_ConfigTree; }
 
+    [[nodiscard]] double tolerance() const noexcept { return m_Tolerance; }
+
    private:
     long m_Seed;                /**< The global random seed. */
     bool m_Silent;              /**< Flag indicating if the program should run in silent mode. */
     int  m_MultiThreadingCores; /**< The number of cores to use for multi-threading. */
+    double m_Tolerance;         /**< The tolerance for the minimizer. */
 
     std::string m_ConfigFile; /**< The configuration file path. */
 

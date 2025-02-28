@@ -33,6 +33,7 @@ namespace io {
       ("seed", po::value<long>(&m_Seed)->default_value(current_time), "Set seed for simulation")
       ("silent", po::bool_switch(&m_Silent), "Run fit in silence mode")
       ("multiThreading,m", po::value<int>(&m_MultiThreadingCores)->default_value(1), "Use multiple threads for fitting")
+      ("tolerance", po::value<double>(&m_Tolerance)->default_value(0.05), "Set Fit tolerance")
       ;
 
       po::options_description cmdline_options;
