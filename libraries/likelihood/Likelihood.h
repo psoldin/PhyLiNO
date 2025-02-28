@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Parameter.h"
 #include <span>
 #include "Options.h"
+#include "Parameter.h"
 
 namespace ana::dc {
 
   class Likelihood {
-  public:
+   public:
     explicit Likelihood(std::shared_ptr<io::Options> options)
-      : m_Options(std::move(options)) { }
+      : m_Options(std::move(options)) {}
 
     virtual ~Likelihood() = default;
 
@@ -17,7 +17,7 @@ namespace ana::dc {
 
     [[nodiscard]] virtual double calculate_likelihood(const double* parameter) = 0;
 
-  protected:
+   protected:
     std::shared_ptr<io::Options> m_Options;
   };
 
