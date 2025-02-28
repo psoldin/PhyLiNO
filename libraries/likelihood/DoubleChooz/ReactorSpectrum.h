@@ -10,7 +10,7 @@ namespace ana::dc {
   public:
     explicit ReactorSpectrum(std::shared_ptr<io::Options> options);
 
-    [[nodiscard]] bool check_and_recalculate(const ParameterWrapper& parameter) override;
+    bool check_and_recalculate(const ParameterWrapper& parameter) override;
 
     [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override;
 
