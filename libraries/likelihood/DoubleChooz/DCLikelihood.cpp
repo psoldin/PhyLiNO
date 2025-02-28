@@ -1,5 +1,7 @@
 #include "DCLikelihood.h"
 
+#include <ranges>
+
 namespace ana::dc {
 
   /**
@@ -40,6 +42,58 @@ namespace ana::dc {
     }
 
     return recalculate;
+  }
+
+  void DCLikelihood::initialize_measurement_data() {
+    if (m_Options->inputOptions().double_chooz().use_data()) {
+      read_measurement_data();
+    } else {
+      generate_measurement_data();
+    }
+  }
+
+  void DCLikelihood::read_measurement_data() {
+    throw std::runtime_error("Not implemented");
+  }
+
+  inline void print_array(std::span<const double> data, std::string_view name) {
+    std::cout << name << ":\n";
+    for (const auto& d : data) {
+      std::cout << d << ' ';
+    }
+    std::cout << '\n';
+  }
+
+  void DCLikelihood::generate_measurement_data() {
+    std::vector<double> parameter(params::number_of_parameters(), 0.0);
+
+    const auto& pv = m_Options->inputOptions().input_parameters().parameters();
+
+    for (std::size_t i = 0; i < parameter.size(); ++i) {
+      parameter[i] = pv[i].value();
+    }
+
+    m_Parameter.reset_parameter(parameter.data());
+
+    std::cout << "First check and recalculate\n";
+    m_Reactor.check_and_recalculate(m_Parameter);
+    std::cout << "After check and recalculate\n";
+
+    using enum params::dc::DetectorType;
+
+    for (auto detector : {ND, FDI, FDII}) {
+      std::span<const double> spectrum = m_Reactor.get_spectrum(detector);
+      print_array(spectrum, "Reactor Spectrum " + params::dc::get_detector_name(detector));
+      std::array<double, 44> array{};
+      std::ranges::copy(spectrum, array.begin());
+      m_MeasurementData[detector] = array;
+
+      if (detector == ND || detector == FDII) {
+        std::array<double, 44> off_off_data{};
+        std::ranges::fill(off_off_data, 0.0);
+        m_OffOffData[detector] = off_off_data;
+      }
+    }
   }
 
   void correlate_parameters(const io::Options& options, std::span<double> parameters) {
@@ -108,12 +162,27 @@ namespace ana::dc {
     }
   }
 
+  DCLikelihood::DCLikelihood(std::shared_ptr<io::Options> options)
+    : Likelihood(std::move(options))
+    , m_Parameter(params::number_of_parameters(), m_Options)
+    , m_Accidental(m_Options)
+    , m_Lithium(m_Options)
+    , m_FastN(m_Options)
+    , m_DNC(m_Options)
+    , m_Reactor(m_Options) {
+    initialize_measurement_data();
+    // m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
+    m_Components = {&m_Reactor, &m_Accidental};
+  }
+
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
 
     for (auto* component : m_Components) {
+      std::cout << "Component: " << component << '\n';
       component->check_and_recalculate(m_Parameter);
     }
+    // const bool _ = m_Reactor.check_and_recalculate(m_Parameter);
 
     if (m_Options->inputOptions().double_chooz().reactor_split()) {
       return calculate_reactor_split_likelihood(m_Parameter);
@@ -136,10 +205,14 @@ namespace ana::dc {
     auto off_off_bkg = (off_lifetime / on_lifetime) * bkg;
 
     // Exclude the bins up to 3 MeV due to residual neutrinos
-    constexpr std::size_t idx = std::distance(io::dc::Constants::EnergyBinXaxis.cbegin(), std::ranges::lower_bound(io::dc::Constants::EnergyBinXaxis, 3.0));
+    constexpr std::size_t idx = std::distance(io::dc::Constants::EnergyBinXaxis.cbegin(),
+                                              std::ranges::lower_bound(io::dc::Constants::EnergyBinXaxis, 3.0));
+
+    const Eigen::Array<double, 44, 1> off_off_llh = -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg);
 
     // Calculate Poisson Likelihood
-    return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail<nBins - idx>().sum();
+    return off_off_llh.tail(nBins - idx).sum();
+    // return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail(nBins - idx).sum();
   }
 
   double DCLikelihood::calculate_default_likelihood(const ParameterWrapper& parameter) noexcept {
@@ -154,31 +227,36 @@ namespace ana::dc {
       using array_t = Eigen::Array<double, nBins, 1>;
 
       // Get all spectrum components as Eigen::Map
-      map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
-      map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
-      map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
-      map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
+      // map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
+      // map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
+      // map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
+      // map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
       map_t reactor(m_Reactor.get_spectrum(detector).data(), nBins);
 
       // Add all background components to the full background contribution
-      const array_t bkg = acc + li + fastN + dnc;
+      const array_t bkg = array_t::Ones();  // acc + li + fastN + dnc;
 
       // Get the measurement data as Eigen::Map
       map_t data(get_measurement_data(detector).data(), nBins);
 
       // Get the MC normalization parameter
-      const double mcNorm = parameter[params::index(detector, params::dc::Detector::MCNorm)];
+      // const double mcNorm = parameter[params::index(detector, params::dc::Detector::MCNorm)];
 
       // Calculate the full spectrum prediction
-      auto prediction = bkg + (mcNorm * reactor);
+      array_t prediction = (bkg + (1.0 * reactor));
+
+      print_array(data, "data");
+      print_array({prediction.data(), 44}, "prediction");
 
       // Calculate Poisson Likelihood
-      likelihood += -2.0 * (data * prediction.log() - prediction).sum();
+      likelihood += -2.0 * ((data + 1) * prediction.log() - prediction).sum();
+      std::cout << params::dc::get_detector_name(detector) << '\t' << likelihood << '\n';
 
       // Calculate the off-off component of the likelihood
-      if (detector == ND || detector == FDII) {
-        likelihood += calculate_off_off_likelihood(bkg, detector);
-      }
+      // if (detector == ND || detector == FDII) {
+      //   likelihood += calculate_off_off_likelihood(bkg, detector);
+      //   std::cout << params::dc::get_detector_name(detector) << "_off_off" << '\t' << likelihood << '\n';
+      // }
     }
 
     // Return the likelihood parameter if it is finite, otherwise return a large number. This is to prevent the minimizer from crashing.

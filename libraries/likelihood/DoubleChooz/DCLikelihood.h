@@ -30,16 +30,7 @@ namespace ana::dc {
      *
      * @param options A shared pointer to an io::Options object that contains the configuration options.
      */
-    explicit DCLikelihood(std::shared_ptr<io::Options> options)
-      : Likelihood(std::move(options))
-      , m_Parameter(params::number_of_parameters(), m_Options)
-      , m_Accidental(m_Options)
-      , m_Lithium(m_Options)
-      , m_FastN(m_Options)
-      , m_DNC(m_Options)
-      , m_Reactor(m_Options) {
-      m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
-    }
+    explicit DCLikelihood(std::shared_ptr<io::Options> options);
 
     /**
      * @brief Default destructor for DCLikelihood class.
@@ -72,8 +63,7 @@ namespace ana::dc {
     }
 
     [[nodiscard]] std::span<const double> get_off_off_data(params::dc::DetectorType type) const noexcept {
-      // TODO
-      return {};
+      return m_OffOffData.at(type);
     }
 
     /**
@@ -96,7 +86,9 @@ namespace ana::dc {
 
     [[nodiscard]] const DNCBackground& dnc_background() const noexcept { return m_DNC; }
 
-    [[nodiscard]] const ReactorSpectrum& reactor_spectrum() const noexcept { return m_Reactor; }
+    [[nodiscard]] ReactorSpectrum& reactor_spectrum() noexcept { return m_Reactor; }
+
+    ParameterWrapper& parameter() noexcept { return m_Parameter; }
 
    private:
     /**
@@ -134,6 +126,12 @@ namespace ana::dc {
      */
     bool recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
+    void initialize_measurement_data();
+
+    void read_measurement_data();
+
+    void generate_measurement_data();
+
     ParameterWrapper m_Parameter;  ///< The parameter wrapper object used for likelihood calculation.
 
     AccidentalBackground m_Accidental;  ///< The accidental background object.
@@ -142,9 +140,10 @@ namespace ana::dc {
     DNCBackground        m_DNC;         ///< The delayed neutron capture background object.
     ReactorSpectrum      m_Reactor;     ///< The reactor spectrum object.
 
-    std::array<SpectrumBase*, 5> m_Components;
+    std::vector<SpectrumBase*> m_Components;
 
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;  ///< The measurement data for each detector type.
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_OffOffData;      ///< The off-off data for each detector type.
   };
 
 }  // namespace ana::dc
