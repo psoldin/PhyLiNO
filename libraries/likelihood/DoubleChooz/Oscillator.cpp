@@ -68,7 +68,7 @@ namespace ana::dc {
     using enum params::General;
 
     bool recalculate = parameter.check_parameter_changed(SinSqT13);
-    recalculate |= parameter.check_parameter_changed(DeltaM31);
+    recalculate |= parameter.check_parameter_changed(DeltaMee);
     recalculate |= parameter.check_parameter_changed(SinSqT12);
     recalculate |= parameter.check_parameter_changed(DeltaM21);
     recalculate |= parameter.check_parameter_changed(SinSqT14);
@@ -99,7 +99,7 @@ namespace ana::dc {
     }
 
     const ThreeFlavorOscillation osci(parameter[params::General::SinSqT13],
-                                      parameter[params::General::DeltaM31],
+                                      parameter[params::General::DeltaMee],
                                       parameter[params::General::SinSqT12],
                                       parameter[params::General::DeltaM21]);
 
