@@ -24,7 +24,7 @@ namespace ana::dc {
     [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType type) const noexcept override;
 
   private:
-    std::unordered_map<params::dc::DetectorType, Eigen::Array<double, 80, 1>> m_Cache;
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_Cache;
     Eigen::Array<double, 80, 1> m_XPos;
     std::shared_ptr<ShapeCorrection> m_ShapeCorrection;
 

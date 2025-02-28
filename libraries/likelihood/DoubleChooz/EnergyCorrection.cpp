@@ -6,19 +6,32 @@
 
 namespace ana::dc {
 
-  inline double energy_scale_correction(double parA, double parB, double parC, double E) noexcept {
-    double result = E;
-    if (std::abs(parC) < 1.0e-7) {
-      double equationSubterm = (-1.0 * parB) / (2.0 * parC);
-      double term            = std::sqrt(std::pow(equationSubterm, 2) - (parA - result) / parC);
-      double upperBranch     = equationSubterm + term;
-      double lowerBranch     = equationSubterm - term;
+  inline double energy_scale_correction(double energyA, double energyB, double energyC, double energyInput) noexcept {
+    double result = energyInput;
+
+    // ---- step 1: do the shift as the fitter routine wants it
+    // (our reference is the data spectrum, hence inverse function has to be applied to MC) ----
+    // If a proper quadratic equation is given, then use p-q-equation
+    // (if parameter c is too close to zero, we try to avoid numerical imprecisions by switching to linear equation)
+    if (energyC < -0.0000001 || 0.0000001 < energyC) {
+      const double equationSubterm = (-1.0 * energyB) / (2.0 * energyC);
+      const double term            = std::sqrt(std::pow(equationSubterm, 2) - (energyA - result) / energyC);
+      const double upperBranch     = equationSubterm + term;
+      const double lowerBranch     = equationSubterm - term;
+
+      // for our parameter set,
+      // we have either a solution around 10 MeV or around +-10.000MeV,
+      // thus we take the solution with smaller absolute value
 
       result = (std::abs(upperBranch) < std::abs(lowerBranch)) ? upperBranch : lowerBranch;
-    } else if (utilities::fuzzyIsNull(parC)) {
-      result = (result - parA) / parB;
+    } else if (energyB != 0.0) {
+      result = (result - energyA) / energyB;
     }
 
+    //---- step 2: counteract a possible energy corrected MC spectrum ----
+    // result = dMCenergyparama + dMCenergyparamb * result + dMCEnergyC * std::pow(result, 2);
+
+    //---- step 3: handle unphysical large corrections ----
     return std::max(0.0, result);
   }
 
@@ -87,6 +100,13 @@ namespace ana::dc {
     , m_ShapeCorrection(std::move(shape_correction)) {
     auto xpos_values = range(0.25, 20.25, 0.25);
     m_XPos           = Eigen::Array<double, 80, 1>(xpos_values.data());
+
+    using enum params::dc::DetectorType;
+    for (auto detector : {ND, FDI, FDII}) {
+      std::array<double, 44> empty{};
+      std::ranges::fill(empty, 0.0);
+      m_Cache[detector] = empty;
+    }
   }
 
   [[nodiscard]] inline bool parameter_changed(const ParameterWrapper& parameter) noexcept {
@@ -107,9 +127,9 @@ namespace ana::dc {
     const bool this_step     = parameter_changed(parameter);
     const bool recalculate   = previous_step | this_step;
 
-    // if (recalculate) {
-    //   calculate_spectra(parameter);
-    // }
+    if (recalculate) {
+      calculate_spectra(parameter);
+    }
 
     return recalculate;
   }
@@ -118,38 +138,61 @@ namespace ana::dc {
     return m_Cache.at(type);
   }
 
-  void EnergyCorrection::calculate_spectra(const ana::dc::ParameterWrapper& parameter) noexcept {
+  void EnergyCorrection::calculate_spectra(const ParameterWrapper& parameter) noexcept {
     using namespace params;
     using namespace params::dc;
     using enum DetectorType;
 
-    // auto starting_parameter = m_Options->starting_parameter();
-    //
-    // const io::ParameterValue base_parA = starting_parameter.energy_correction_parameter_A();
-    // const double parA = base_parA.value() + base_parA.error() * parameter[index(General::EnergyA)];
-    //
-    // for (auto detector : {ND, FDI, FDII}) {
-    //   std::span<const double> oscillatedSpectrum = m_ShapeCorrection->get_spectrum(detector);
-    //
-    //   Eigen::Array<double, 80, 1> cumSum;
-    //   std::partial_sum(oscillatedSpectrum.data(), oscillatedSpectrum.data() + oscillatedSpectrum.size(), cumSum.data());
-    //
-    //   SplineFunction spline(m_XPos, cumSum);
-    //   const io::ParameterValue base_parB = starting_parameter.energy_correction_parameter_B(detector);
-    //   const io::ParameterValue base_parC = starting_parameter.energy_correction_parameter_C(detector);
-    //
-    //   const double parB = base_parB.value() + base_parB.error() * parameter[index(detector, Detector::EnergyB)];
-    //   const double parC = base_parC.value() + base_parC.error() * parameter[index(detector, Detector::EnergyC)];
-    //
-    //   auto& energy_corrected_spectrum = m_Cache[detector];
-    //
-    //   for (int i = 1; i < io::Constants::number_of_energy_bins; ++i) {
-    //     double e_upper = energy_scale_correction(parA, parB, parC, io::Constants::EnergyBinXaxis[i - 1]);
-    //     double e_lower = energy_scale_correction(parA, parB, parC, io::Constants::EnergyBinXaxis[i]);
-    //     double bin_content = spline(e_upper) - spline(e_lower);
-    //     energy_corrected_spectrum[i - 1] = std::max(0.0, bin_content);
-    //   }
-    // }
+    const auto& db = m_Options->double_chooz().dataBase();
+
+    using span_t = std::span<const double>;
+
+    const auto [CVa, SIGa] = db.energy_central_values(EnergyA);
+    const double parA      = CVa + SIGa * parameter[EnergyA];
+
+    for (const auto detector : {ND, FDI, FDII}) {
+      span_t oscillated_spectrum = m_ShapeCorrection->get_spectrum(detector);
+
+      Eigen::Array<double, 80, 1> cumSum;  // Cumulative sum of the oscillated spectrum
+
+      // Calculate the cumulative sum of the oscillated spectrum.
+      // This makes the integral calculation easier later.
+      std::partial_sum(oscillated_spectrum.begin(), oscillated_spectrum.end(), cumSum.begin());
+
+      // Create a spline function from the cumulative sum upper bin edges
+      SplineFunction spline(m_XPos, cumSum);
+
+      // Get the central values of the energy correction parameters.
+      // The fit parameters are only a deviation from these parameters. This is mathematically equivalent to using
+      // the central values and the fit parameters directly. The benefit is that it is numerically more stable.
+      const auto [CVb, SIGb] = db.energy_central_values(index(detector, EnergyB));
+      const auto [CVc, SIGc] = db.energy_central_values(index(detector, EnergyC));
+
+      // Calculate the energy correction parameters for EnergyB and EnergyC
+      const double parB = CVb + SIGb * parameter[index(detector, EnergyB)];
+      const double parC = CVc + SIGc * parameter[index(detector, EnergyC)];
+
+      // Get the edges for the energy bins
+      const auto& binning = io::dc::Constants::EnergyBinXaxis;
+
+      // Get the cache for the detector as reference
+      auto& energy_corrected_spectrum = m_Cache[detector];
+
+      // The way the correction is implemented is that the bin edges are used to calculate the energy correction.
+      // The bin content is then calculated by integrating the spline function over the new bin edges.
+      for (int i = 1; i < io::dc::Constants::number_of_energy_bins; ++i) {
+        const double e_lower = energy_scale_correction(parA, parB, parC, binning[i - 1]);
+        const double e_upper = energy_scale_correction(parA, parB, parC, binning[i]);
+
+        // Calculate the bin content by "integrating" the spline function over the new bin edges.
+        // The bin content is the difference between the spline value at the upper and lower bin edges since this
+        // is the cumulative sum of the oscillated spectrum.
+        const double bin_content = spline(e_upper) - spline(e_lower);
+
+        // Store the bin content in the cache and limit it to positive values.
+        energy_corrected_spectrum[i - 1] = std::max(0.0, bin_content);
+      }
+    }
   }
 
 }  // namespace ana::dc
