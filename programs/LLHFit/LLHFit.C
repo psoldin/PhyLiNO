@@ -3,28 +3,27 @@
 #include <ranges>
 
 // includes
-#include "Options.h"
 #include "Fit.h"
+#include "Options.h"
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include "DoubleChooz/DCLikelihood.h"
+
+#include <TFile.h>
+#include <TH1D.h>
+#include <TH2D.h>
+
+#include <numeric>
 
 int main(int argc, char** argv) {
-  try {
-    auto options = std::make_shared<io::Options>(argc, argv);
 
-    std::cout << std::boolalpha << options->inputOptions().silent() << '\n';
+  auto options = std::make_shared<io::Options>(argc, argv);
 
-    const auto& parameters = options->inputOptions().input_parameter().parameters();
-    const auto& names = options->inputOptions().input_parameter().names();
+  ana::Fit fit(options);
 
-    for (int i = 0; i < parameters.size(); ++i) {
-      std::cout << names[i] << ": " << parameters[i].value() << '\n';
-    }
+  fit.minimize();
 
-    // ana::Fit fit(options);
-
-    // std::cout << options->inputOptions().seed() << std::endl;
-
-    std::cout << "Hello World!" << std::endl;
-  } catch (std::exception& e) {
-    std::cout << e.what() << '\n';
-  }
+  std::cout << "####\t" << fit.get_minimizer()->X()[0] << '\n';
 }
