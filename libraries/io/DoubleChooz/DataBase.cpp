@@ -24,6 +24,78 @@
 
 namespace io::dc {
 
+  std::shared_ptr<Eigen::MatrixXd> get_bkg_cov_matrix(std::span<const double> backgroundSpectrum, int nBins = Constants::number_of_energy_bins) {
+    auto histogram = std::make_unique<TH1D>("h",
+                                            "",
+                                            nBins,
+                                            Constants::EnergyBinXaxis.data());
+
+    for (auto E : backgroundSpectrum) {
+      histogram->Fill(E);
+    }
+
+    auto cv = std::move(histogram);
+
+    int    Nbins = cv->GetNbinsX();
+    double Ntot  = cv->Integral(0, Nbins);
+
+    // For ease of handling, make N_i vector
+    TVectorD N(Nbins);
+    for (int b = 0; b < Nbins; b++) {
+      N[b] = cv->GetBinContent(b + 1);
+    }
+
+    // Construct total, normalization, and shape matrices
+    auto Mtot = std::make_unique<TMatrixD>(Nbins, Nbins);
+    Mtot->Zero();
+
+    for (int i = 0; i < Nbins; i++) {
+      (*Mtot)(i, i) = std::pow(cv->GetBinError(i + 1), 2);
+    }
+
+    const double Msum = Mtot->Sum();
+
+    auto Mnorm  = std::make_unique<TMatrixD>(Nbins, Nbins);
+    auto Mshape = std::make_unique<TMatrixD>(Nbins, Nbins);
+    auto Mmixed = std::make_unique<TMatrixD>(Nbins, Nbins);
+
+    for (int i = 0; i < Nbins; i++) {
+      for (int j = 0; j < Nbins; j++) {
+        (*Mnorm)(i, j) = N[i] * N[j] / pow(Ntot, 2) * Msum;
+
+        (*Mshape)(i, j) = (*Mtot)(i, j) - N[j] / Ntot * (*Mtot)(i, i) - N[i] / Ntot * (*Mtot)(j, j) + N[i] * N[j] / pow(Ntot, 2) * Msum;
+
+        (*Mmixed)(i, j) = N[j] / Ntot * (*Mtot)(i, i) + N[i] / Ntot * (*Mtot)(j, j) - 2 * N[i] * N[j] / pow(Ntot, 2) * Msum;
+      }
+    }
+
+    // Shape+mixed actually is the "shape matrix" for final fit
+    auto Mffit = std::make_unique<TMatrixD>(*Mshape);
+    (*Mffit) += (*Mmixed);
+
+    auto Mffit_frac = std::make_unique<TMatrixD>(*Mffit);
+
+    // Fractionalize the ffit matrix
+    for (int i = 0; i < Nbins; i++) {
+      for (int j = 0; j < Nbins; j++) {
+        if (N[i] == 0 || N[j] == 0)
+          (*Mffit_frac)(i, j) = 0;
+        else
+          (*Mffit_frac)(i, j) *= 1. / (N[i] * N[j]);
+      }
+    }
+
+    auto fracCovMatrix = std::make_shared<Eigen::MatrixXd>(nBins, nBins);
+
+    for (unsigned int i = 0; i < nBins; ++i) {
+      for (unsigned int j = 0; j < nBins; ++j) {
+        (*fracCovMatrix)(i, j) = (*Mffit_frac)(i, j);
+      }
+    }
+
+    return fracCovMatrix;
+  }
+
   /**
    * @brief Represents a dynamic array of double values.
    *
@@ -409,14 +481,34 @@ namespace io::dc {
     }
 
     using enum params::dc::BackgroundType;
+    using enum SpectrumType;
+
     std::cout << "Generating " << std::setw(10) << 40'000 << " samples for Accidental Background\n";
-    m_BackgroundData[accidental] = generate_accidental_background(gen, 40'000);
+    {
+      m_BackgroundData[Accidental]                            = generate_accidental_background(gen, 40'000);
+      auto acc_bkg                                            = get_bkg_cov_matrix(m_BackgroundData[Accidental]);
+      m_CovarianceMatrices[std::make_tuple(ND, Accidental)]   = acc_bkg;
+      m_CovarianceMatrices[std::make_tuple(FDI, Accidental)]  = acc_bkg;
+      m_CovarianceMatrices[std::make_tuple(FDII, Accidental)] = std::move(acc_bkg);
+    }
 
     std::cout << "Generating " << std::setw(10) << 650'000 << " samples for Lithium Background\n";
-    m_BackgroundData[lithium] = generate_lithium_background(gen, 650'000);
+    {
+      m_BackgroundData[Lithium]                            = generate_lithium_background(gen, 650'000);
+      auto li_bkg                                          = get_bkg_cov_matrix(m_BackgroundData[Lithium]);
+      m_CovarianceMatrices[std::make_tuple(ND, Lithium)]   = li_bkg;
+      m_CovarianceMatrices[std::make_tuple(FDI, Lithium)]  = li_bkg;
+      m_CovarianceMatrices[std::make_tuple(FDII, Lithium)] = std::move(li_bkg);
+    }
 
     std::cout << "Generating " << std::setw(10) << 2'000'000 << " samples for fastN Background\n";
-    m_BackgroundData[fastN] = generate_fastN_background(gen, 2'000'000);
+    {
+      m_BackgroundData[FastN]                            = generate_fastN_background(gen, 2'000'000);
+      auto fastN_bkg                                     = get_bkg_cov_matrix(m_BackgroundData[FastN], 44);
+      m_CovarianceMatrices[std::make_tuple(ND, FastN)]   = fastN_bkg;
+      m_CovarianceMatrices[std::make_tuple(FDI, FastN)]  = fastN_bkg;
+      m_CovarianceMatrices[std::make_tuple(FDII, FastN)] = std::move(fastN_bkg);
+    }
 
     auto string_to_DetectorType = [](std::string_view name) -> params::dc::DetectorType {
       if (name == "ND") {
@@ -488,7 +580,7 @@ namespace io::dc {
   std::shared_ptr<Eigen::MatrixXd> DataBase::covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
     if (!m_CovarianceMatrices.contains({detectorType, spectrumType})) {
       std::stringstream ss;
-      ss << "Covariance matrix not found for detector " << detectorType << " and spectrum type " << get_spectrum_type_string(spectrumType);
+      ss << "Covariance matrix not found for detector \"" << get_detector_name(detectorType) << "\" and spectrum type \"" << get_spectrum_type_string(spectrumType) << '\"';
       throw std::invalid_argument(ss.str());
     }
     return m_CovarianceMatrices.at({detectorType, spectrumType});

@@ -85,7 +85,7 @@ namespace io::dc {
 
     [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return m_OnLifeTime.at(type); }
 
-    [[nodiscard]] std::span<const double> background_data(params::dc::BackgroundType type) const {
+    [[nodiscard]] std::span<const double> background_data(io::dc::SpectrumType type) const {
       return m_BackgroundData.at(type);
     }
 
@@ -137,7 +137,7 @@ namespace io::dc {
 
     std::unordered_map<params::dc::DetectorType, std::shared_ptr<ReactorData>> m_ReactorData;
 
-    std::unordered_map<params::dc::BackgroundType, std::vector<double>> m_BackgroundData;
+    std::unordered_map<SpectrumType, std::vector<double>> m_BackgroundData;
 
     std::unordered_map<params::dc::DetectorType, double> m_OnLifeTime;
     std::unordered_map<params::dc::DetectorType, double> m_OffLifeTime;
