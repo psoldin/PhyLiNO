@@ -348,6 +348,7 @@ namespace params {
 
   /**
    * Enumeration of general parameters used in the Double Chooz experiment.
+   * This can also be extended to general parameters used in other experiments.
    * Each parameter is represented as an integer value.
    */
   enum General : int {
