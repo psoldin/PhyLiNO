@@ -171,15 +171,13 @@ namespace ana::dc {
     , m_DNC(m_Options)
     , m_Reactor(m_Options) {
     initialize_measurement_data();
-    // m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
-    m_Components = {&m_Reactor, &m_Accidental};
+    m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
   }
 
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
 
     for (auto* component : m_Components) {
-      std::cout << "Component: " << component << '\n';
       component->check_and_recalculate(m_Parameter);
     }
 
@@ -189,7 +187,7 @@ namespace ana::dc {
     return calculate_default_likelihood(m_Parameter);
   }
 
-  double DCLikelihood::calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType detector) {
+  double DCLikelihood::calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType detector) const {
     constexpr int nBins = 44;
     using map_t         = Eigen::Map<const Eigen::Array<double, 44, 1>>;
 
@@ -214,7 +212,21 @@ namespace ana::dc {
     // return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail(nBins - idx).sum();
   }
 
-  double DCLikelihood::calculate_default_likelihood(const ParameterWrapper& parameter) noexcept {
+  double DCLikelihood::calculate_mcNorm(const ParameterWrapper& parameter, params::dc::DetectorType type) const noexcept {
+    using namespace params::dc;
+
+    const auto [value, error] = m_Options->double_chooz().dataBase().mcNorm_central_values(type);
+
+    const double norm = parameter[params::index(type, Detector::MCNorm)];
+
+    const double result = value + error * norm;
+
+    const double bugey4 = parameter[params::Bugey4];
+
+    return result * bugey4;
+  }
+
+  double DCLikelihood::calculate_default_likelihood(const ParameterWrapper& parameter) const noexcept {
     using enum params::dc::DetectorType;
 
     double likelihood = 0.0;
@@ -226,29 +238,35 @@ namespace ana::dc {
       using array_t = Eigen::Array<double, nBins, 1>;
 
       // Get all spectrum components as Eigen::Map
-      // map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
-      // map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
-      // map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
-      // map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
+      map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
+      print_array(acc, "Accidental");
+      map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
+      print_array(li, "Lithium");
+      map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
+      print_array(fastN, "FastN");
+      map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
+      print_array(dnc, "DnC");
       map_t reactor(m_Reactor.get_spectrum(detector).data(), nBins);
+      print_array(reactor, "Reactor");
 
       // Add all background components to the full background contribution
-      const array_t bkg = array_t::Ones();  // acc + li + fastN + dnc;
+      const array_t bkg = acc + li + fastN + dnc;
+      print_array(bkg, "Full Bkg");
 
       // Get the measurement data as Eigen::Map
       map_t data(get_measurement_data(detector).data(), nBins);
+      print_array(data, "Data");
 
       // Get the MC normalization parameter
-      // const double mcNorm = parameter[params::index(detector, params::dc::Detector::MCNorm)];
+      const double mcNorm = calculate_mcNorm(parameter, detector);
+      std::cout << "MCNorm:\t" << mcNorm << '\n';
 
       // Calculate the full spectrum prediction
-      array_t prediction = (bkg + (1.0 * reactor));
-
-      print_array(data, "data");
-      print_array({prediction.data(), 44}, "prediction");
+      array_t prediction = (bkg + (mcNorm * reactor));
+      print_array(prediction, "Prediction");
 
       // Calculate Poisson Likelihood
-      likelihood += -2.0 * ((data + 1) * prediction.log() - prediction).sum();
+      likelihood += -2.0 * (data * prediction.log() - prediction).sum();
       std::cout << params::dc::get_detector_name(detector) << '\t' << likelihood << '\n';
 
       // Calculate the off-off component of the likelihood

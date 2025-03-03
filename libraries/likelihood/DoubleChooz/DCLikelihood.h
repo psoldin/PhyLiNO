@@ -76,7 +76,7 @@ namespace ana::dc {
      * @param type The type of detector being used (as defined in params::dc::DetectorType).
      * @return A double representing the calculated off-off likelihood.
      */
-    [[nodiscard]] double calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType type);
+    [[nodiscard]] double calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType type) const;
 
     [[nodiscard]] const AccidentalBackground& accidental_background() const noexcept { return m_Accidental; }
 
@@ -90,6 +90,8 @@ namespace ana::dc {
 
     ParameterWrapper& parameter() noexcept { return m_Parameter; }
 
+    [[nodiscard]] double calculate_mcNorm(const ParameterWrapper& parameter, params::dc::DetectorType type) const noexcept;
+
    private:
     /**
      * @brief Calculates the default likelihood for the given parameter.
@@ -100,7 +102,7 @@ namespace ana::dc {
      * @param parameter The parameter for which the likelihood is to be calculated.
      * @return The calculated likelihood as a double.
      */
-    [[nodiscard]] double calculate_default_likelihood(const ParameterWrapper& parameter) noexcept;
+    [[nodiscard]] double calculate_default_likelihood(const ParameterWrapper& parameter) const noexcept;
 
     /**
      * @brief Calculates the likelihood of the reactor split based on the given parameters.
