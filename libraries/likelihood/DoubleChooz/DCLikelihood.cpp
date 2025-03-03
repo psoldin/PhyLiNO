@@ -182,7 +182,6 @@ namespace ana::dc {
       std::cout << "Component: " << component << '\n';
       component->check_and_recalculate(m_Parameter);
     }
-    // const bool _ = m_Reactor.check_and_recalculate(m_Parameter);
 
     if (m_Options->inputOptions().double_chooz().reactor_split()) {
       return calculate_reactor_split_likelihood(m_Parameter);
