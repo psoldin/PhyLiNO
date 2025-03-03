@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Definitions.h"
-#include "Options.h"
 #include "../SpectrumBase.h"
+#include "Options.h"
 
 namespace ana::dc {
 
@@ -22,11 +22,16 @@ namespace ana::dc {
       return m_BackgroundTemplate.at(type);
     }
 
-  private:
-    using map_t = std::unordered_map<params::dc::DetectorType, std::array<double, 44>>;
+   private:
+    using array_t = std::array<double, 44>;
 
-    map_t m_BackgroundTemplate;
-    map_t m_LiSpectrum;
+    template <typename T>
+    using map_t = std::unordered_map<params::dc::DetectorType, T>;
+
+    map_t<array_t> m_BackgroundTemplate;
+    map_t<array_t> m_LiSpectrum;
+
+    map_t<std::shared_ptr<Eigen::MatrixXd>> m_CovMatrix;
 
     void recalculate_spectra(const ParameterWrapper& parameter);
 
