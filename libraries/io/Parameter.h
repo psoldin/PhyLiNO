@@ -225,7 +225,6 @@ namespace params {
       EnergyB,
       EnergyC,
       MCNorm,
-      NuOffOffRate,
       NuShape01,
       NuShape02,
       NuShape03,
