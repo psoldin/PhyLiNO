@@ -90,7 +90,6 @@ namespace ana::dc {
     std::ranges::fill(null_template, 0.0);
 
     for (auto detector : {ND, FDI, FDII}) {
-      std::cout << params::dc::get_detector_name(detector) << '\n';
       const double lifeTime = m_Options->double_chooz().dataBase().on_lifetime(detector);
 
       std::array<double, 44> background_spectrum;
