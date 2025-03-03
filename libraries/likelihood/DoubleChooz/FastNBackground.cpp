@@ -63,11 +63,9 @@ namespace ana::dc {
 
       assert(m_CovMatrix[detector] != nullptr);
 
-      const Eigen::MatrixXd&  covMatrix = *m_CovMatrix[detector];
+      const Eigen::MatrixXd& covMatrix = *m_CovMatrix[detector];
 
-      std::cout << "COVARIANCE: " << covMatrix.rows() << '\t' << covMatrix.cols() << '\n';
-
-      std::array<double, 44>& result    = m_AccSpectrum[detector];
+      std::array<double, 44>& result = m_AccSpectrum[detector];
 
       calculate_spectrum(rate,
                          background_template,
