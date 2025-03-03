@@ -40,7 +40,6 @@ namespace ana::dc {
   }
 
   bool ShapeCorrection::check_and_recalculate(const ParameterWrapper& parameter) noexcept {
-    std::cout << "SHAPECORRECTION\n";
     const bool previous_step = m_Oscillator->check_and_recalculate(parameter);
     const bool this_step     = parameter_changed(parameter);
     const bool recalculate   = previous_step | this_step;
