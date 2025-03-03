@@ -75,22 +75,52 @@ namespace ana::dc {
 
     m_Parameter.reset_parameter(parameter.data());
 
-    std::cout << "First check and recalculate\n";
     m_Reactor.check_and_recalculate(m_Parameter);
-    std::cout << "After check and recalculate\n";
+
+    for (auto* component : m_Components)
+      component->check_and_recalculate(m_Parameter);
 
     using enum params::dc::DetectorType;
 
+    constexpr int nBins = 44;
+
     for (auto detector : {ND, FDI, FDII}) {
-      std::span<const double> spectrum = m_Reactor.get_spectrum(detector);
-      print_array(spectrum, "Reactor Spectrum " + params::dc::get_detector_name(detector));
+      using map_t   = Eigen::Map<const Eigen::Array<double, nBins, 1>>;
+      using array_t = Eigen::Array<double, nBins, 1>;
+
+      // Get all spectrum components as Eigen::Map
+      map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
+      map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
+      map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
+      map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
+      map_t reactor(m_Reactor.get_spectrum(detector).data(), nBins);
+
+      // Add all background components to the full background contribution
+      const array_t bkg = acc + li + fastN + dnc;
+
+      // Get the measurement data as Eigen::Map
+      map_t data(get_measurement_data(detector).data(), nBins);
+
+      // Get the MC normalization parameter
+      const double mcNorm = calculate_mcNorm(m_Parameter, detector);
+
+      // Calculate the full spectrum prediction
+      array_t prediction = (bkg + (mcNorm * reactor));
+
       std::array<double, 44> array{};
-      std::ranges::copy(spectrum, array.begin());
+      std::ranges::copy(prediction, array.begin());
       m_MeasurementData[detector] = array;
 
       if (detector == ND || detector == FDII) {
+        // Get the on and off lifetimes
+        const double on_lifetime  = m_Options->double_chooz().dataBase().on_lifetime(detector);
+        const double off_lifetime = m_Options->double_chooz().dataBase().off_lifetime(detector);
+
         std::array<double, 44> off_off_data{};
-        std::ranges::fill(off_off_data, 0.0);
+
+        const array_t off_off_bkg = (off_lifetime / on_lifetime) * bkg;
+
+        std::ranges::copy(off_off_bkg, off_off_data.begin());
         m_OffOffData[detector] = off_off_data;
       }
     }
@@ -239,35 +269,25 @@ namespace ana::dc {
 
       // Get all spectrum components as Eigen::Map
       map_t acc(m_Accidental.get_spectrum(detector).data(), nBins);
-      print_array(acc, "Accidental");
       map_t li(m_Lithium.get_spectrum(detector).data(), nBins);
-      print_array(li, "Lithium");
       map_t fastN(m_FastN.get_spectrum(detector).data(), nBins);
-      print_array(fastN, "FastN");
       map_t dnc(m_DNC.get_spectrum(detector).data(), nBins);
-      print_array(dnc, "DnC");
       map_t reactor(m_Reactor.get_spectrum(detector).data(), nBins);
-      print_array(reactor, "Reactor");
 
       // Add all background components to the full background contribution
       const array_t bkg = acc + li + fastN + dnc;
-      print_array(bkg, "Full Bkg");
 
       // Get the measurement data as Eigen::Map
       map_t data(get_measurement_data(detector).data(), nBins);
-      print_array(data, "Data");
 
       // Get the MC normalization parameter
       const double mcNorm = calculate_mcNorm(parameter, detector);
-      std::cout << "MCNorm:\t" << mcNorm << '\n';
 
       // Calculate the full spectrum prediction
       array_t prediction = (bkg + (mcNorm * reactor));
-      print_array(prediction, "Prediction");
 
       // Calculate Poisson Likelihood
       likelihood += -2.0 * (data * prediction.log() - prediction).sum();
-      std::cout << params::dc::get_detector_name(detector) << '\t' << likelihood << '\n';
 
       // Calculate the off-off component of the likelihood
       // if (detector == ND || detector == FDII) {
