@@ -58,7 +58,7 @@ namespace ana::dc {
   }
 
   void LithiumBackground::fill_data() {
-    auto acc_data = m_Options->double_chooz().dataBase().background_data(params::dc::BackgroundType::lithium);
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(io::dc::SpectrumType::Lithium);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
 

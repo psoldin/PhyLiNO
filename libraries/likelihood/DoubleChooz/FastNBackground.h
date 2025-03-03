@@ -11,7 +11,7 @@ namespace ana::dc {
 
     ~FastNBackground() override = default;
 
-    [[nodiscard]] bool check_and_recalculate(const ParameterWrapper &parameter) override;
+    [[nodiscard]] bool check_and_recalculate(const ParameterWrapper& parameter) override;
 
     [[nodiscard]] std::span<const double> get_spectrum(params::dc::DetectorType detector) const override {
       return m_AccSpectrum.at(detector);
@@ -22,8 +22,12 @@ namespace ana::dc {
     }
 
    private:
-    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_BackgroundTemplate;
-    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_AccSpectrum;
+    template <typename T>
+    using map_t = std::unordered_map<params::dc::DetectorType, T>;
+
+    map_t<std::array<double, 44>>           m_BackgroundTemplate;
+    map_t<std::array<double, 44>>           m_AccSpectrum;
+    map_t<std::shared_ptr<Eigen::MatrixXd>> m_CovMatrix;
 
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 

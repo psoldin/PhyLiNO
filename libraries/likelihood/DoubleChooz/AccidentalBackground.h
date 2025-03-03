@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../SpectrumBase.h"
+#include "Calculate_Spectrum.h"
 
 namespace ana::dc {
 
@@ -54,14 +55,19 @@ namespace ana::dc {
     }
 
    private:
-    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_BackgroundTemplate;
-    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_AccSpectrum;
+    using array_t = std::array<double, 44>;
+
+    template <typename T>
+    using map_t = std::unordered_map<params::dc::DetectorType, T>;
+
+    map_t<array_t> m_BackgroundTemplate;
+    map_t<array_t> m_AccSpectrum;
+
+    map_t<std::shared_ptr<Eigen::MatrixXd>> m_CovMatrix;
 
     void fill_data();
 
-    void recalculate_spectra(const ParameterWrapper& parameter) {
-      // Recalculate the accidental background spectrum
-    }
+    void recalculate_spectra(const ParameterWrapper& parameter);
   };
 
 }  // namespace ana::dc

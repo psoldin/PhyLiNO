@@ -56,11 +56,20 @@ namespace ana::dc {
 
   AccidentalBackground::AccidentalBackground(std::shared_ptr<io::Options> options)
     : SpectrumBase(std::move(options)) {
+    using enum params::dc::DetectorType;
+
+    const auto& db = m_Options->double_chooz().dataBase();
+
+    for (auto detector : {ND, FDI, FDII}) {
+      auto cov              = db.covariance_matrix(detector, io::dc::SpectrumType::Accidental);
+      m_CovMatrix[detector] = std::move(cov);
+    }
+
     fill_data();
   }
 
   void AccidentalBackground::fill_data() {
-    auto acc_data = m_Options->double_chooz().dataBase().background_data(params::dc::BackgroundType::accidental);
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(io::dc::SpectrumType::Accidental);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
 
@@ -90,6 +99,34 @@ namespace ana::dc {
       }
 
       m_BackgroundTemplate[detector] = background_spectrum;
+    }
+  }
+  void AccidentalBackground::recalculate_spectra(const ParameterWrapper& parameter) {
+    // Recalculate the accidental background spectrum
+
+    using enum params::dc::DetectorType;
+    using namespace params::dc;
+
+    for (const auto detector : {ND, FDI, FDII}) {
+      using span_t = std::span<const double>;
+
+      span_t background_template = get_background_template(detector);
+
+      span_t shape_parameter = parameter.sub_range(params::index(detector, AccShape01),
+                                                   params::index(detector, AccShape38) + 1);
+
+      const double rate = parameter[params::index(detector, BkgRAcc)];
+
+      assert(m_CovMatrix[detector] != nullptr);
+
+      const Eigen::MatrixXd&  covMatrix = *m_CovMatrix[detector];
+      std::array<double, 44>& result    = m_AccSpectrum[detector];
+
+      calculate_spectrum(rate,
+                         background_template,
+                         shape_parameter,
+                         covMatrix,
+                         result);
     }
   }
 

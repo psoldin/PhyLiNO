@@ -1,7 +1,7 @@
 #include "FastNBackground.h"
+#include <DoubleChooz/Constants.h>
 #include "Calculate_Spectrum.h"
 #include "Parameter.h"
-#include <DoubleChooz/Constants.h>
 
 // STL includes
 #include <numeric>
@@ -28,10 +28,19 @@ namespace ana::dc {
 
   FastNBackground::FastNBackground(std::shared_ptr<io::Options> options)
     : SpectrumBase(std::move(options)) {
+    using enum params::dc::DetectorType;
+
+    const auto& db = m_Options->double_chooz().dataBase();
+
+    for (const auto detector : {ND, FDI, FDII}) {
+      auto cov              = db.covariance_matrix(detector, io::dc::SpectrumType::FastN);
+      m_CovMatrix[detector] = std::move(cov);
+    }
+
     fill_data();
   }
 
-  bool FastNBackground::check_and_recalculate(const ParameterWrapper &parameter) {
+  bool FastNBackground::check_and_recalculate(const ParameterWrapper& parameter) {
     bool has_changed = parameter_changed(parameter);
     if (has_changed) {
       recalculate_spectra(parameter);
@@ -43,24 +52,33 @@ namespace ana::dc {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
     using namespace params;
-    //
-    // for (auto detector : {ND, FDI, FDII}) {
-    //   double      rate            = parameter[params::index(detector, BkgRFNSM)];
-    //   const auto& shape           = m_SpectrumTemplate[detector];
-    //   auto        shape_parameter = parameter.sub_range(index(detector, FNSMShape01), index(detector, FNSMShape44) + 1);
-    //   const auto& covMatrix       = m_Options->dataBase().covariance_matrix(detector, io::SpectrumType::FastN);
-    //   auto&       result          = m_Cache[detector];
-    //
-    //   calculate_spectrum<44>(rate,
-    //                          shape,
-    //                          shape_parameter,
-    //                          covMatrix,
-    //                          result);
-    // }
+
+    for (const auto detector : {ND, FDI, FDII}) {
+      using span_t = std::span<const double>;
+
+      span_t background_template = get_background_template(detector);
+      span_t shape_parameter     = parameter.sub_range(index(detector, FNSMShape01), index(detector, FNSMShape44) + 1);
+
+      const double rate = parameter[index(detector, BkgRFNSM)];
+
+      assert(m_CovMatrix[detector] != nullptr);
+
+      const Eigen::MatrixXd&  covMatrix = *m_CovMatrix[detector];
+
+      std::cout << "COVARIANCE: " << covMatrix.rows() << '\t' << covMatrix.cols() << '\n';
+
+      std::array<double, 44>& result    = m_AccSpectrum[detector];
+
+      calculate_spectrum(rate,
+                         background_template,
+                         shape_parameter,
+                         covMatrix,
+                         result);
+    }
   }
 
   void FastNBackground::fill_data() {
-    auto acc_data = m_Options->double_chooz().dataBase().background_data(params::dc::BackgroundType::fastN);
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(io::dc::SpectrumType::FastN);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
 
