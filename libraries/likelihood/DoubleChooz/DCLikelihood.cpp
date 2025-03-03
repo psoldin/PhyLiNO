@@ -210,7 +210,7 @@ namespace ana::dc {
     const Eigen::Array<double, 44, 1> off_off_llh = -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg);
 
     // Calculate Poisson Likelihood
-    return off_off_llh.tail(nBins - idx).sum();
+    return -2.0 * off_off_llh.tail(nBins - idx).sum();
     // return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail(nBins - idx).sum();
   }
 
