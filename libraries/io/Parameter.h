@@ -352,7 +352,7 @@ namespace params {
    */
   enum General : int {
     SinSqT13 = 0,
-    DeltaM31,
+    DeltaMee,
     SinSqT12,
     DeltaM21,
     SinSqT14,
