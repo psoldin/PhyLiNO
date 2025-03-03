@@ -18,11 +18,12 @@ namespace ana::dc {
   DNCBackground::DNCBackground(std::shared_ptr<io::Options> options)
     : SpectrumBase(std::move(options)) {
     using enum params::dc::DetectorType;
+      std::array<double, 44> null_shape{};
+      std::ranges::fill(null_shape, 0.0);
     for (auto detector : {ND, FDI, FDII}) {
-      std::array<double, 38> shape{};
-      std::ranges::fill(shape, 0.0);
-      m_SpectrumTemplate_Gd[detector] = shape;
-      m_SpectrumTemplate_Hy[detector] = shape;
+      m_SpectrumTemplate_Gd[detector] = null_shape;
+      m_SpectrumTemplate_Hy[detector] = null_shape;
+      m_Cache[detector] = null_shape;
     }
   }
 
@@ -48,7 +49,7 @@ namespace ana::dc {
       double lifetime = m_Options->double_chooz().dataBase().on_lifetime(detector);
 
       auto& result = m_Cache[detector];
-      for (int i = 0; i < io::dc::Constants::number_of_energy_bins; ++i) {
+      for (int i = 0; i < 44; ++i) {
         result[i] = std::max(lifetime * ((gd_rate * gd_shape[i]) + (hy_rate * hy_shape[i])), 0.0);
       }
     }
