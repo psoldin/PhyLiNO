@@ -36,6 +36,8 @@ namespace ana {
 
     [[nodiscard]] const io::Options& options() const;
 
+    auto get_minimizer() const { return m_Minimizer; }
+
    private:
     std::shared_ptr<io::Options> m_Options;
 
