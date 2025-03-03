@@ -67,12 +67,7 @@ namespace ana::dc {
   inline bool check_parameter(const ParameterWrapper& parameter) noexcept {
     using enum params::General;
 
-    bool recalculate = parameter.check_parameter_changed(SinSqT13);
-    recalculate |= parameter.check_parameter_changed(DeltaMee);
-    recalculate |= parameter.check_parameter_changed(SinSqT12);
-    recalculate |= parameter.check_parameter_changed(DeltaM21);
-    recalculate |= parameter.check_parameter_changed(SinSqT14);
-    recalculate |= parameter.check_parameter_changed(DeltaM41);
+    const bool recalculate = parameter.check_parameter_changed(SinSqT13, DeltaM41);
 
     return recalculate;
   }
