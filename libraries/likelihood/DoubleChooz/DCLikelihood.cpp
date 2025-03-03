@@ -69,16 +69,20 @@ namespace ana::dc {
 
     const auto& pv = m_Options->inputOptions().input_parameters().parameters();
 
+    std::cout << "Setting starting parameters as set in config file for Asimov data set generation!\n";
     for (std::size_t i = 0; i < parameter.size(); ++i) {
       parameter[i] = pv[i].value();
     }
 
+    std::cout << "Set SinSqT13 = 0.1 in the parameter array for Asimov data set generation!\n";
+    parameter[params::SinSqT13] = 0.1;
+
     m_Parameter.reset_parameter(parameter.data());
 
-    m_Reactor.check_and_recalculate(m_Parameter);
-
-    for (auto* component : m_Components)
+    std::cout << "Calculate the spectrum components for Asimov data set generation!\n";
+    for (auto* component : m_Components) {
       component->check_and_recalculate(m_Parameter);
+    }
 
     using enum params::dc::DetectorType;
 
@@ -97,9 +101,6 @@ namespace ana::dc {
 
       // Add all background components to the full background contribution
       const array_t bkg = acc + li + fastN + dnc;
-
-      // Get the measurement data as Eigen::Map
-      map_t data(get_measurement_data(detector).data(), nBins);
 
       // Get the MC normalization parameter
       const double mcNorm = calculate_mcNorm(m_Parameter, detector);
@@ -200,8 +201,8 @@ namespace ana::dc {
     , m_FastN(m_Options)
     , m_DNC(m_Options)
     , m_Reactor(m_Options) {
-    initialize_measurement_data();
     m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
+    initialize_measurement_data();
   }
 
   double DCLikelihood::calculate_likelihood(const double* parameter) {
