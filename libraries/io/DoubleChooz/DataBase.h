@@ -96,6 +96,13 @@ namespace io::dc {
       return m_EnergyCentralValues.at(idx);
     }
 
+    [[nodiscard]] std::pair<double, double> mcNorm_central_values(params::dc::DetectorType idx) const {
+      if (!m_MCNormCentralValues.contains(idx)) {
+        throw std::invalid_argument("Index not found in MCnorm central values");
+      }
+      return m_MCNormCentralValues.at(idx);
+    }
+
    private:
     void construct_energy_correlation_matrix();
 
@@ -143,6 +150,8 @@ namespace io::dc {
     std::unordered_map<params::dc::DetectorType, double> m_OffLifeTime;
 
     std::unordered_map<int, std::pair<double, double>> m_EnergyCentralValues;
+
+    std::unordered_map<params::dc::DetectorType, std::pair<double, double>> m_MCNormCentralValues;
 
     std::vector<std::vector<double>> m_SignalData;
     std::vector<std::vector<double>> m_MeasurementData;

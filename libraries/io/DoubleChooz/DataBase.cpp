@@ -288,7 +288,7 @@ namespace io::dc {
       double value;
       do {
         value = dist(gen);
-      } while (value < 1.0 && value > 10.0);
+      } while (value < 1.0 || value > 10.0);
       sample[i] = value;
     }
     return sample;
@@ -304,10 +304,16 @@ namespace io::dc {
   }
 
   std::vector<double> generate_fastN_background(std::default_random_engine& gen, std::size_t num_samples) {
-    std::exponential_distribution dist(50.0);
+    std::exponential_distribution dist(1.0 / 50.0);
     std::vector<double>           samples(num_samples);
+
+    double sample_value;
     for (std::size_t i = 0; i < num_samples; ++i) {
-      samples[i] = dist(gen) + 1.0;
+      do {
+        sample_value = dist(gen) + 1.0;
+      } while (sample_value < 1.0 || sample_value > 50.0);
+
+      samples[i] = sample_value;
     }
     return samples;
   }
@@ -530,11 +536,16 @@ namespace io::dc {
         m_OnLifeTime[string_to_DetectorType(section)]  = data.get<double>("on_lifetime");
         m_OffLifeTime[string_to_DetectorType(section)] = data.get<double>("off_lifetime");
 
-        std::array e = {std::make_pair(data.get<double>("energy_A_CV"), data.get<double>("energy_A_Sig")),
-                        std::make_pair(data.get<double>("energy_B_CV"), data.get<double>("energy_B_Sig")),
-                        std::make_pair(data.get<double>("energy_C_CV"), data.get<double>("energy_C_Sig"))};
+        const std::array e = {std::make_pair(data.get<double>("energy_A_CV"), data.get<double>("energy_A_Sig")),
+                              std::make_pair(data.get<double>("energy_B_CV"), data.get<double>("energy_B_Sig")),
+                              std::make_pair(data.get<double>("energy_C_CV"), data.get<double>("energy_C_Sig"))};
 
-        energy_central_values[string_to_DetectorType(section)] = std::move(e);
+        energy_central_values[string_to_DetectorType(section)] = e;
+
+        const auto mcNorm_Total = std::make_pair(data.get<double>("MCNorm_Total_CV"),
+                                                 data.get<double>("MCNorm_Total_Sig"));
+
+        m_MCNormCentralValues[string_to_DetectorType(section)] = mcNorm_Total;
       }
     } catch (const boost::property_tree::ptree_bad_path& e) {
       std::cout << e.what() << '\n';
