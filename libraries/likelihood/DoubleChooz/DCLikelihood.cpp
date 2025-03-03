@@ -53,7 +53,7 @@ namespace ana::dc {
   }
 
   void DCLikelihood::read_measurement_data() {
-    throw std::runtime_error("Not implemented");
+    throw std::runtime_error("Reading measurement data is not yet implemented");
   }
 
   inline void print_array(std::span<const double> data, std::string_view name) {
