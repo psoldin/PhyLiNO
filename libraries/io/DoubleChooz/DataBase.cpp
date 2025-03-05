@@ -328,13 +328,13 @@ namespace io::dc {
     for (std::size_t i = 0; i < num_samples; ++i) {
       do {
         truth_value = dist_truth(gen);
-      } while (truth_value < 0.0);
+      } while (truth_value < 0.0 || truth_value > 20.0);
       nuE_truth[i] = truth_value;
 
       std::normal_distribution reco_dist(truth_value, 0.5);
       do {
         reco_value = reco_dist(gen);
-      } while (reco_value < 0.0);
+      } while (reco_value < 0.0 || reco_value > 20.0);
       nuE_vis[i] = reco_value;
     }
 
