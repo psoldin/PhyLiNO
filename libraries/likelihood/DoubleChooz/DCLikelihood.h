@@ -134,6 +134,10 @@ namespace ana::dc {
 
     void generate_measurement_data();
 
+    void setup_pulls();
+
+    double calculate_pulls(const ParameterWrapper& parameter) const noexcept;
+
     ParameterWrapper m_Parameter;  ///< The parameter wrapper object used for likelihood calculation.
 
     AccidentalBackground m_Accidental;  ///< The accidental background object.
@@ -143,6 +147,9 @@ namespace ana::dc {
     ReactorSpectrum      m_Reactor;     ///< The reactor spectrum object.
 
     std::vector<SpectrumBase*> m_Components;
+
+    std::vector<std::tuple<int, double, double>> m_Pulls;
+    std::vector<std::tuple<double, double, double>> m_ShapeCV;
 
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;  ///< The measurement data for each detector type.
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_OffOffData;      ///< The off-off data for each detector type.

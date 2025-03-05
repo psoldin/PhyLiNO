@@ -205,6 +205,63 @@ namespace ana::dc {
     initialize_measurement_data();
   }
 
+  void DCLikelihood::setup_pulls() {
+    const auto& input_parameters = m_Options->inputOptions().input_parameters();
+
+    const auto& names       = input_parameters.names();
+    const auto& fixed       = input_parameters.fixed();
+    const auto& parameters  = input_parameters.parameters();
+    const auto& constrained = input_parameters.constrained();
+
+    for (std::size_t i = 0, end = m_Components.size(); i < end; ++i) {
+      if (constrained[i]) {
+        std::cout << "Setup pull for parameter " << std::setw(8) << i << ":\t" << names[i] << '\n';
+        m_Pulls.emplace_back(i, parameters[i].value(), parameters[i].uncertainty());
+      }
+    }
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+    for (int i = 0, end = NuShape43 - NuShape01 + 1; i < end; ++i) {
+      m_ShapeCV.emplace_back(parameters[params::index(ND, i)].value(),
+                             parameters[params::index(FDI, i)].value(),
+                             parameters[params::index(FDII, i)].value());
+    }
+  }
+
+  double DCLikelihood::calculate_pulls(const ParameterWrapper& parameter) const noexcept {
+    double result = 0.0;
+    for (const auto [idx, CV, sig] : m_Pulls) {
+      result += pow_2((parameter[idx] - CV) / sig);
+    }
+
+    using span_t = std::span<const double>;
+
+    span_t rawP = parameter.raw_parameters();
+
+    using enum params::dc::DetectorType;
+    using enum params::dc::Detector;
+
+    constexpr size_t nShape = NuShape43 - NuShape01 + 1;
+
+    span_t nd_shape  = rawP.subspan(params::index(ND, NuShape01), nShape);
+    span_t fd1_shape = rawP.subspan(params::index(FDI, NuShape01), nShape);
+    span_t fd2_shape = rawP.subspan(params::index(FDII, NuShape01), nShape);
+
+    constexpr double scale = 1.0;
+
+    for (std::size_t i = 0; i < nShape; ++i) {
+      const auto [nd_CV, fd1_CV, fd2_CV] = m_ShapeCV[i];
+
+      const double nd_result  = pow_2((nd_shape[i] - nd_CV) / scale);
+      const double fd1_result = pow_2((fd1_shape[i] - fd1_CV) / scale);
+      const double fd2_result = pow_2((fd2_shape[i] - fd2_CV) / scale);
+
+      result += nd_result + fd1_result + fd2_result;
+    }
+
+    return result;
+  }
+
   double DCLikelihood::calculate_likelihood(const double* parameter) {
     m_Parameter.reset_parameter(parameter);
 
@@ -296,6 +353,8 @@ namespace ana::dc {
       //   std::cout << params::dc::get_detector_name(detector) << "_off_off" << '\t' << likelihood << '\n';
       // }
     }
+
+    likelihood += calculate_pulls(parameter);
 
     // Return the likelihood parameter if it is finite, otherwise return a large number. This is to prevent the minimizer from crashing.
     return std::isfinite(likelihood) ? likelihood : 1.0e25;
