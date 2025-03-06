@@ -35,6 +35,7 @@ namespace ana::dc {
     for (const auto detector : {ND, FDI, FDII}) {
       auto cov              = db.covariance_matrix(detector, io::dc::SpectrumType::FastN);
       m_CovMatrix[detector] = std::move(cov);
+      m_FastNSpectrum[detector].fill(0.0);
     }
 
     fill_data();
@@ -65,7 +66,7 @@ namespace ana::dc {
 
       const Eigen::MatrixXd& covMatrix = *m_CovMatrix[detector];
 
-      std::array<double, 44>& result = m_AccSpectrum[detector];
+      std::array<double, 44>& result = m_FastNSpectrum[detector];
 
       calculate_spectrum(rate,
                          background_template,
