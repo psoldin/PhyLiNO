@@ -43,11 +43,11 @@ namespace ana::dc {
     // Get the target bin indices
     const std::vector<int> indices = get_indices(evis);
 
-    for (unsigned int i = 1; i < indices.size(); ++i) {
-      m_CalculationData.emplace_back(std::span<const double>(&LoverE[indices[i - 1]], indices[i] - indices[i - 1]),
-                                    std::span<const double>(&scaling[indices[i - 1]], indices[i] - indices[i - 1]),
-                                    i,
-                                    type);
+    for (unsigned int i = 1, N = indices.size(); i < N; ++i) {
+      m_CalculationData.emplace_back(std::span(&LoverE[indices[i - 1]], indices[i] - indices[i - 1]),
+                                     std::span(&scaling[indices[i - 1]], indices[i] - indices[i - 1]),
+                                     i,
+                                     type);
     }
   }
 
@@ -63,7 +63,7 @@ namespace ana::dc {
     perform_cpu_oscillation(parameter);
   }
 
-  bool Oscillator::check_and_recalculate(const ParameterWrapper &parameter) noexcept {
+  bool Oscillator::check_and_recalculate(const ParameterWrapper& parameter) noexcept {
     const bool recalculate = check_parameter(parameter);
 
     if (recalculate) {
