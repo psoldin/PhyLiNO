@@ -203,6 +203,7 @@ namespace ana::dc {
     , m_Reactor(m_Options) {
     m_Components = {&m_Accidental, &m_Lithium, &m_FastN, &m_DNC, &m_Reactor};
     initialize_measurement_data();
+    setup_pulls();
   }
 
   void DCLikelihood::setup_pulls() {
@@ -221,7 +222,7 @@ namespace ana::dc {
     }
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
-    for (int i = 0, end = NuShape43 - NuShape01 + 1; i < end; ++i) {
+    for (int i = 0, end = (NuShape43 - NuShape01) + 1; i < end; ++i) {
       m_ShapeCV.emplace_back(parameters[params::index(ND, i)].value(),
                              parameters[params::index(FDI, i)].value(),
                              parameters[params::index(FDII, i)].value());
@@ -241,7 +242,7 @@ namespace ana::dc {
     using enum params::dc::DetectorType;
     using enum params::dc::Detector;
 
-    constexpr size_t nShape = NuShape43 - NuShape01 + 1;
+    constexpr size_t nShape = (NuShape43 - NuShape01) + 1;
 
     span_t nd_shape  = rawP.subspan(params::index(ND, NuShape01), nShape);
     span_t fd1_shape = rawP.subspan(params::index(FDI, NuShape01), nShape);
