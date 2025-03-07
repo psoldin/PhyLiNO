@@ -34,9 +34,11 @@ namespace ana {
 
     [[nodiscard]] bool converged() const;
 
-    [[nodiscard]] const io::Options& options() const;
+    [[nodiscard]] const std::shared_ptr<io::Options>& options() const;
 
     auto get_minimizer() const { return m_Minimizer; }
+
+    bool use_double_chooz() const { return true; }  // TODO This should be initialized in the Constructor
 
    private:
     std::shared_ptr<io::Options> m_Options;
