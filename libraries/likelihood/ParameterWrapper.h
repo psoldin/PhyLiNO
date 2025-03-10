@@ -1,15 +1,12 @@
-  #pragma once
-
-#include "../io/Parameter.h"
-
-  // STL includes
-#include <array>
-#include <span>
-#include <vector>
+#pragma once
 
 #include "Options.h"
 
-  namespace ana::dc { // TODO move class to ana namespace
+// STL includes
+#include <span>
+#include <vector>
+
+namespace ana::dc {  // TODO move class to ana namespace
 
   /**
    * @brief Wrapper class for a parameter array.
@@ -18,9 +15,10 @@
    * It wraps a raw double pointer and provides various member functions for accessing the parameters.
    */
   class ParameterWrapper {
-    using transform_fn_t = void(*)(const io::Options& options, std::span<double> parameter);
+    using transform_fn_t = void (*)(const io::Options& options, std::span<double> parameter);
+
    public:
-/**
+    /**
      * @brief Constructs a ParameterWrapper object.
      *
      * @param nParameter The number of parameters.
@@ -142,13 +140,13 @@
     [[nodiscard]] bool check_parameter_changed(int from, int to) const;
 
    private:
-    std::vector<double> m_CurrentParameters;  // Unified parameters array
-    std::vector<double> m_PreviousParameters;  // Previous parameter set for comparison
-    std::vector<char> m_ParameterChanged;  // Array to store the changed parameters
-    std::size_t m_NParameter;  // Number of parameters
-    std::shared_ptr<io::Options> m_Options;  // Options object
-    const double* m_RawParameter;  // Pointer to the raw parameter array
-    transform_fn_t m_TransformFn;  // Function to transform the parameters
+    std::vector<double>          m_CurrentParameters;   // Unified parameters array
+    std::vector<double>          m_PreviousParameters;  // Previous parameter set for comparison
+    std::vector<char>            m_ParameterChanged;    // Array to store the changed parameters
+    std::size_t                  m_NParameter;          // Number of parameters
+    std::shared_ptr<io::Options> m_Options;             // Options object
+    const double*                m_RawParameter;        // Pointer to the raw parameter array
+    transform_fn_t               m_TransformFn;         // Function to transform the parameters
 
     /**
      * @brief Unifies the parameters.

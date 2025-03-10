@@ -24,11 +24,9 @@ namespace ana {
 
     ~Fit() = default;
 
-    [[nodiscard]] std::shared_ptr<dc::Likelihood> doublechooz_likelihood() const;
+    [[nodiscard]] std::shared_ptr<dc::DCLikelihood> doublechooz_likelihood() const;
 
     bool minimize();
-
-    const dc::DCLikelihood& likelihood() const;
 
     [[nodiscard]] double time_duration() const;
 
@@ -52,7 +50,7 @@ namespace ana {
 
     std::shared_ptr<ROOT::Math::Functor> m_Functor;
 
-    std::shared_ptr<dc::Likelihood> m_DCLikelihood;
+    std::shared_ptr<dc::DCLikelihood> m_DCLikelihood;
 
     void setup_minimizer();
   };

@@ -1,7 +1,5 @@
 #include "DCLikelihood.h"
 
-#include <ranges>
-
 namespace ana::dc {
 
   /**
@@ -193,9 +191,8 @@ namespace ana::dc {
     }
   }
 
-  DCLikelihood::DCLikelihood(std::shared_ptr<io::Options> options)
-    : Likelihood(std::move(options))
-    , m_Parameter(params::number_of_parameters(), m_Options)
+  DCLikelihood::DCLikelihood(std::shared_ptr<io::Options> options, int nParameter)
+    : Likelihood(std::move(options), nParameter)
     , m_Accidental(m_Options)
     , m_Lithium(m_Options)
     , m_FastN(m_Options)
@@ -263,13 +260,16 @@ namespace ana::dc {
     return result;
   }
 
-  double DCLikelihood::calculate_likelihood(const double* parameter) {
+  void DCLikelihood::check_and_recalculate(const double* parameter) noexcept {
     m_Parameter.reset_parameter(parameter);
 
     for (auto* component : m_Components) {
       component->check_and_recalculate(m_Parameter);
     }
+  }
 
+  double DCLikelihood::calculate_likelihood(const double* parameter) {
+    check_and_recalculate(parameter);
     if (m_Options->inputOptions().double_chooz().reactor_split()) {
       return calculate_reactor_split_likelihood(m_Parameter);
     }

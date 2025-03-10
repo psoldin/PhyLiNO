@@ -13,19 +13,23 @@ namespace ana {
 
     // Initialize Likelihood
     // TODO Make this dynamic
-    m_DCLikelihood = std::make_shared<dc::DCLikelihood>(m_Options);
+    m_DCLikelihood = std::make_shared<dc::DCLikelihood>(m_Options, params::number_of_parameters());
 
-    // Create the minimizer
+    // Initialize the minimizer object
     m_Minimizer = std::shared_ptr<ROOT::Math::Minimizer>(ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad"));
 
+    // Initialize the functor object
     m_Functor = std::make_shared<ROOT::Math::Functor>(m_DCLikelihood.get(),
                                                       &dc::Likelihood::calculate_likelihood,
                                                       params::number_of_parameters());
 
+    // Set the function to be minimized
     m_Minimizer->SetFunction(*m_Functor);
 
+    // Set the fit tolerance
     m_Minimizer->SetTolerance(m_Options->inputOptions().tolerance());
 
+    // Setup the minimizer parameters.
     setup_minimizer();
   }
 
@@ -70,7 +74,7 @@ namespace ana {
     }
   }
 
-  std::shared_ptr<dc::Likelihood> Fit::doublechooz_likelihood() const {
+  std::shared_ptr<dc::DCLikelihood> Fit::doublechooz_likelihood() const {
     return m_DCLikelihood;
   }
 
@@ -98,13 +102,6 @@ namespace ana {
     return m_Converged;
   }
 
-  const dc::DCLikelihood& Fit::likelihood() const {
-    if (!m_DCLikelihood)
-      throw std::logic_error("DCLikelihood not initialized");
-
-    return *std::static_pointer_cast<dc::DCLikelihood>(m_DCLikelihood);
-  }
-
   double Fit::time_duration() const {
     if (!m_FitPerformed)
       std::cout << "Fit not performed yet\n";
@@ -119,11 +116,8 @@ namespace ana {
     return m_Converged;
   }
 
-  const io::Options& Fit::options() const {
-    if (!m_FitPerformed)
-      std::cout << "Fit not performed yet\n";
-
-    return *m_Options;
+  const std::shared_ptr<io::Options>& Fit::options() const {
+    return m_Options;
   }
 
 }  // namespace ana

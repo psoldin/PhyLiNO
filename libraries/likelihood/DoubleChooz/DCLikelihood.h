@@ -30,7 +30,7 @@ namespace ana::dc {
      *
      * @param options A shared pointer to an io::Options object that contains the configuration options.
      */
-    explicit DCLikelihood(std::shared_ptr<io::Options> options);
+    explicit DCLikelihood(std::shared_ptr<io::Options> options, int nParameter);
 
     /**
      * @brief Default destructor for DCLikelihood class.
@@ -78,19 +78,19 @@ namespace ana::dc {
      */
     [[nodiscard]] double calculate_off_off_likelihood(const Eigen::Array<double, 44, 1>& bkg, params::dc::DetectorType type) const;
 
-    [[nodiscard]] const AccidentalBackground& accidental_background() const noexcept { return m_Accidental; }
+    [[nodiscard]] AccidentalBackground& accidental_background() noexcept { return m_Accidental; }
 
-    [[nodiscard]] const LithiumBackground& lithium_background() const noexcept { return m_Lithium; }
+    [[nodiscard]] LithiumBackground& lithium_background() noexcept { return m_Lithium; }
 
-    [[nodiscard]] const FastNBackground& fastn_background() const noexcept { return m_FastN; }
+    [[nodiscard]] FastNBackground& fastn_background() noexcept { return m_FastN; }
 
-    [[nodiscard]] const DNCBackground& dnc_background() const noexcept { return m_DNC; }
+    [[nodiscard]] DNCBackground& dnc_background() noexcept { return m_DNC; }
 
     [[nodiscard]] ReactorSpectrum& reactor_spectrum() noexcept { return m_Reactor; }
 
-    ParameterWrapper& parameter() noexcept { return m_Parameter; }
-
     [[nodiscard]] double calculate_mcNorm(const ParameterWrapper& parameter, params::dc::DetectorType type) const noexcept;
+
+    void check_and_recalculate(const double* parameter) noexcept;
 
    private:
     /**
@@ -138,8 +138,6 @@ namespace ana::dc {
 
     double calculate_pulls(const ParameterWrapper& parameter) const noexcept;
 
-    ParameterWrapper m_Parameter;  ///< The parameter wrapper object used for likelihood calculation.
-
     AccidentalBackground m_Accidental;  ///< The accidental background object.
     LithiumBackground    m_Lithium;     ///< The lithium background object.
     FastNBackground      m_FastN;       ///< The fast neutron background object.
@@ -148,11 +146,11 @@ namespace ana::dc {
 
     std::vector<SpectrumBase*> m_Components;
 
-    std::vector<std::tuple<int, double, double>> m_Pulls;
+    std::vector<std::tuple<int, double, double>>    m_Pulls;
     std::vector<std::tuple<double, double, double>> m_ShapeCV;
 
     std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_MeasurementData;  ///< The measurement data for each detector type.
-    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_OffOffData;      ///< The off-off data for each detector type.
+    std::unordered_map<params::dc::DetectorType, std::array<double, 44>> m_OffOffData;       ///< The off-off data for each detector type.
   };
 
 }  // namespace ana::dc
