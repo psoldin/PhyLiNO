@@ -298,7 +298,6 @@ namespace ana::dc {
 
     // Calculate Poisson Likelihood
     return -2.0 * off_off_llh.tail(nBins - idx).sum();
-    // return -2.0 * (off_off_data * off_off_bkg.log() - off_off_bkg).tail(nBins - idx).sum();
   }
 
   double DCLikelihood::calculate_mcNorm(const ParameterWrapper& parameter, params::dc::DetectorType type) const noexcept {
