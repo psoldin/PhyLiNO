@@ -26,7 +26,7 @@ namespace ana::dc {
   }
 
   template <typename T1, typename T2>
-  inline void add_vector1_to_vector2(const T1& v1, const T2& v2) noexcept {
+  inline void add_vector1_to_vector2(const T1& v1, T2& v2) noexcept {
     std::transform(v1.cbegin(),
                    v1.cend(),
                    v2.cbegin(),
@@ -101,6 +101,7 @@ namespace ana::dc {
       m_BackgroundTemplate[detector] = background_spectrum;
     }
   }
+
   void AccidentalBackground::recalculate_spectra(const ParameterWrapper& parameter) {
     // Recalculate the accidental background spectrum
 
