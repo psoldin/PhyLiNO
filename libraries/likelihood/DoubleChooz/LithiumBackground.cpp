@@ -26,7 +26,10 @@ namespace ana::dc {
 
   LithiumBackground::LithiumBackground(std::shared_ptr<io::Options> options)
     : SpectrumBase(std::move(options)) {
-    fill_data();
+    using enum params::dc::DetectorType;
+    for (const auto detector : {ND, FDI, FDII}) {
+      fill_data(detector);
+    }
   }
 
   bool LithiumBackground::check_and_recalculate(const ParameterWrapper& parameter) {
@@ -65,8 +68,8 @@ namespace ana::dc {
     }
   }
 
-  void LithiumBackground::fill_data() {
-    const auto acc_data = m_Options->double_chooz().dataBase().background_data(io::dc::SpectrumType::Lithium);
+  void LithiumBackground::fill_data(params::dc::DetectorType type) {
+    const auto acc_data = m_Options->double_chooz().dataBase().background_data(type, params::dc::SpectrumType::lithium);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
 
@@ -102,7 +105,7 @@ namespace ana::dc {
 
       m_BackgroundTemplate[detector] = background_spectrum;
       m_LiSpectrum[detector]         = null_template;
-      m_CovMatrix[detector]          = m_Options->double_chooz().dataBase().covariance_matrix(detector, io::dc::SpectrumType::Lithium);
+      m_CovMatrix[detector]          = m_Options->double_chooz().dataBase().covariance_matrix(detector, params::dc::SpectrumType::lithium);
     }
   }
 }  // namespace ana::dc

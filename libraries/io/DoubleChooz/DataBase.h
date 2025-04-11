@@ -16,14 +16,6 @@
 
 namespace io::dc {
 
-  enum class SpectrumType {
-    Reactor,
-    Accidental,
-    FastN,
-    Lithium,
-    DNC
-  };
-
   /**
    * \brief Class representing the database for Double Chooz data.
    *
@@ -73,7 +65,7 @@ namespace io::dc {
       return *reactor_data;
     }
 
-    [[nodiscard]] std::shared_ptr<Eigen::MatrixXd> covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const;
+    [[nodiscard]] std::shared_ptr<Eigen::MatrixXd> covariance_matrix(params::dc::DetectorType detectorType, params::dc::SpectrumType spectrumType) const;
 
     [[nodiscard]] const TMatrixD& energy_correlation_matrix() const { return m_EnergyCorrelationMatrix; }
 
@@ -85,8 +77,12 @@ namespace io::dc {
 
     [[nodiscard]] double on_lifetime(params::dc::DetectorType type) const noexcept { return m_OnLifeTime.at(type); }
 
-    [[nodiscard]] std::span<const double> background_data(io::dc::SpectrumType type) const {
-      return m_BackgroundData.at(type);
+    [[nodiscard]] std::span<const double> background_data(params::dc::DetectorType detectorType, params::dc::SpectrumType spectrumType) const {
+      const auto key = std::make_tuple(detectorType, spectrumType);
+      if (!m_BackgroundData.contains(key)) {
+        throw std::invalid_argument("Key not found in background data");
+      }
+      return m_BackgroundData.at(key);
     }
 
     [[nodiscard]] std::pair<double, double> energy_central_values(int idx) const {
@@ -123,7 +119,7 @@ namespace io::dc {
        * @param k1 The detector type.
        * @param k2 The background type.
        */
-      KeyPair(params::dc::DetectorType k1, params::dc::BackgroundType k2)
+      KeyPair(params::dc::DetectorType k1, params::dc::SpectrumType k2)
         : key1(params::get_index(k1))
         , key2(static_cast<int>(k2)) {}
 
@@ -144,8 +140,6 @@ namespace io::dc {
 
     std::unordered_map<params::dc::DetectorType, std::shared_ptr<ReactorData>> m_ReactorData;
 
-    std::unordered_map<SpectrumType, std::vector<double>> m_BackgroundData;
-
     std::unordered_map<params::dc::DetectorType, double> m_OnLifeTime;
     std::unordered_map<params::dc::DetectorType, double> m_OffLifeTime;
 
@@ -165,12 +159,13 @@ namespace io::dc {
       }
     };
 
-    using tuple_t      = std::tuple<params::dc::DetectorType, SpectrumType>;
+    using tuple_t      = std::tuple<params::dc::DetectorType, params::dc::SpectrumType>;
     using cov_matrix_t = std::shared_ptr<Eigen::MatrixXd>;
-    std::unordered_map<tuple_t, cov_matrix_t, KeyHash> m_CovarianceMatrices;
-    TMatrixD                                           m_EnergyCorrelationMatrix;         // TODO Replace with Eigen Matrix
-    TMatrixD                                           m_MCNormCorrelationMatrix;         // TODO Replace with Eigen Matrix
-    TMatrixD                                           m_InterDetectorCorrelationMatrix;  // TODO Replace with Eigen Matrix
+    std::unordered_map<tuple_t, cov_matrix_t, KeyHash>        m_CovarianceMatrices;
+    std::unordered_map<tuple_t, std::vector<double>, KeyHash> m_BackgroundData;
+    TMatrixD                                                  m_EnergyCorrelationMatrix;         // TODO Replace with Eigen Matrix
+    TMatrixD                                                  m_MCNormCorrelationMatrix;         // TODO Replace with Eigen Matrix
+    TMatrixD                                                  m_InterDetectorCorrelationMatrix;  // TODO Replace with Eigen Matrix
   };
 
 }  // namespace io::dc

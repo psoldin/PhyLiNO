@@ -224,7 +224,7 @@ namespace io::dc {
    * @param treeName The name of the TTree.
    * @return A vector of visible energy entries.
    */
-  std::vector<double> getBackgroundEntries(const std::string& path, const std::string& treeName) {
+  std::vector<double> get_background_entries(const std::string& path, const std::string& treeName) {
     // Open the ROOT file at the given path
     auto* file = TFile::Open(path.c_str(), "READ");
     // Check if the file was opened successfully
@@ -364,6 +364,52 @@ namespace io::dc {
     return reactor_tree_entries;
   }
 
+  std::vector<Eigen::MatrixXd> read_reactor_cov(const std::string& filePath) {
+    auto file = std::unique_ptr<TFile>(TFile::Open(filePath.c_str(), "READ"));
+
+    auto* ROOT_matrix = dynamic_cast<TMatrixD*>(file->Get("frac_approx"));
+
+    // In DC-V, the covariance matrix is of shape 132x132, which is a grid of 3x3 * 44x44 matrices.
+    // The needed matrices are on the main diagonale in the order FD-1, FD-2, ND and are extracted here
+    // The info for that is nowhere to be found, got it personally from Thiago
+
+    using enum params::dc::DetectorType;
+
+    std::vector<Eigen::MatrixXd> returnVector;
+
+    for (const auto type : {FDI, FDII, ND}) {
+      unsigned int lower = -1;
+
+      switch (type) {
+        case FDI:
+          lower = 0;
+          break;
+        case FDII:
+          lower = 44;
+          break;
+        case ND:
+          lower = 88;
+          break;
+        default:
+          throw std::invalid_argument("Detector now implemented");
+      }
+
+      Eigen::MatrixXd covMatrix = Eigen::Array<double, 43, 43>::Zero();
+
+      for (unsigned int i = lower, a = 0; i < lower + 38; ++i, ++a) {
+        for (unsigned int j = lower, b = 0; j < lower + 38; ++j, ++b) {
+          covMatrix(a, b) = (*ROOT_matrix)(i, j);
+        }
+      }
+
+      returnVector.emplace_back(covMatrix);
+    }
+
+    file->Close();
+
+    return returnVector;
+  }
+
   // Eigen::MatrixXd generate_reactor_covariance_matrix(const std::vector<double>& binnedSpectrum) {
   Eigen::MatrixXd generate_reactor_covariance_matrix(std::span<const double> samples) {
     auto h = std::make_unique<TH1D>("h", "", io::dc::Constants::number_of_energy_bins, io::dc::Constants::EnergyBinXaxis.data());
@@ -471,49 +517,75 @@ namespace io::dc {
             throw std::invalid_argument("Detector type unknown");
         }
 
-        std::cout << "Generating " << std::setw(10) << num_samples << " samples for reactor data set for " << name << '\n';
-        auto reactor_tree_entries = generate_reactor_entries(gen, num_samples, ratio, p1, p2);
+        // std::cout << "Generating " << std::setw(10) << num_samples << " samples for reactor data set for " << name << '\n';
+        auto reactor_tree_entries = read_reactor_root_file(m_InputOptions.double_chooz().input_paths(detector));
 
         m_ReactorData[detector] = std::make_shared<ReactorData>(reactor_tree_entries, detector);
 
-        auto m = generate_reactor_covariance_matrix(m_ReactorData[detector]->evis());
+      }
+      // FDI, FDII, ND
+      auto m = read_reactor_cov(m_InputOptions.double_chooz().input_paths(ND).reactor_covariance_matrix_path()); //generate_reactor_covariance_matrix(m_ReactorData[detector]->evis());
 
+      std::vector detectors = {FDI, FDII, ND};
+
+      for (int i = 0; i < 3; ++i) {
         // Convert matrix to a shared pointer and store it in the map
-        m_CovarianceMatrices[{detector, SpectrumType::Reactor}] = std::make_shared<Eigen::MatrixXd>(m);
+        std::cout << "Covariance matrix for " << m[i].rows() << '\t' << m[i].cols() << ":\n";
+        m_CovarianceMatrices[{detectors[i], params::dc::SpectrumType::reactor}] = std::make_shared<Eigen::MatrixXd>(m[i]);
       }
     } catch (const std::exception& e) {
       std::cout << e.what() << '\n';
       throw;
     }
 
-    using enum params::dc::BackgroundType;
-    using enum SpectrumType;
+    using enum params::dc::SpectrumType;
 
     std::cout << "Generating " << std::setw(10) << 40'000 << " samples for Accidental Background\n";
     {
-      m_BackgroundData[Accidental]                            = generate_accidental_background(gen, 40'000);
-      auto acc_bkg                                            = get_bkg_cov_matrix(m_BackgroundData[Accidental]);
-      m_CovarianceMatrices[std::make_tuple(ND, Accidental)]   = acc_bkg;
-      m_CovarianceMatrices[std::make_tuple(FDI, Accidental)]  = acc_bkg;
-      m_CovarianceMatrices[std::make_tuple(FDII, Accidental)] = std::move(acc_bkg);
+      for (const auto detector : {ND, FDI, FDII}) {
+        const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
+        auto entries = get_background_entries(paths.background_path(accidental), paths.background_tree_name(accidental));
+        auto key_pair = std::make_tuple(detector, accidental);
+        m_BackgroundData[key_pair] = std::move(entries);
+        m_CovarianceMatrices[key_pair] = get_bkg_cov_matrix(m_BackgroundData[key_pair]); // TODO Read from Double Chooz files
+      }
+      // for (const auto detector : {ND, FDI, FDII}) {
+      //   m_BackgroundData[std::make_tuple(detector, accidental)] = generate_accidental_background(gen, 40'000);
+      //   m_CovarianceMatrices[key_pair] = get_bkg_cov_matrix(m_BackgroundData[key_pair]); // TODO Read from Double Chooz files
+      // }
     }
 
     std::cout << "Generating " << std::setw(10) << 650'000 << " samples for Lithium Background\n";
     {
-      m_BackgroundData[Lithium]                            = generate_lithium_background(gen, 650'000);
-      auto li_bkg                                          = get_bkg_cov_matrix(m_BackgroundData[Lithium]);
-      m_CovarianceMatrices[std::make_tuple(ND, Lithium)]   = li_bkg;
-      m_CovarianceMatrices[std::make_tuple(FDI, Lithium)]  = li_bkg;
-      m_CovarianceMatrices[std::make_tuple(FDII, Lithium)] = std::move(li_bkg);
+      auto lithium_background_samples = generate_lithium_background(gen, 650'000);
+      for (const auto detector : {ND, FDI, FDII}) {
+        const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
+        auto entries = get_background_entries(paths.background_path(lithium), paths.background_tree_name(lithium));
+        auto key_pair = std::make_tuple(detector, lithium);
+        m_BackgroundData[key_pair] = std::move(entries);
+        m_CovarianceMatrices[key_pair] = get_bkg_cov_matrix(m_BackgroundData[key_pair]); // TODO Read from Double Chooz files
+      }
+      // for (const auto detector : {ND, FDI, FDII}) {
+      //   auto key_pair = std::make_tuple(detector, lithium);
+      //   m_BackgroundData[key_pair] = generate_lithium_background(gen, 650'000);
+      //   m_CovarianceMatrices[key_pair] = get_bkg_cov_matrix(m_BackgroundData[key_pair]); // TODO Read from Double Chooz files
+      // }
     }
 
     std::cout << "Generating " << std::setw(10) << 2'000'000 << " samples for fastN Background\n";
     {
-      m_BackgroundData[FastN]                            = generate_fastN_background(gen, 2'000'000);
-      auto fastN_bkg                                     = get_bkg_cov_matrix(m_BackgroundData[FastN], 44);
-      m_CovarianceMatrices[std::make_tuple(ND, FastN)]   = fastN_bkg;
-      m_CovarianceMatrices[std::make_tuple(FDI, FastN)]  = fastN_bkg;
-      m_CovarianceMatrices[std::make_tuple(FDII, FastN)] = std::move(fastN_bkg);
+      for (const auto detector : {ND, FDI, FDII}) {
+        const auto& paths = m_InputOptions.double_chooz().input_paths(detector);
+        auto entries = get_background_entries(paths.background_path(fastN), paths.background_tree_name(fastN));
+        auto key_pair = std::make_tuple(detector, fastN);
+        m_BackgroundData[key_pair] = std::move(entries);
+        m_CovarianceMatrices[key_pair] = get_bkg_cov_matrix(m_BackgroundData[key_pair]); // TODO Read from Double Chooz files
+      }
+      // for (const auto detector : {ND, FDI, FDII}) {
+      //   auto key_pair = std::make_tuple(detector, fastN);
+      //   m_BackgroundData[key_pair] = generate_fastN_background(gen, 2'000'000);
+      //   m_CovarianceMatrices[key_pair] = get_bkg_cov_matrix(m_BackgroundData[key_pair]); // TODO Read from Double Chooz files
+      // }
     }
 
     auto string_to_DetectorType = [](std::string_view name) -> params::dc::DetectorType {
@@ -571,24 +643,24 @@ namespace io::dc {
     }
   }
 
-  std::string get_spectrum_type_string(SpectrumType type) {
-    using enum SpectrumType;
+  std::string get_spectrum_type_string(params::dc::SpectrumType type) {
+    using enum params::dc::SpectrumType;
     switch (type) {
-      case Reactor:
+      case reactor:
         return "Reactor";
-      case Accidental:
+      case accidental:
         return "Accidental";
-      case FastN:
+      case fastN:
         return "FastN";
-      case Lithium:
+      case lithium:
         return "Lithium";
-      case DNC:
+      case dnc:
         return "DNC";
     }
     throw std::invalid_argument("Spectrum Type not known");
   }
 
-  std::shared_ptr<Eigen::MatrixXd> DataBase::covariance_matrix(params::dc::DetectorType detectorType, SpectrumType spectrumType) const {
+  std::shared_ptr<Eigen::MatrixXd> DataBase::covariance_matrix(params::dc::DetectorType detectorType, params::dc::SpectrumType spectrumType) const {
     if (!m_CovarianceMatrices.contains({detectorType, spectrumType})) {
       std::stringstream ss;
       ss << "Covariance matrix not found for detector \"" << get_detector_name(detectorType) << "\" and spectrum type \"" << get_spectrum_type_string(spectrumType) << '\"';

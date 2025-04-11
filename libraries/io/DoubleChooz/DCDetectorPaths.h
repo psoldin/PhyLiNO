@@ -102,7 +102,7 @@ namespace io::dc {
      * @param type The background type.
      * @return The covariance matrix path.
      */
-    [[nodiscard]] const std::string& covarianceMatrix_path(params::dc::BackgroundType type) const {
+    [[nodiscard]] const std::string& covarianceMatrix_path(params::dc::SpectrumType type) const {
       return m_CovarianceMatrixPath[static_cast<int>(type)];
     }
 
@@ -111,7 +111,7 @@ namespace io::dc {
      * @param type The background type.
      * @return The covariance matrix name.
      */
-    [[nodiscard]] const std::string& covarianceMatrix_name(params::dc::BackgroundType type) const {
+    [[nodiscard]] const std::string& covarianceMatrix_name(params::dc::SpectrumType type) const {
       return m_CovarianceMatrixName[static_cast<int>(type)];
     }
 
@@ -120,7 +120,7 @@ namespace io::dc {
      * @param type The background type.
      * @return The background path.
      */
-    [[nodiscard]] const std::string& background_path(params::dc::BackgroundType type) const noexcept {
+    [[nodiscard]] const std::string& background_path(params::dc::SpectrumType type) const noexcept {
       return m_BackgroundPath[static_cast<int>(type)];
     }
 
@@ -129,7 +129,7 @@ namespace io::dc {
      * @param type The background type.
      * @return The background tree name.
      */
-    [[nodiscard]] const std::string& background_tree_name(params::dc::BackgroundType type) const noexcept {
+    [[nodiscard]] const std::string& background_tree_name(params::dc::SpectrumType type) const noexcept {
       return m_BackgroundTree[static_cast<int>(type)];
     }
 
@@ -138,7 +138,7 @@ namespace io::dc {
      * @param type The background type.
      * @return The background branch name.
      */
-    [[nodiscard]] const std::string& background_branch_name(params::dc::BackgroundType type) const noexcept {
+    [[nodiscard]] const std::string& background_branch_name(params::dc::SpectrumType type) const noexcept {
       return m_BackgroundBranch[static_cast<int>(type)];
     }
 

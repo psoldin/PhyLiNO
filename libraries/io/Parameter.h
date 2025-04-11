@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 
+#include <iostream>
+
 namespace params {
 
   enum class ExperimentType : char {
@@ -315,11 +317,12 @@ namespace params {
      * This enum class represents the different types of backgrounds that can be encountered in the Double Chooz experiment.
      * The background types include accidental, lithium, fast neutron, and delayed neutron capture.
      */
-    enum class BackgroundType : int {
+    enum class SpectrumType : int {
+      reactor,    /**< Reactor spectrum */
       accidental, /**< Accidental background */
       lithium,    /**< Lithium background */
-      fastN,      /**< Fast neutron background */
-      dnc         /**< Delayed neutron capture background */
+      fastN,      /**< Fast Neutron background */
+      dnc         /**< Double Neutron Capture background */
     };
 
     /**
@@ -329,15 +332,15 @@ namespace params {
      * @return The name of the background type as a string.
      * @throws std::invalid_argument if the background type is invalid.
      */
-    inline std::string get_background_name(BackgroundType type) {
+    inline std::string get_background_name(SpectrumType type) {
       switch (type) {
-        case BackgroundType::accidental:
+        case SpectrumType::accidental:
           return "accidental";
-        case BackgroundType::lithium:
+        case SpectrumType::lithium:
           return "lithium";
-        case BackgroundType::fastN:
+        case SpectrumType::fastN:
           return "fnsm";
-        case BackgroundType::dnc:
+        case SpectrumType::dnc:
           return "dnc";
         default:
           throw std::invalid_argument("Invalid background type");
@@ -482,5 +485,400 @@ namespace params {
    */
   constexpr int index(dc::DetectorType d, dc::Detector p) noexcept {
     return index(d, static_cast<int>(p));
+  }
+
+  inline std::string get_general_parameter_name(unsigned int c) {
+    switch (c) {
+      case SinSqT13:
+        return "SinSqT13";
+      case DeltaMee:
+        return "DeltaMee";
+      case SinSqT12:
+        return "SinSqT12";
+      case DeltaM21:
+        return "DeltaMSq21";
+      case SinSqT14:
+        return "SinSqT14";
+      case DeltaM41:
+        return "DeltaM41";
+      case Bugey4:
+        return "Bugey4";
+      case EnergyA:
+        return "EnergyA";
+      case LiShape01:
+        return "LiShape01";
+      case LiShape02:
+        return "LiShape02";
+      case LiShape03:
+        return "LiShape03";
+      case LiShape04:
+        return "LiShape04";
+      case LiShape05:
+        return "LiShape05";
+      case LiShape06:
+        return "LiShape06";
+      case LiShape07:
+        return "LiShape07";
+      case LiShape08:
+        return "LiShape08";
+      case LiShape09:
+        return "LiShape09";
+      case LiShape10:
+        return "LiShape10";
+      case LiShape11:
+        return "LiShape11";
+      case LiShape12:
+        return "LiShape12";
+      case LiShape13:
+        return "LiShape13";
+      case LiShape14:
+        return "LiShape14";
+      case LiShape15:
+        return "LiShape15";
+      case LiShape16:
+        return "LiShape16";
+      case LiShape17:
+        return "LiShape17";
+      case LiShape18:
+        return "LiShape18";
+      case LiShape19:
+        return "LiShape19";
+      case LiShape20:
+        return "LiShape20";
+      case LiShape21:
+        return "LiShape21";
+      case LiShape22:
+        return "LiShape22";
+      case LiShape23:
+        return "LiShape23";
+      case LiShape24:
+        return "LiShape24";
+      case LiShape25:
+        return "LiShape25";
+      case LiShape26:
+        return "LiShape26";
+      case LiShape27:
+        return "LiShape27";
+      case LiShape28:
+        return "LiShape28";
+      case LiShape29:
+        return "LiShape29";
+      case LiShape30:
+        return "LiShape30";
+      case LiShape31:
+        return "LiShape31";
+      case LiShape32:
+        return "LiShape32";
+      case LiShape33:
+        return "LiShape33";
+      case LiShape34:
+        return "LiShape34";
+      case LiShape35:
+        return "LiShape35";
+      case LiShape36:
+        return "LiShape36";
+      case LiShape37:
+        return "LiShape37";
+      case LiShape38:
+        return "LiShape38";
+      default:
+        throw std::invalid_argument(std::to_string(static_cast<int>(c)) + " Not a parameter");
+    }
+  }
+
+  inline std::string get_detector_parameter_name(unsigned int c) {
+    using namespace dc;
+    switch (c) {
+      case BkgRAcc:
+        return "BkgRAcc";
+      case BkgRLi:
+        return "BkgRLi";
+      case BkgRFNSM:
+        return "BkgRFNSM";
+      case BkgRDNCGd:
+        return "BkgRDNCGd";
+      case BkgRDNCHy:
+        return "BkgRDNCHy";
+      case FNSMShape01:
+        return "FNSMShape01";
+      case FNSMShape02:
+        return "FNSMShape02";
+      case FNSMShape03:
+        return "FNSMShape03";
+      case FNSMShape04:
+        return "FNSMShape04";
+      case FNSMShape05:
+        return "FNSMShape05";
+      case FNSMShape06:
+        return "FNSMShape06";
+      case FNSMShape07:
+        return "FNSMShape07";
+      case FNSMShape08:
+        return "FNSMShape08";
+      case FNSMShape09:
+        return "FNSMShape09";
+      case FNSMShape10:
+        return "FNSMShape10";
+      case FNSMShape11:
+        return "FNSMShape11";
+      case FNSMShape12:
+        return "FNSMShape12";
+      case FNSMShape13:
+        return "FNSMShape13";
+      case FNSMShape14:
+        return "FNSMShape14";
+      case FNSMShape15:
+        return "FNSMShape15";
+      case FNSMShape16:
+        return "FNSMShape16";
+      case FNSMShape17:
+        return "FNSMShape17";
+      case FNSMShape18:
+        return "FNSMShape18";
+      case FNSMShape19:
+        return "FNSMShape19";
+      case FNSMShape20:
+        return "FNSMShape20";
+      case FNSMShape21:
+        return "FNSMShape21";
+      case FNSMShape22:
+        return "FNSMShape22";
+      case FNSMShape23:
+        return "FNSMShape23";
+      case FNSMShape24:
+        return "FNSMShape24";
+      case FNSMShape25:
+        return "FNSMShape25";
+      case FNSMShape26:
+        return "FNSMShape26";
+      case FNSMShape27:
+        return "FNSMShape27";
+      case FNSMShape28:
+        return "FNSMShape28";
+      case FNSMShape29:
+        return "FNSMShape29";
+      case FNSMShape30:
+        return "FNSMShape30";
+      case FNSMShape31:
+        return "FNSMShape31";
+      case FNSMShape32:
+        return "FNSMShape32";
+      case FNSMShape33:
+        return "FNSMShape33";
+      case FNSMShape34:
+        return "FNSMShape34";
+      case FNSMShape35:
+        return "FNSMShape35";
+      case FNSMShape36:
+        return "FNSMShape36";
+      case FNSMShape37:
+        return "FNSMShape37";
+      case FNSMShape38:
+        return "FNSMShape38";
+      case FNSMShape39:
+        return "FNSMShape39";
+      case FNSMShape40:
+        return "FNSMShape40";
+      case FNSMShape41:
+        return "FNSMShape41";
+      case FNSMShape42:
+        return "FNSMShape42";
+      case FNSMShape43:
+        return "FNSMShape43";
+      case FNSMShape44:
+        return "FNSMShape44";
+      case EnergyB:
+        return "EnergyB";
+      case EnergyC:
+        return "EnergyC";
+      case MCNorm:
+        return "MCNorm";
+      case NuShape01:
+        return "NuShape01";
+      case NuShape02:
+        return "NuShape02";
+      case NuShape03:
+        return "NuShape03";
+      case NuShape04:
+        return "NuShape04";
+      case NuShape05:
+        return "NuShape05";
+      case NuShape06:
+        return "NuShape06";
+      case NuShape07:
+        return "NuShape07";
+      case NuShape08:
+        return "NuShape08";
+      case NuShape09:
+        return "NuShape09";
+      case NuShape10:
+        return "NuShape10";
+      case NuShape11:
+        return "NuShape11";
+      case NuShape12:
+        return "NuShape12";
+      case NuShape13:
+        return "NuShape13";
+      case NuShape14:
+        return "NuShape14";
+      case NuShape15:
+        return "NuShape15";
+      case NuShape16:
+        return "NuShape16";
+      case NuShape17:
+        return "NuShape17";
+      case NuShape18:
+        return "NuShape18";
+      case NuShape19:
+        return "NuShape19";
+      case NuShape20:
+        return "NuShape20";
+      case NuShape21:
+        return "NuShape21";
+      case NuShape22:
+        return "NuShape22";
+      case NuShape23:
+        return "NuShape23";
+      case NuShape24:
+        return "NuShape24";
+      case NuShape25:
+        return "NuShape25";
+      case NuShape26:
+        return "NuShape26";
+      case NuShape27:
+        return "NuShape27";
+      case NuShape28:
+        return "NuShape28";
+      case NuShape29:
+        return "NuShape29";
+      case NuShape30:
+        return "NuShape30";
+      case NuShape31:
+        return "NuShape31";
+      case NuShape32:
+        return "NuShape32";
+      case NuShape33:
+        return "NuShape33";
+      case NuShape34:
+        return "NuShape34";
+      case NuShape35:
+        return "NuShape35";
+      case NuShape36:
+        return "NuShape36";
+      case NuShape37:
+        return "NuShape37";
+      case NuShape38:
+        return "NuShape38";
+      case NuShape39:
+        return "NuShape39";
+      case NuShape40:
+        return "NuShape40";
+      case NuShape41:
+        return "NuShape41";
+      case NuShape42:
+        return "NuShape42";
+      case NuShape43:
+        return "NuShape43";
+      case AccShape01:
+        return "AccShape01";
+      case AccShape02:
+        return "AccShape02";
+      case AccShape03:
+        return "AccShape03";
+      case AccShape04:
+        return "AccShape04";
+      case AccShape05:
+        return "AccShape05";
+      case AccShape06:
+        return "AccShape06";
+      case AccShape07:
+        return "AccShape07";
+      case AccShape08:
+        return "AccShape08";
+      case AccShape09:
+        return "AccShape09";
+      case AccShape10:
+        return "AccShape10";
+      case AccShape11:
+        return "AccShape11";
+      case AccShape12:
+        return "AccShape12";
+      case AccShape13:
+        return "AccShape13";
+      case AccShape14:
+        return "AccShape14";
+      case AccShape15:
+        return "AccShape15";
+      case AccShape16:
+        return "AccShape16";
+      case AccShape17:
+        return "AccShape17";
+      case AccShape18:
+        return "AccShape18";
+      case AccShape19:
+        return "AccShape19";
+      case AccShape20:
+        return "AccShape20";
+      case AccShape21:
+        return "AccShape21";
+      case AccShape22:
+        return "AccShape22";
+      case AccShape23:
+        return "AccShape23";
+      case AccShape24:
+        return "AccShape24";
+      case AccShape25:
+        return "AccShape25";
+      case AccShape26:
+        return "AccShape26";
+      case AccShape27:
+        return "AccShape27";
+      case AccShape28:
+        return "AccShape28";
+      case AccShape29:
+        return "AccShape29";
+      case AccShape30:
+        return "AccShape30";
+      case AccShape31:
+        return "AccShape31";
+      case AccShape32:
+        return "AccShape32";
+      case AccShape33:
+        return "AccShape33";
+      case AccShape34:
+        return "AccShape34";
+      case AccShape35:
+        return "AccShape35";
+      case AccShape36:
+        return "AccShape36";
+      case AccShape37:
+        return "AccShape37";
+      case AccShape38:
+        return "AccShape38";
+      default:
+        throw std::invalid_argument("Not a parameter");
+    }
+  }
+
+  inline std::vector<std::string> get_all_parameter_names() {
+    std::vector<std::string> parameter_names;
+
+    for (std::size_t i = 0; i < number_of_general_parameters(); ++i) {
+      parameter_names.push_back(get_general_parameter_name(i));
+    }
+
+    using namespace dc;
+
+    const std::array detector_types = {ND, FDI, FDII};
+
+    for (auto& detector : detector_types) {
+      const auto detector_name = get_detector_name(detector);
+
+      for (std::size_t i = 0; i < number_of_DoubleChooz_detector_parameters(); ++i) {
+        parameter_names.push_back(detector_name + "_" + get_detector_parameter_name(i));
+      }
+    }
+
+    return parameter_names;
   }
 }  // namespace params

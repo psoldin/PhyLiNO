@@ -34,7 +34,7 @@ namespace ana::dc {
     const auto& db = m_Options->double_chooz().dataBase();
 
     for (auto detector : {ND, FDI, FDII}) {
-      const auto& cov       = db.covariance_matrix(detector, io::dc::SpectrumType::Reactor);
+      const auto& cov       = db.covariance_matrix(detector, params::dc::SpectrumType::reactor);
       m_CovMatrix[detector] = cov;
     }
   }

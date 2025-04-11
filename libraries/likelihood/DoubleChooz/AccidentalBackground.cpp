@@ -14,6 +14,7 @@
 #include <TH1.h>
 
 #include "DoubleChooz/Constants.h"
+#include "Parameter.h"
 
 namespace ana::dc {
 
@@ -61,15 +62,14 @@ namespace ana::dc {
     const auto& db = m_Options->double_chooz().dataBase();
 
     for (auto detector : {ND, FDI, FDII}) {
-      auto cov              = db.covariance_matrix(detector, io::dc::SpectrumType::Accidental);
+      auto cov              = db.covariance_matrix(detector, params::dc::SpectrumType::accidental);
       m_CovMatrix[detector] = std::move(cov);
+      fill_data(detector);
     }
-
-    fill_data();
   }
 
-  void AccidentalBackground::fill_data() {
-    auto acc_data = m_Options->double_chooz().dataBase().background_data(io::dc::SpectrumType::Accidental);
+  void AccidentalBackground::fill_data(params::dc::DetectorType type) {
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(type, params::dc::SpectrumType::accidental);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
 

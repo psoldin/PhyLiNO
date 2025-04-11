@@ -31,6 +31,6 @@ namespace ana::dc {
 
     void recalculate_spectra(const ParameterWrapper& parameter) noexcept;
 
-    void fill_data();
+    void fill_data(params::dc::DetectorType);
   };
 }  // namespace ana::dc

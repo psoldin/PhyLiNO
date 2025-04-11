@@ -2,6 +2,7 @@
 
 #include "../SpectrumBase.h"
 #include "Calculate_Spectrum.h"
+#include "Parameter.h"
 
 namespace ana::dc {
 
@@ -65,7 +66,7 @@ namespace ana::dc {
 
     map_t<std::shared_ptr<Eigen::MatrixXd>> m_CovMatrix;
 
-    void fill_data();
+    void fill_data(params::dc::DetectorType);
 
     void recalculate_spectra(const ParameterWrapper& parameter);
   };

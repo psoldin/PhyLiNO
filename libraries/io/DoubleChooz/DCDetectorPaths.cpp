@@ -14,7 +14,7 @@ namespace io::dc {
   DCDetectorPaths::DCDetectorPaths(std::string section, const boost::property_tree::ptree& tree)
     : m_DetectorSection(std::move(section)) {
     // Define enum for less writing
-    using enum params::dc::BackgroundType;
+    using enum params::dc::SpectrumType;
     try {
       // Read the paths from the property tree for backgrounds
       for (const auto background : {accidental, lithium, fastN}) {
@@ -52,9 +52,9 @@ namespace io::dc {
   std::ostream& operator<<(std::ostream& os, const DCDetectorPaths& paths) {
     os << "Paths for '" << paths.detector_section() << "':\n";
 
-    using enum params::dc::BackgroundType;
+    using enum params::dc::SpectrumType;
 
-    auto bkgType_to_string = [](params::dc::BackgroundType type) -> std::string {
+    auto bkgType_to_string = [](params::dc::SpectrumType type) -> std::string {
       switch (type) {
         case accidental:
           return "Accidental";

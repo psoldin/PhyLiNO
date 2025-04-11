@@ -33,12 +33,11 @@ namespace ana::dc {
     const auto& db = m_Options->double_chooz().dataBase();
 
     for (const auto detector : {ND, FDI, FDII}) {
-      auto cov              = db.covariance_matrix(detector, io::dc::SpectrumType::FastN);
+      auto cov              = db.covariance_matrix(detector, params::dc::SpectrumType::fastN);
       m_CovMatrix[detector] = std::move(cov);
       m_FastNSpectrum[detector].fill(0.0);
+      fill_data(detector);
     }
-
-    fill_data();
   }
 
   bool FastNBackground::check_and_recalculate(const ParameterWrapper& parameter) {
@@ -76,8 +75,8 @@ namespace ana::dc {
     }
   }
 
-  void FastNBackground::fill_data() {
-    auto acc_data = m_Options->double_chooz().dataBase().background_data(io::dc::SpectrumType::FastN);
+  void FastNBackground::fill_data(params::dc::DetectorType type) {
+    auto acc_data = m_Options->double_chooz().dataBase().background_data(type, params::dc::SpectrumType::fastN);
 
     const auto& binning = io::dc::Constants::EnergyBinXaxis;
 
