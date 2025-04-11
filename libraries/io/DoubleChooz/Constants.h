@@ -6,6 +6,7 @@
 
 namespace io::dc {
 
+  // TODO Should this not be a constant variable in the namespace without the class?
   class Constants {
    public:
     Constants() = default;
